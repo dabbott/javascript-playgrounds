@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
+import Phone from './components/Phone'
+import Player from './components/Player'
+
 const style = {
   display: 'flex',
   flexDirection: 'column',
@@ -9,7 +12,7 @@ const style = {
 
 const root = (
   <div style={style}>
-    Hello
+    <Player />
   </div>
 )
 
