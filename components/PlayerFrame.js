@@ -44,21 +44,23 @@ export default class extends Component {
             this.runApplication(this.code)
             this.code = null
           }
-          break
-        default:
+        break
       }
     })
+  }
+
+  postMessage(message) {
+    this.refs.iframe.contentWindow.postMessage(message, '*')
   }
 
   runApplication(code) {
     switch (this.status) {
       case 'loading':
         this.code = code
-        break
+      break
       case 'ready':
-        this.refs.iframe.contentWindow.postMessage(code, '*')
-        break
-      default:
+        this.postMessage(this.code)
+      break
     }
   }
 
@@ -72,7 +74,7 @@ export default class extends Component {
         frameBorder={0}
         width={width}
         height={height}
-        src={`sandbox/${id}`}
+        src={`player.html?id=${id}`}
       />
     )
   }

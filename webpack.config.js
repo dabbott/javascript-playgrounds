@@ -8,7 +8,8 @@ module.exports = {
     contentBase: DIRECTORY
   },
   entry: {
-    dashboard: DIRECTORY
+    index: path.join(DIRECTORY, 'index.js'),
+    player: path.join(DIRECTORY, 'player.js'),
   },
   module: {
     loaders: [
@@ -21,11 +22,16 @@ module.exports = {
       {
         test: /\.json$/,
         loader: 'json-loader'
-      }
+      },
+      {
+        test: /\.css$/,
+        loader: "style-loader!css-loader"
+      },
     ]
   },
   output: {
-    filename: 'bundle.js'
+    path: path.join(DIRECTORY, 'dist'),
+    filename: '[name].js'
   },
   plugins: [
     new webpack.DefinePlugin({

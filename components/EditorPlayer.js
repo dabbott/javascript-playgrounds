@@ -3,6 +3,10 @@ import React, { Component } from 'react';
 import PlayerFrame from './PlayerFrame'
 import { options, requireAddons } from '../constants/CodeMirror'
 
+// Styles
+require("../node_modules/codemirror/lib/codemirror.css")
+require("../node_modules/codemirror/theme/base16-light.css")
+
 const Babel = require('babel-standalone')
 
 const playerWidth = 400
