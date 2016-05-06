@@ -107,7 +107,10 @@ export default class EditorTranspiler extends Component {
 
   compile(cm) {
     try {
-      const code = Babel.transform(cm.getValue(), { presets: ['es2015', 'react'] }).code
+      const code = Babel.transform(cm.getValue(), {
+        presets: ['es2015', 'react'],
+        retainLines: true,
+      }).code
 
       this.setState({
         compilerError: null

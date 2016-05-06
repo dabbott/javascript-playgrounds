@@ -3,6 +3,27 @@ import ReactDOM from 'react-dom'
 
 import Phone from './Phone'
 
+const prefix = `
+var require = function(name) {
+  if (name === 'react-native') {
+    return window._ReactNative;
+  } else {
+    return {};
+  }
+};
+
+var exports = {};
+
+(function(module, exports, require) {
+`
+
+const suffix = `
+})({ exports: exports }, exports, require);
+;
+`
+
+const prefixLineCount = prefix.split('\n').length - 1
+
 export default class Player extends Component {
 
   static defaultProps = {
@@ -20,18 +41,51 @@ export default class Player extends Component {
       this.runApplication(e.data)
     }
 
-    // window.onerror = (e) => {
-    //   console.warn('ERROR', e)
-    //   parent.postMessage(JSON.stringify({
-    //     id: this.props.id,
-    //     type: 'error',
-    //     payload: e,
-    //   }), '*')
-    // }
+    window.onerror = (message, source, line) => {
+      line -= prefixLineCount
+      this.throwError(`${message} (${line})`)
+      return true
+    }
 
     parent.postMessage(JSON.stringify({
       id: this.props.id,
       type: 'ready',
+    }), '*')
+  }
+
+  buildErrorMessage(e) {
+    let message = `${e.name}: ${e.message}`
+    let line = null
+
+    // Safari
+    if (e.line != null) {
+      line = e.line
+
+    // FF
+  } else if (e.lineNumber != null) {
+      line = e.lineNumber
+
+    // Chrome
+    } else if (e.stack) {
+      const matched = e.stack.match(/<anonymous>:(\d+)/)
+      if (matched) {
+        line = parseInt(matched[1])
+      }
+    }
+
+    if (typeof line === 'number') {
+      line -= prefixLineCount
+      message = `${message} (${line})`
+    }
+
+    return message
+  }
+
+  throwError(message) {
+    parent.postMessage(JSON.stringify({
+      id: this.props.id,
+      type: 'error',
+      payload: message,
     }), '*')
   }
 
@@ -51,7 +105,8 @@ export default class Player extends Component {
         rootTag: screenElement,
       })
     } catch (e) {
-      // console.log('Failed to run MyApp', e)
+      const message = this.buildErrorMessage(e)
+      this.throwError(message)
       this.props.onError(e)
     }
   }
@@ -65,22 +120,7 @@ export default class Player extends Component {
   evaluate(code) {
     window._ReactNative = require('react-native-web')
 
-    const wrapped = `
-    var require = function(name) {
-      if (name === 'react-native') {
-        return window._ReactNative;
-      } else {
-        return {};
-      }
-    };
-
-    var exports = {};
-
-    (function(module, exports, require) {
-      ${code}
-    })({ exports: exports }, exports, require);
-    ;
-    `
+    const wrapped = prefix + code + suffix
 
     eval(wrapped)
   }

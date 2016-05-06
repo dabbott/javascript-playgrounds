@@ -5,6 +5,8 @@ export default class extends Component {
   static defaultProps = {
     height: 600,
     width: 400,
+    onError: () => {},
+    onRun: () => {},
   }
 
   constructor(props) {
@@ -31,7 +33,7 @@ export default class extends Component {
         return
       }
 
-      const {id, type} = data
+      const {id, type, payload} = data
 
       if (id !== this.state.id) {
         return
@@ -45,11 +47,15 @@ export default class extends Component {
             this.code = null
           }
         break
+        case 'error':
+          this.props.onError(payload)
+        break
       }
     })
   }
 
   runApplication(code) {
+    this.props.onRun()
     switch (this.status) {
       case 'loading':
         this.code = code
