@@ -1,6 +1,8 @@
 # react-native-web-player
 Run react native apps in your browser!
 
+See it in action: http://dabbott.github.io/react-native-web-player/
+
 ### usage
 
 ```
