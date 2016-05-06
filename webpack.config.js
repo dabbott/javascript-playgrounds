@@ -30,8 +30,7 @@ module.exports = {
     ]
   },
   output: {
-    path: path.join(DIRECTORY, 'dist'),
-    filename: '[name].js'
+    filename: '[name]-bundle.js'
   },
   plugins: [
     new webpack.DefinePlugin({

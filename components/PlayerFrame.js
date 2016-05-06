@@ -49,17 +49,13 @@ export default class extends Component {
     })
   }
 
-  postMessage(message) {
-    this.refs.iframe.contentWindow.postMessage(message, '*')
-  }
-
   runApplication(code) {
     switch (this.status) {
       case 'loading':
         this.code = code
       break
       case 'ready':
-        this.postMessage(this.code)
+        this.refs.iframe.contentWindow.postMessage(code, '*')
       break
     }
   }
