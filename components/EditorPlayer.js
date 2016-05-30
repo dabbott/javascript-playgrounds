@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 // import ReactDOM from 'react-dom/server';
+import Tabs from './Tabs'
 import PlayerFrame from './PlayerFrame'
 import { options, requireAddons } from '../constants/CodeMirror'
 
@@ -13,7 +14,7 @@ const playerWidth = 400
 const editorHeight = 600
 
 const widgetContainerStyle = {
-  margin: '20px 0px 30px 0px',
+  flex: '1 1 auto',
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'stretch',
@@ -147,7 +148,10 @@ export default class EditorTranspiler extends Component {
     return (
       <div style={widgetContainerStyle}>
         <div style={widgetStyle}>
-          <div style={cmHeaderStyle}>{inputHeader}</div>
+          <Tabs
+            tabs={['Live JSX Editor', 'Compiled JS']}
+            active={'Live JSX Editor'}
+          />
           <div style={{height: editorHeight}} ref={'editor'} />
         </div>
         <div style={playerContainerStyle}>

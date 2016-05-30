@@ -1,3 +1,6 @@
+require('./reset.css')
+require('./index.css')
+
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
@@ -57,6 +60,7 @@ const styles = StyleSheet.create({
 AppRegistry.registerComponent('MyApp', () => App);`
 
 const style = {
+  flex: '1 1 auto',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
