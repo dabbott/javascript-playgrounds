@@ -6,66 +6,68 @@ import { options, requireAddons } from '../constants/CodeMirror'
 
 // Styles
 require("../node_modules/codemirror/lib/codemirror.css")
-require("../node_modules/codemirror/theme/base16-light.css")
+require("../styles/codemirror-theme.css")
 
 const Babel = require('babel-standalone')
 
 const playerWidth = 400
 const editorHeight = 600
 
-const widgetContainerStyle = {
-  flex: '1 1 auto',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'stretch',
-  minWidth: 0,
-  minHeight: 0,
-}
-
-const widgetStyle = {
-  // width: 'calc(50%)',
-  // display: 'inline-block',
-  flex: `0 0 calc(100% - ${playerWidth}px)`,
-  // position: 'relative',
-  minWidth: 0,
-  minHeight: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'stretch',
-}
-
-const playerContainerStyle = {
-  flex: `0 0 ${playerWidth}px`,
-  minWidth: 0,
-  minHeight: 0,
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  position: 'relative',
-}
-
-const cmHeaderStyle = {
-  backgroundColor: 'rgb(245,245,245)',
-  color: 'rgba(0,0,0,0.8)',
-  height: 40,
-  paddingTop: 10,
-  paddingLeft: 20,
-  paddingBottom: 10,
-}
-
-const errorContainerStyle = {
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  right: 0,
-  backgroundColor: 'white',
-  overflow: 'auto',
-  borderTop: '1px solid whitesmoke',
-  color: '#ac4142',
-  padding: '15px 20px',
-  whiteSpace: 'pre',
-  fontFamily: 'monospace',
-  zIndex: 1,
+const styles = {
+  container: {
+    flex: '1 1 auto',
+    display: 'flex',
+    alignItems: 'stretch',
+    minWidth: 0,
+    minHeight: 0,
+  },
+  left: {
+    flex: `1 1 auto`,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    minWidth: 0,
+    minHeight: 0,
+  },
+  right: {
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    minWidth: 0,
+    minHeight: 0,
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  // Work around a codemirror + flexbox + chrome issue by creating an absolute
+  // positioned parent and flex grandparent of the codemirror element.
+  // https://github.com/jlongster/debugger.html/issues/63
+  editorContainer: {
+    display: 'flex',
+    position: 'relative',
+    flex: '1',
+    minWidth: 0,
+    minHeight: 0,
+  },
+  editor: {
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
+  },
+  err: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    overflow: 'auto',
+    borderTop: '1px solid whitesmoke',
+    color: '#ac4142',
+    padding: '15px 20px',
+    whiteSpace: 'pre',
+    fontFamily: 'monospace',
+    zIndex: 1,
+  },
 }
 
 export default class EditorTranspiler extends Component {
@@ -92,7 +94,7 @@ export default class EditorTranspiler extends Component {
         this.runApplication(cm)
       })
 
-      this.cm1.setSize('100%', '' + editorHeight)
+      this.cm1.setSize('100%', '100%')
 
       this.runApplication(this.cm1)
     }
@@ -133,7 +135,7 @@ export default class EditorTranspiler extends Component {
 
     if (e) {
       return (
-        <div style={errorContainerStyle}>
+        <div style={styles.err}>
           {e}
         </div>
       )
@@ -146,15 +148,17 @@ export default class EditorTranspiler extends Component {
     const {inputHeader} = this.props
 
     return (
-      <div style={widgetContainerStyle}>
-        <div style={widgetStyle}>
+      <div style={styles.container}>
+        <div style={styles.left}>
           <Tabs
             tabs={['Live JSX Editor', 'Compiled JS']}
             active={'Live JSX Editor'}
           />
-          <div style={{height: editorHeight}} ref={'editor'} />
+          <div style={styles.editorContainer}>
+            <div style={styles.editor} ref={'editor'} />
+          </div>
         </div>
-        <div style={playerContainerStyle}>
+        <div style={styles.right}>
           {this.renderError()}
           <PlayerFrame ref={'player'}
             width={playerWidth}
