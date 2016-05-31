@@ -3,4 +3,4 @@
  */
 export Phone from './Phone';
 export Player from './Player';
-export EditorPlayer from './EditorPlayer';
+export Workspace from './Workspace';

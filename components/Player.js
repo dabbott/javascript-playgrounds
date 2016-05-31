@@ -92,7 +92,7 @@ export default class extends Component {
   runApplication(code) {
     const {AppRegistry} = require('react-native-web')
 
-    const screenElement = this.refs.phone.getScreenNode()
+    const screenElement = this.refs.root
 
     this.resetApplication()
 
@@ -112,7 +112,7 @@ export default class extends Component {
   }
 
   resetApplication() {
-    const screenElement = this.refs.phone.getScreenNode()
+    const screenElement = this.refs.root
 
     ReactDOM.unmountComponentAtNode(screenElement)
   }
@@ -127,7 +127,9 @@ export default class extends Component {
 
   render() {
     return (
-      <Phone ref={"phone"} />
+      <Phone>
+        <div ref={"root"} />
+      </Phone>
     )
   }
 }

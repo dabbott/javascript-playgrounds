@@ -22,16 +22,13 @@ const styles = {
 }
 
 export default class extends Component {
+
   static defaultProps = {
     height: 600,
   }
 
-  getScreenNode() {
-    return this.refs.screen
-  }
-
   render() {
-    const {height} = this.props
+    const {children, height} = this.props
     const scale = height / dimensions.deviceImageHeight
     const width = scale * dimensions.deviceImageWidth
 
@@ -55,7 +52,8 @@ export default class extends Component {
     return (
       <div style={containerStyle}>
         <div style={phoneStyle}>
-          <div ref={'screen'} style={styles.screen}>
+          <div style={styles.screen}>
+            {children}
           </div>
         </div>
       </div>

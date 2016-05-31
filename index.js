@@ -4,7 +4,7 @@ require('./index.css')
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-import EditorPlayer from './components/EditorPlayer'
+import Workspace from './components/Workspace'
 import QueryString from './utils/QueryString'
 import DefaultCode from './constants/DefaultCode'
 
@@ -18,7 +18,7 @@ const style = {
 
 const root = (
   <div style={style}>
-    <EditorPlayer
+    <Workspace
       title={QueryString.title || 'Live React Native Editor'}
       value={QueryString.code || DefaultCode}
     />
