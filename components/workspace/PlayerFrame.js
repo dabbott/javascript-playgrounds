@@ -1,5 +1,11 @@
 import React, { Component } from 'react'
 
+const styles = {
+  iframe: {
+    flex: '1 1 auto',
+  },
+}
+
 export default class extends Component {
 
   static defaultProps = {
@@ -71,6 +77,7 @@ export default class extends Component {
 
     return id && (
       <iframe
+        style={styles.iframe}
         ref={'iframe'}
         width={width}
         frameBorder={0}

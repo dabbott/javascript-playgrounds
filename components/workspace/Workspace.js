@@ -25,8 +25,7 @@ const styles = {
   right: {
     position: 'relative',
     display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: 'column',
     minWidth: 0,
     minHeight: 0,
     marginLeft: 10,
