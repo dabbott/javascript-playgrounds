@@ -7,31 +7,30 @@ const dimensions = {
   screenHeight: 1334,
 }
 
-const screenStyle = {
-  backgroundColor: 'white',
-  width: dimensions.screenWidth / 2,
-  height: dimensions.screenHeight / 2,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'stretch',
-  position: 'relative',
-  transform: `scale3d(${2}, ${2}, 1)`,
-  overflow: 'hidden',
+const styles = {
+  screen: {
+    backgroundColor: 'white',
+    width: dimensions.screenWidth / 2,
+    height: dimensions.screenHeight / 2,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    position: 'relative',
+    transform: `scale3d(${2}, ${2}, 1)`,
+    overflow: 'hidden',
+  },
 }
 
-export default class Phone extends Component {
-  static defaultProps = {
-    height: 600,
-  }
+export default class extends Component {
 
-  getScreenNode() {
-    return this.refs.screen
+  static defaultProps = {
+    width: 300,
   }
 
   render() {
-    const {height} = this.props
-    const scale = height / dimensions.deviceImageHeight
-    const width = scale * dimensions.deviceImageWidth
+    const {children, width} = this.props
+    const scale = width / dimensions.deviceImageWidth
+    const height = scale * dimensions.deviceImageHeight
 
     const containerStyle = {
       width,
@@ -53,7 +52,8 @@ export default class Phone extends Component {
     return (
       <div style={containerStyle}>
         <div style={phoneStyle}>
-          <div ref={'screen'} style={screenStyle}>
+          <div style={styles.screen}>
+            {children}
           </div>
         </div>
       </div>

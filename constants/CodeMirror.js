@@ -2,6 +2,7 @@
 export const options = {
   value: '',
   mode: 'jsx',
+  keyMap: 'sublime',
   indentUnit: 2,
   lineNumbers: true,
   dragDrop: false,
@@ -14,7 +15,7 @@ export const options = {
   addModeClass: true,
   showCursorWhenSelecting: true,
   highlightSelectionMatches: true,
-  theme: 'base16-light',
+  theme: 'react',
   extraKeys: {
     'Cmd-/': (cm) => {
       cm.listSelections().forEach((selection) => {
@@ -45,6 +46,7 @@ export const readOnlyOptions = Object.assign({}, options, {
 
 export const requireAddons = () => {
   require('codemirror/mode/jsx/jsx')
+  require('codemirror/keymap/sublime')
   require('codemirror/addon/fold/xml-fold')
   require('codemirror/addon/edit/matchtags')
   require('codemirror/addon/edit/matchbrackets')

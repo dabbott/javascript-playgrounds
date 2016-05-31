@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-import Phone from './Phone'
-
 const prefix = `
 var require = function(name) {
   if (name === 'react-native') {
@@ -24,7 +22,7 @@ const suffix = `
 
 const prefixLineCount = prefix.split('\n').length - 1
 
-export default class Player extends Component {
+export default class extends Component {
 
   static defaultProps = {
     code: '',
@@ -92,7 +90,7 @@ export default class Player extends Component {
   runApplication(code) {
     const {AppRegistry} = require('react-native-web')
 
-    const screenElement = this.refs.phone.getScreenNode()
+    const screenElement = this.refs.root
 
     this.resetApplication()
 
@@ -112,7 +110,7 @@ export default class Player extends Component {
   }
 
   resetApplication() {
-    const screenElement = this.refs.phone.getScreenNode()
+    const screenElement = this.refs.root
 
     ReactDOM.unmountComponentAtNode(screenElement)
   }
@@ -127,7 +125,7 @@ export default class Player extends Component {
 
   render() {
     return (
-      <Phone ref={"phone"} />
+      <div ref={"root"} />
     )
   }
 }

@@ -10,6 +10,7 @@ module.exports = {
   entry: {
     index: path.join(DIRECTORY, 'index.js'),
     player: path.join(DIRECTORY, 'player.js'),
+    vendor: ['react', 'react-dom'],
   },
   module: {
     loaders: [
@@ -33,9 +34,7 @@ module.exports = {
     filename: '[name]-bundle.js'
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-    }),
+    new webpack.optimize.CommonsChunkPlugin("vendor", "vendor-bundle.js"),
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin()
   ]

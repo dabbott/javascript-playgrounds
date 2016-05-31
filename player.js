@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-import Player from './components/Player'
+import Player from './components/player/Player'
 import QueryString from './utils/QueryString'
 
 const style = {
@@ -18,6 +18,7 @@ const root = (
   <div style={style}>
     <Player
       id={QueryString.id || '0'}
+      width={parseInt(QueryString.width) || 210}
     />
   </div>
 )

@@ -1,72 +1,26 @@
+require('./reset.css')
+require('./index.css')
+
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-import EditorPlayer from './components/EditorPlayer'
-
-const defaultValue = `/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- */
-
-import React, {
-  AppRegistry,
-  Component,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
-
-class App extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\\n'}
-          Cmd+D or shake for dev menu
-        </Text>
-      </View>
-    );
-  }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
-
-AppRegistry.registerComponent('MyApp', () => App);`
+import Workspace from './components/workspace/Workspace'
+import QueryString from './utils/QueryString'
+import DefaultCode from './constants/DefaultCode'
 
 const style = {
+  flex: '1 1 auto',
   display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
+  alignItems: 'stretch',
+  minWidth: 0,
+  minHeight: 0,
 }
 
 const root = (
   <div style={style}>
-    <EditorPlayer
-      value={defaultValue}
-      inputHeader={'Hello World App'}
+    <Workspace
+      title={QueryString.title || 'Live React Native Editor'}
+      value={QueryString.code || DefaultCode}
     />
   </div>
 )
