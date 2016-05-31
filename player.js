@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-import Player from './components/Player'
+import Player from './components/player/Player'
 import QueryString from './utils/QueryString'
 
 const style = {

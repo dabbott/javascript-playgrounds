@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-import Phone from './Phone'
-
 const prefix = `
 var require = function(name) {
   if (name === 'react-native') {
@@ -127,9 +125,7 @@ export default class extends Component {
 
   render() {
     return (
-      <Phone>
-        <div ref={"root"} />
-      </Phone>
+      <div ref={"root"} />
     )
   }
 }

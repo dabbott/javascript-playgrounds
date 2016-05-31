@@ -4,7 +4,7 @@ require('./index.css')
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-import Workspace from './components/Workspace'
+import Workspace from './components/workspace/Workspace'
 import QueryString from './utils/QueryString'
 import DefaultCode from './constants/DefaultCode'
 

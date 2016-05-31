@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 
-import { options, readOnlyOptions, requireAddons } from '../constants/CodeMirror'
+import { options, readOnlyOptions, requireAddons } from '../../constants/CodeMirror'
 
-require("../node_modules/codemirror/lib/codemirror.css")
-require("../styles/codemirror-theme.css")
+require("../../node_modules/codemirror/lib/codemirror.css")
+require("../../styles/codemirror-theme.css")
 
 // Work around a codemirror + flexbox + chrome issue by creating an absolute
 // positioned parent and flex grandparent of the codemirror element.
