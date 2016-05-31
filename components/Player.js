@@ -24,7 +24,7 @@ const suffix = `
 
 const prefixLineCount = prefix.split('\n').length - 1
 
-export default class Player extends Component {
+export default class extends Component {
 
   static defaultProps = {
     code: '',

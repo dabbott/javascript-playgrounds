@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 // import ReactDOM from 'react-dom/server';
-import Tabs from './Tabs'
+import Header from './Header'
 import Editor from './Editor'
 import PlayerFrame from './PlayerFrame'
 
@@ -51,15 +51,18 @@ const styles = {
   },
 }
 
-const LIVE_EDITOR = 'Live JSX Editor'
-const COMPILED_JS = 'Compiled JS'
-const tabs = [LIVE_EDITOR, COMPILED_JS]
+export default class extends Component {
 
-export default class EditorTranspiler extends Component {
-  constructor() {
-    super()
+  static defaultProps = {
+    value: '',
+    title: 'Live Editor'
+  }
+
+  constructor(props) {
+    super(props)
     this.state = {
-      activeTab: LIVE_EDITOR,
+      compilerError: null,
+      runtimeError: null,
     }
   }
 
@@ -86,7 +89,6 @@ export default class EditorTranspiler extends Component {
       }).code
 
       this.setState({
-        compiledOutput: code,
         compilerError: null
       })
 
@@ -115,47 +117,24 @@ export default class EditorTranspiler extends Component {
     return null
   }
 
-  renderEditor(activeTab, value, compiledOutput) {
-    console.log('rendering editor', activeTab)
-    switch (activeTab) {
-      case LIVE_EDITOR:
-        return (
-          <Editor
-            key={LIVE_EDITOR}
-            value={value}
-            onChange={this.runApplication.bind(this)}
-          />
-        )
-      break
-      case COMPILED_JS:
-        return (
-          <Editor
-            key={COMPILED_JS}
-            value={compiledOutput}
-            readOnly={true}
-          />
-        )
-      break
-    }
-  }
-
   render() {
-    const {value} = this.props
-    const {activeTab, compiledOutput} = this.state
+    const {value, title} = this.props
 
     return (
       <div style={styles.container}>
         <div style={styles.left}>
-          <Tabs
-            tabs={tabs}
-            active={activeTab}
-            onChange={(activeTab) => this.setState({activeTab})}
+          <Header
+            text={title}
           />
-          {this.renderEditor(activeTab, value, compiledOutput)}
+          <Editor
+            value={value}
+            onChange={this.runApplication.bind(this)}
+          />
         </div>
         <div style={styles.right}>
           {this.renderError()}
-          <PlayerFrame ref={'player'}
+          <PlayerFrame
+            ref={'player'}
             width={playerWidth}
             height={editorHeight}
             onRun={() => {
@@ -163,7 +142,8 @@ export default class EditorTranspiler extends Component {
             }}
             onError={(e) => {
               this.setState({runtimeError: e})
-            }}/>
+            }}
+          />
         </div>
       </div>
     )

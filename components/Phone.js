@@ -7,19 +7,21 @@ const dimensions = {
   screenHeight: 1334,
 }
 
-const screenStyle = {
-  backgroundColor: 'white',
-  width: dimensions.screenWidth / 2,
-  height: dimensions.screenHeight / 2,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'stretch',
-  position: 'relative',
-  transform: `scale3d(${2}, ${2}, 1)`,
-  overflow: 'hidden',
+const styles = {
+  screen: {
+    backgroundColor: 'white',
+    width: dimensions.screenWidth / 2,
+    height: dimensions.screenHeight / 2,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    position: 'relative',
+    transform: `scale3d(${2}, ${2}, 1)`,
+    overflow: 'hidden',
+  },
 }
 
-export default class Phone extends Component {
+export default class extends Component {
   static defaultProps = {
     height: 600,
   }
@@ -53,7 +55,7 @@ export default class Phone extends Component {
     return (
       <div style={containerStyle}>
         <div style={phoneStyle}>
-          <div ref={'screen'} style={screenStyle}>
+          <div ref={'screen'} style={styles.screen}>
           </div>
         </div>
       </div>

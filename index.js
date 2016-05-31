@@ -19,6 +19,7 @@ const style = {
 const root = (
   <div style={style}>
     <EditorPlayer
+      title={QueryString.title || 'Live React Native Editor'}
       value={QueryString.code || DefaultCode}
     />
   </div>
