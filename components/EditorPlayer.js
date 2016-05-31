@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
 // import ReactDOM from 'react-dom/server';
 import Tabs from './Tabs'
+import Editor from './Editor'
 import PlayerFrame from './PlayerFrame'
-import { options, requireAddons } from '../constants/CodeMirror'
-
-// Styles
-require("../node_modules/codemirror/lib/codemirror.css")
-require("../styles/codemirror-theme.css")
 
 const Babel = require('babel-standalone')
 
@@ -39,21 +35,6 @@ const styles = {
     marginLeft: 10,
     marginRight: 10,
   },
-  // Work around a codemirror + flexbox + chrome issue by creating an absolute
-  // positioned parent and flex grandparent of the codemirror element.
-  // https://github.com/jlongster/debugger.html/issues/63
-  editorContainer: {
-    display: 'flex',
-    position: 'relative',
-    flex: '1',
-    minWidth: 0,
-    minHeight: 0,
-  },
-  editor: {
-    position: 'absolute',
-    height: '100%',
-    width: '100%',
-  },
   err: {
     position: 'absolute',
     bottom: 0,
@@ -70,52 +51,42 @@ const styles = {
   },
 }
 
+const LIVE_EDITOR = 'Live JSX Editor'
+const COMPILED_JS = 'Compiled JS'
+const tabs = [LIVE_EDITOR, COMPILED_JS]
+
 export default class EditorTranspiler extends Component {
   constructor() {
     super()
-    this.state = {}
+    this.state = {
+      activeTab: LIVE_EDITOR,
+    }
   }
 
   componentDidMount() {
     if (typeof navigator !== 'undefined') {
-      const value = typeof this.props.value === 'string' ? this.props.value :
-          this.props.value.join('\n')
-
-      requireAddons()
-
-      this.cm1 = require('codemirror')(
-        this.refs.editor,
-        Object.assign({}, options, {
-          value,
-        })
-      )
-
-      this.cm1.on('changes', (cm) => {
-        this.runApplication(cm)
-      })
-
-      this.cm1.setSize('100%', '100%')
-
-      this.runApplication(this.cm1)
+      const {value} = this.props
+      this.runApplication(value)
     }
   }
 
-  runApplication(code) {
-    const compiled = this.compile(code)
+  runApplication(value) {
+    const compiled = this.compile(value)
 
     if (compiled) {
       this.refs.player.runApplication(compiled)
     }
   }
 
-  compile(cm) {
+  compile(value) {
     try {
-      const code = Babel.transform(cm.getValue(), {
+      const code = Babel.transform(value, {
         presets: ['es2015', 'react'],
         retainLines: true,
       }).code
 
       this.setState({
+        compiledOutput: code,
         compilerError: null
       })
 
@@ -144,19 +115,43 @@ export default class EditorTranspiler extends Component {
     return null
   }
 
+  renderEditor(activeTab, value, compiledOutput) {
+    console.log('rendering editor', activeTab)
+    switch (activeTab) {
+      case LIVE_EDITOR:
+        return (
+          <Editor
+            key={LIVE_EDITOR}
+            value={value}
+            onChange={this.runApplication.bind(this)}
+          />
+        )
+      break
+      case COMPILED_JS:
+        return (
+          <Editor
+            key={COMPILED_JS}
+            value={compiledOutput}
+            readOnly={true}
+          />
+        )
+      break
+    }
+  }
+
   render() {
-    const {inputHeader} = this.props
+    const {value} = this.props
+    const {activeTab, compiledOutput} = this.state
 
     return (
       <div style={styles.container}>
         <div style={styles.left}>
           <Tabs
-            tabs={['Live JSX Editor', 'Compiled JS']}
-            active={'Live JSX Editor'}
+            tabs={tabs}
+            active={activeTab}
+            onChange={(activeTab) => this.setState({activeTab})}
           />
-          <div style={styles.editorContainer}>
-            <div style={styles.editor} ref={'editor'} />
-          </div>
+          {this.renderEditor(activeTab, value, compiledOutput)}
         </div>
         <div style={styles.right}>
           {this.renderError()}
