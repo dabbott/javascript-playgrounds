@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 export default class extends Component {
 
   static defaultProps = {
+    width: 300,
     onError: () => {},
     onRun: () => {},
   }
@@ -65,13 +66,15 @@ export default class extends Component {
   }
 
   render() {
+    const {width} = this.props
     const {id} = this.state
 
     return id && (
       <iframe
         ref={'iframe'}
+        width={width}
         frameBorder={0}
-        src={`player.html?id=${id}`}
+        src={`player.html?id=${id}&width=${width}`}
       />
     )
   }

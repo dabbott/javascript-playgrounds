@@ -24,13 +24,13 @@ const styles = {
 export default class extends Component {
 
   static defaultProps = {
-    height: 600,
+    width: 300,
   }
 
   render() {
-    const {children, height} = this.props
-    const scale = height / dimensions.deviceImageHeight
-    const width = scale * dimensions.deviceImageWidth
+    const {children, width} = this.props
+    const scale = width / dimensions.deviceImageWidth
+    const height = scale * dimensions.deviceImageHeight
 
     const containerStyle = {
       width,

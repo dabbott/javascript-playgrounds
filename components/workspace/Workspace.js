@@ -6,9 +6,6 @@ import PlayerFrame from './PlayerFrame'
 
 const Babel = require('babel-standalone')
 
-const playerWidth = 400
-const editorHeight = 600
-
 const styles = {
   container: {
     flex: '1 1 auto',
@@ -135,8 +132,7 @@ export default class extends Component {
           {this.renderError()}
           <PlayerFrame
             ref={'player'}
-            width={playerWidth}
-            height={editorHeight}
+            width={210}
             onRun={() => {
               this.setState({runtimeError: null})
             }}

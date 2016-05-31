@@ -6,13 +6,11 @@ import Sandbox from './Sandbox'
 
 export default class extends Component {
   render() {
-    const {id} = this.props
+    const {id, width} = this.props
 
     return (
-      <Phone>
-        <Sandbox
-          id={id}
-        />
+      <Phone width={width}>
+        <Sandbox id={id} />
       </Phone>
     )
   }

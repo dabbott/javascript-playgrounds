@@ -18,6 +18,7 @@ const root = (
   <div style={style}>
     <Player
       id={QueryString.id || '0'}
+      width={parseInt(QueryString.width) || 210}
     />
   </div>
 )
