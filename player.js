@@ -8,6 +8,7 @@ const style = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
+  overflow: 'hidden',
 }
 
 if (! QueryString.id) {
