@@ -47,6 +47,9 @@ export default class extends Component {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
+      // Make fonts more legible when scaled to small sizes
+      textRendering: 'geometricPrecision',
+      WebkitFontSmoothing: 'subpixel-antialiased',
     }
 
     return (
