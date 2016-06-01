@@ -12,7 +12,11 @@
   line-height: 22px;
 }
 
-.cm-s-react .CodeMirror-gutters { background: white; border-right: 0px; }
+.cm-s-react .CodeMirror-gutters {
+  background: white;
+  border-left: 4px solid rgba(238,238,238,1);
+  border-right: 0px;
+}
 
 .cm-s-react span.cm-meta { color: #FF1717; }
 .cm-s-react span.cm-keyword { color: #1990B8; }
