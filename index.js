@@ -17,11 +17,18 @@ const style = {
   overflow: 'hidden',
 }
 
+const {
+  showHeader = "true",
+  title = 'Live React Native Editor',
+  code = DefaultCode,
+} = QueryString
+
 const root = (
   <div style={style}>
     <Workspace
-      title={QueryString.title || 'Live React Native Editor'}
-      value={QueryString.code || DefaultCode}
+      showHeader={showHeader !== "false"}
+      title={title}
+      value={code}
     />
   </div>
 )

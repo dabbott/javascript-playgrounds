@@ -51,7 +51,8 @@ export default class extends Component {
 
   static defaultProps = {
     value: '',
-    title: 'Live Editor'
+    title: 'Live Editor',
+    showHeader: true,
   }
 
   constructor(props) {
@@ -114,14 +115,16 @@ export default class extends Component {
   }
 
   render() {
-    const {value, title} = this.props
+    const {value, title, showHeader} = this.props
 
     return (
       <div style={styles.container}>
         <div style={styles.left}>
-          <Header
-            text={title}
-          />
+          {showHeader && (
+            <Header
+              text={title}
+            />
+          )}
           <Editor
             value={value}
             onChange={this.runApplication.bind(this)}
