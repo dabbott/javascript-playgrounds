@@ -5,6 +5,8 @@ const prefix = `
 var require = function(name) {
   if (name === 'react-native') {
     return window._ReactNative;
+  } else if (name === 'react') {
+    return window._React;
   } else {
     return {};
   }
@@ -117,6 +119,7 @@ export default class extends Component {
 
   evaluate(code) {
     window._ReactNative = require('react-native-web')
+    window._React = require('react')
 
     const wrapped = prefix + code + suffix
 
