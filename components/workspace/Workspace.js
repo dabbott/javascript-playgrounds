@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-// import ReactDOM from 'react-dom/server';
+
 import Header from './Header'
 import Editor from './Editor'
 import PlayerFrame from './PlayerFrame'
 
-const Babel = require('babel-standalone')
+const BabelWorker = require("worker!../../babel-worker.js")
+const babelWorker = new BabelWorker()
 
 const styles = {
   container: {
@@ -61,42 +62,50 @@ export default class extends Component {
       compilerError: null,
       runtimeError: null,
     }
+    this.onBabelWorkerMessage = this.onBabelWorkerMessage.bind(this)
+    babelWorker.addEventListener("message", this.onBabelWorkerMessage)
+  }
+
+  componentWillUnmount() {
+    babelWorker.removeEventListener("message", this.onBabelWorkerMessage)
   }
 
   componentDidMount() {
     if (typeof navigator !== 'undefined') {
       const {value} = this.props
-      this.runApplication(value)
+      babelWorker.postMessage(value)
     }
   }
 
   runApplication(value) {
-    const compiled = this.compile(value)
-
-    if (compiled) {
-      this.refs.player.runApplication(compiled)
-    }
+    this.refs.player.runApplication(value)
   }
 
-  compile(value) {
-    try {
-      const code = Babel.transform(value, {
-        presets: ['es2015', 'react'],
-        retainLines: true,
-      }).code
+  onBabelWorkerMessage({data}) {
+    this.onCompile(JSON.parse(data))
+  }
 
-      this.setState({
-        compilerError: null
-      })
+  onCompile(data) {
+    switch (data.type) {
+      case 'code':
+        this.setState({
+          compilerError: null
+        })
 
-      return code
-    } catch (e) {
-      this.setState({
-        compilerError: e.message.replace('unknown', e.name)
-      })
+        const {code} = data
+
+        if (code) {
+          this.runApplication(code)
+        }
+      break
+      case 'error':
+        const {error} = data
+
+        this.setState({
+          compilerError: error.message
+        })
+      break
     }
-
-    return null
   }
 
   renderError() {
@@ -127,7 +136,9 @@ export default class extends Component {
           )}
           <Editor
             value={value}
-            onChange={this.runApplication.bind(this)}
+            onChange={(value) => {
+              babelWorker.postMessage(value)
+            }}
           />
         </div>
         <div style={styles.right}>

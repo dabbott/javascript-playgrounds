@@ -33,6 +33,11 @@ module.exports = {
   output: {
     filename: '[name]-bundle.js'
   },
+  worker: {
+    output: {
+      filename: "babel-worker-bundle.js"
+    }
+  },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin("vendor", "vendor-bundle.js"),
     new webpack.optimize.DedupePlugin(),
