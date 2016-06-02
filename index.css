@@ -8,3 +8,8 @@ html, body, #react-root {
 #react-root {
   display: flex;
 }
+
+.CodeMirror {
+  width: 100%;
+  height: 100%;
+}

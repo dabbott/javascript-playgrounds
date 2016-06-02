@@ -49,8 +49,6 @@ export default class extends Component {
         }
       )
 
-      this.cm.setSize('100%', '100%')
-
       this.cm.on('changes', (cm) => {
         onChange(cm.getValue())
       })
