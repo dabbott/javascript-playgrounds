@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { options, readOnlyOptions, requireAddons } from '../../constants/CodeMirror'
+import { options, requireAddons } from '../../constants/CodeMirror'
 
 require("../../node_modules/codemirror/lib/codemirror.css")
 require("../../styles/codemirror-theme.css")
@@ -39,13 +39,12 @@ export default class extends Component {
     if (typeof navigator !== 'undefined') {
       requireAddons()
 
-      const {value, onChange, readOnly} = this.props
+      const {value, onChange} = this.props
 
       this.cm = require('codemirror')(
         this.refs.editor,
         {
           ...options,
-          ...(readOnly && readOnlyOptions),
           value,
         }
       )

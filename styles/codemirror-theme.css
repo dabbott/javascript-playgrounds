@@ -40,4 +40,9 @@
 .cm-s-react span.cm-error { color: #f00; }
 
 .cm-s-react .CodeMirror-activeline-background { background: #e8f2ff; }
-.cm-s-react .CodeMirror-matchingbracket { outline:1px solid grey; color:black !important; }
+.cm-s-react .CodeMirror-matchingtag { background: transparent; }
+.cm-s-react .cm-tag.CodeMirror-matchingtag:not(.cm-bracket) {
+  text-decoration: underline;
+  color:black !important;
+  background-color: white;
+}
