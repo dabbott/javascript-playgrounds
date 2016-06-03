@@ -37,12 +37,20 @@
 /*.cm-s-react span.cm-tag { color: #170; }*/
 /*.cm-s-react span.cm-attribute { color: #00c; }*/
 .cm-s-react span.cm-link { color: #C92C2C; }
-.cm-s-react span.cm-error { color: #f00; }
 
 .cm-s-react .CodeMirror-activeline-background { background: #e8f2ff; }
 .cm-s-react .CodeMirror-matchingtag { background: transparent; }
 .cm-s-react .cm-tag.CodeMirror-matchingtag:not(.cm-bracket) {
   text-decoration: underline;
-  color:black !important;
-  background-color: white;
+}
+
+@keyframes cm-line-warning {
+  0%   { background-color: white; }
+  66%  { background-color: white; }
+  100% { background-color: #FFDADA; }
+}
+
+.cm-s-react .cm-line-error {
+  background-color: #FFDADA;
+  animation: cm-line-warning 0.5s;
 }

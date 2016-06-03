@@ -55,6 +55,21 @@ export default class extends Component {
     }
   }
 
+  componentWillUpdate(nextProps) {
+    const {errorLineNumber: nextLineNumber} = nextProps
+    const {errorLineNumber: prevLineNumber} = this.props
+
+    if (this.cm) {
+      if (typeof prevLineNumber === 'number') {
+        this.cm.removeLineClass(prevLineNumber, "background", "cm-line-error")
+      }
+
+      if (typeof nextLineNumber === 'number') {
+        this.cm.addLineClass(nextLineNumber, "background", "cm-line-error")
+      }
+    }
+  }
+
   render() {
     return (
       <div style={styles.editorContainer}>

@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import Header from './Header'
 import Editor from './Editor'
 import PlayerFrame from './PlayerFrame'
+import Status from './Status'
 
 const BabelWorker = require("worker!../../babel-worker.js")
 const babelWorker = new BabelWorker()
@@ -108,23 +109,13 @@ export default class extends Component {
     }
   }
 
-  renderError() {
-    const {compilerError, runtimeError} = this.state
-    const e = compilerError || runtimeError
-
-    if (e) {
-      return (
-        <div style={styles.err}>
-          {e}
-        </div>
-      )
-    }
-
-    return null
-  }
-
   render() {
     const {value, title, showHeader} = this.props
+    const {compilerError, runtimeError} = this.state
+
+    const error = compilerError || runtimeError
+    const firstLine = error && error.split('\n')[0]
+    const errorLineNumber = firstLine ? firstLine.match(/\((\d+)/) : null
 
     return (
       <div style={styles.container}>
@@ -139,10 +130,14 @@ export default class extends Component {
             onChange={(value) => {
               babelWorker.postMessage(value)
             }}
+            errorLineNumber={errorLineNumber && parseInt(errorLineNumber[1]) - 1}
+          />
+          <Status
+            text={error ? firstLine : 'No Errors'}
+            isError={!! error}
           />
         </div>
         <div style={styles.right}>
-          {this.renderError()}
           <PlayerFrame
             ref={'player'}
             width={210}
