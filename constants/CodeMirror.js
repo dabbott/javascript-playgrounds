@@ -13,6 +13,7 @@ export const options = {
     bothTags: true,
   },
   extraKeys: {
+    'Tab': 'indentMore',
     'Cmd-/': (cm) => {
       cm.listSelections().forEach((selection) => {
         cm.toggleComment({ lineComment: '//' })

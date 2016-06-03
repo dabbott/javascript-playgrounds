@@ -61,8 +61,8 @@ export default class extends Component {
     if (e.line != null) {
       line = e.line
 
-    // FF
-  } else if (e.lineNumber != null) {
+      // FF
+    } else if (e.lineNumber != null) {
       line = e.lineNumber
 
     // Chrome
