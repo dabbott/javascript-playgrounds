@@ -1,4 +1,4 @@
-require('./reset.css')
+require('./styles/reset.css')
 
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'

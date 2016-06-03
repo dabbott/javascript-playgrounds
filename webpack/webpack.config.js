@@ -1,7 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 
-const DIRECTORY = __dirname
+const DIRECTORY = path.dirname(__dirname)
 
 module.exports = {
   devServer: {
