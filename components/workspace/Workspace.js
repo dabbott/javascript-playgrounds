@@ -4,20 +4,21 @@ import Header from './Header'
 import Editor from './Editor'
 import PlayerFrame from './PlayerFrame'
 import Status from './Status'
+import { getErrorDetails } from '../../utils/ErrorMessage'
 
 const BabelWorker = require("worker!../../babel-worker.js")
 const babelWorker = new BabelWorker()
 
 const styles = {
   container: {
-    flex: '1 1 auto',
+    flex: '1',
     display: 'flex',
     alignItems: 'stretch',
     minWidth: 0,
     minHeight: 0,
   },
   left: {
-    flex: `1 1 auto`,
+    flex: '1',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
@@ -114,8 +115,7 @@ export default class extends Component {
     const {compilerError, runtimeError} = this.state
 
     const error = compilerError || runtimeError
-    const firstLine = error && error.split('\n')[0]
-    const errorLineNumber = firstLine ? firstLine.match(/\((\d+)/) : null
+    const errorDetails = error && getErrorDetails(error)
 
     return (
       <div style={styles.container}>
@@ -130,10 +130,10 @@ export default class extends Component {
             onChange={(value) => {
               babelWorker.postMessage(value)
             }}
-            errorLineNumber={errorLineNumber && parseInt(errorLineNumber[1]) - 1}
+            errorLineNumber={error && errorDetails.lineNumber}
           />
           <Status
-            text={error ? firstLine : 'No Errors'}
+            text={error ? errorDetails.summary : 'No Errors'}
             isError={!! error}
           />
         </div>

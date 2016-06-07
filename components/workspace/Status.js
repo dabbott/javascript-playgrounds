@@ -19,6 +19,9 @@ const styles = {
     lineHeight: '40px',
     padding: '0 12px',
     fontWeight: 'bold',
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
   },
 }
 
