@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { options, requireAddons } from '../../constants/CodeMirror'
+import { options, requireAddons } from '../../utils/CodeMirror'
 
 require("../../node_modules/codemirror/lib/codemirror.css")
 require("../../styles/codemirror-theme.css")

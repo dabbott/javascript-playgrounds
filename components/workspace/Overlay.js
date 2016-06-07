@@ -2,27 +2,19 @@ import React, { Component } from 'react'
 
 const styles = {
   container: {
-    flex: '0 0 40px',
+    flex: '1',
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderTop: '1px solid #F7F7F7',
-    borderLeft: '4px solid rgba(238,238,238,1)',
-    boxSizing: 'border-box',
-    paddingRight: 7,
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+    whiteSpace: 'pre-wrap',
   },
   text: {
-    color: '#D8D8D8',
+    color: 'rgba(0,0,0,0.5)',
     fontSize: 13,
     fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
-    padding: '0 12px',
-    fontWeight: 'bold',
-    textOverflow: 'ellipsis',
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    transition: 'color 0.2s',
+    lineHeight: '20px',
+    padding: '12px',
   },
 }
 
@@ -34,19 +26,18 @@ styles.error = {
 export default class extends Component {
 
   static defaultProps = {
-    text: '',
+    children: '',
     isError: false,
   }
 
   render() {
-    const {text, isError, children} = this.props
+    const {children, isError} = this.props
 
     return (
       <div style={styles.container}>
         <div style={isError ? styles.error : styles.text}>
-          {text}
+          {children}
         </div>
-        {children}
       </div>
     )
   }

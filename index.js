@@ -19,7 +19,7 @@ const style = {
 
 const {
   showHeader = "true",
-  title = 'Live React Native Editor',
+  title = 'React Native Web Player',
   code = DefaultCode,
 } = QueryString
 
