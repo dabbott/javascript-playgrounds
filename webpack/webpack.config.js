@@ -30,6 +30,14 @@ module.exports = {
       },
     ]
   },
+  node: {
+    // From babel-standalone:
+    // Mock Node.js modules that Babel require()s but that we don't
+    // particularly care about.
+    fs: 'empty',
+    module: 'empty',
+    net: 'empty'
+  },
   output: {
     filename: '[name]-bundle.js'
   },
