@@ -51,5 +51,5 @@ export default resolvePlugins([
   'transform-react-jsx',
   'transform-regenerator',
   ['transform-es2015-for-of', { loose: true }],
-  require('babel-preset-react-native/transforms/transform-symbol-member'),
+  require('babel!babel-preset-react-native/transforms/transform-symbol-member'),
 ])
