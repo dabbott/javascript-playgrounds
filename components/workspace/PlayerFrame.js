@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 
-const styles = {
+import { prefixObject } from '../../utils/PrefixInlineStyles'
+
+const styles = prefixObject({
   iframe: {
     flex: '1 1 auto',
   },
-}
+})
 
 export default class extends Component {
 

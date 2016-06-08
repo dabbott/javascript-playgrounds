@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 
-const styles = {
+import { prefixObject } from '../../utils/PrefixInlineStyles'
+
+let styles = {
   container: {
     flex: '0 0 40px',
     display: 'flex',
@@ -30,6 +32,8 @@ styles.error = {
   ...styles.text,
   color: '#C92C2C',
 }
+
+styles = prefixObject(styles)
 
 export default class extends Component {
 

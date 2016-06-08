@@ -8,11 +8,12 @@ import Overlay from './Overlay'
 import Button from './Button'
 import About from './About'
 import { getErrorDetails } from '../../utils/ErrorMessage'
+import { prefixObject } from '../../utils/PrefixInlineStyles'
 
 const BabelWorker = require("worker!../../babel-worker.js")
 const babelWorker = new BabelWorker()
 
-const styles = {
+const styles = prefixObject({
   container: {
     flex: '1',
     display: 'flex',
@@ -54,7 +55,7 @@ const styles = {
     display: 'flex',
     alignItems: 'stretch',
   },
-}
+})
 
 export default class extends Component {
 

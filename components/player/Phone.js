@@ -1,4 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+
+import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 
 const dimensions = {
   deviceImageWidth: 870,
@@ -7,7 +9,7 @@ const dimensions = {
   screenHeight: 1334,
 }
 
-const styles = {
+const styles = prefixObject({
   screen: {
     backgroundColor: 'white',
     width: dimensions.screenWidth / 2,
@@ -19,7 +21,7 @@ const styles = {
     transform: `scale3d(${2}, ${2}, 1)`,
     overflow: 'hidden',
   },
-}
+})
 
 export default class extends Component {
 
@@ -32,13 +34,13 @@ export default class extends Component {
     const scale = width / dimensions.deviceImageWidth
     const height = scale * dimensions.deviceImageHeight
 
-    const containerStyle = {
+    const containerStyle = prefix({
       width,
       height,
       margin: '0 auto',
-    }
+    })
 
-    const phoneStyle = {
+    const phoneStyle = prefix({
       width: dimensions.deviceImageWidth,
       height: dimensions.deviceImageHeight,
       backgroundImage: `url(https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/iphone-6-silver.png)`,
@@ -50,7 +52,7 @@ export default class extends Component {
       // Make fonts more legible when scaled to small sizes
       textRendering: 'geometricPrecision',
       WebkitFontSmoothing: 'subpixel-antialiased',
-    }
+    })
 
     return (
       <div style={containerStyle}>

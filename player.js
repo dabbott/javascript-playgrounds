@@ -5,13 +5,14 @@ import ReactDOM from 'react-dom'
 
 import Player from './components/player/Player'
 import QueryString from './utils/QueryString'
+import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
 
-const style = {
+const style = prefix({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   overflow: 'hidden',
-}
+})
 
 if (! QueryString.id) {
   console.warn(`You should pass the player.html iframe a url param 'id'.`)
@@ -26,4 +27,9 @@ const root = (
   </div>
 )
 
-ReactDOM.render(root, document.getElementById('react-root'))
+const mount = document.getElementById('react-root')
+
+// Set mount node to flex in a vendor-prefixed way
+prefixAndApply({ display: 'flex' }, mount)
+
+ReactDOM.render(root, mount)

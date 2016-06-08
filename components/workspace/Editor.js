@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import { options, requireAddons } from '../../utils/CodeMirror'
+import { prefixObject } from '../../utils/PrefixInlineStyles'
 
 require("../../node_modules/codemirror/lib/codemirror.css")
 require("../../styles/codemirror-theme.css")
@@ -8,7 +9,7 @@ require("../../styles/codemirror-theme.css")
 // Work around a codemirror + flexbox + chrome issue by creating an absolute
 // positioned parent and flex grandparent of the codemirror element.
 // https://github.com/jlongster/debugger.html/issues/63
-const styles = {
+const styles = prefixObject({
   editorContainer: {
     display: 'flex',
     position: 'relative',
@@ -21,7 +22,7 @@ const styles = {
     height: '100%',
     width: '100%',
   },
-}
+})
 
 export default class extends Component {
 

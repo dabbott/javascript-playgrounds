@@ -7,15 +7,16 @@ import ReactDOM from 'react-dom'
 import Workspace from './components/workspace/Workspace'
 import QueryString from './utils/QueryString'
 import DefaultCode from './constants/DefaultCode'
+import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
 
-const style = {
+const style = prefix({
   flex: '1 1 auto',
   display: 'flex',
   alignItems: 'stretch',
   minWidth: 0,
   minHeight: 0,
   overflow: 'hidden',
-}
+})
 
 const {
   showHeader = "true",
@@ -33,4 +34,9 @@ const root = (
   </div>
 )
 
-ReactDOM.render(root, document.getElementById('react-root'))
+const mount = document.getElementById('react-root')
+
+// Set mount node to flex in a vendor-prefixed way
+prefixAndApply({ display: 'flex' }, mount)
+
+ReactDOM.render(root, mount)

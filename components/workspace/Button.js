@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 
+import { prefixObject } from '../../utils/PrefixInlineStyles'
+
 const colors = {
   normal: '#D8D8D8',
   error: '#C92C2C',
@@ -38,14 +40,14 @@ const errorStates = ['normal', 'error']
 errorStates.forEach(errorState => {
   const color = colors[errorState]
   styles[errorState] = {
-    base: {
+    base: prefixObject({
       container: { ...baseStyles.container, borderColor: color },
       text: { ...baseStyles.text, color: color },
-    },
-    active: {
+    }),
+    active: prefixObject({
       container: { ...baseStyles.container, backgroundColor: color, borderColor: color },
       text: { ...baseStyles.text, color: 'white' },
-    }
+    })
   }
 })
 

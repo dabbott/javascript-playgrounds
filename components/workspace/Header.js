@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 
-const styles = {
+import { prefixObject } from '../../utils/PrefixInlineStyles'
+
+const styles = prefixObject({
   container: {
     flex: '0 0 40px',
     display: 'flex',
@@ -16,7 +18,7 @@ const styles = {
     lineHeight: '40px',
     padding: '0 20px',
   },
-}
+})
 
 export default class extends Component {
 
