@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
+import pureRender from 'pure-render-decorator'
 
 const nbsp = "\u00a0"
 
+@pureRender
 export default class extends Component {
 
   static defaultProps = {}

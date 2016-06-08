@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import pureRender from 'pure-render-decorator'
 
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
@@ -35,6 +36,7 @@ styles.error = {
 
 styles = prefixObject(styles)
 
+@pureRender
 export default class extends Component {
 
   static defaultProps = {

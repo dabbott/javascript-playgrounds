@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+import pureRender from 'pure-render-decorator'
 
 import Header from './Header'
 import Editor from './Editor'
@@ -57,6 +58,7 @@ const styles = prefixObject({
   },
 })
 
+@pureRender
 export default class extends Component {
 
   static defaultProps = {
@@ -72,6 +74,10 @@ export default class extends Component {
       runtimeError: null,
       showDetails: false,
     }
+    this.onCodeChange = this.onCodeChange.bind(this)
+    this.onToggleDetails = this.onToggleDetails.bind(this)
+    this.onPlayerRun = this.onPlayerRun.bind(this)
+    this.onPlayerError = this.onPlayerError.bind(this)
     this.onBabelWorkerMessage = this.onBabelWorkerMessage.bind(this)
     babelWorker.addEventListener("message", this.onBabelWorkerMessage)
   }
@@ -113,10 +119,26 @@ export default class extends Component {
         const {error} = data
 
         this.setState({
-          compilerError: error.message
+          compilerError: getErrorDetails(error.message)
         })
       break
     }
+  }
+
+  onCodeChange(value) {
+    babelWorker.postMessage(value)
+  }
+
+  onToggleDetails(showDetails) {
+    this.setState({showDetails})
+  }
+
+  onPlayerRun() {
+    this.setState({runtimeError: null})
+  }
+
+  onPlayerError(message) {
+    this.setState({runtimeError: getErrorDetails(message)})
   }
 
   render() {
@@ -125,7 +147,6 @@ export default class extends Component {
 
     const error = compilerError || runtimeError
     const isError = !! error
-    const errorDetails = isError && getErrorDetails(error)
 
     return (
       <div style={styles.container}>
@@ -137,29 +158,27 @@ export default class extends Component {
           )}
           <Editor
             value={value}
-            onChange={(value) => {
-              babelWorker.postMessage(value)
-            }}
-            errorLineNumber={isError && errorDetails.lineNumber}
+            onChange={this.onCodeChange}
+            errorLineNumber={isError && error.lineNumber}
           />
           {showDetails && (
             <div style={styles.overlayContainer}>
               <div style={styles.overlay}>
                 <Overlay isError={isError}>
-                  {isError ? errorDetails.description + '\n\n' : ''}
+                  {isError ? error.description + '\n\n' : ''}
                   <About />
                 </Overlay>
               </div>
             </div>
           )}
           <Status
-            text={isError ? errorDetails.summary : 'No Errors'}
+            text={isError ? error.summary : 'No Errors'}
             isError={isError}
           >
             <Button
               active={showDetails}
               isError={isError}
-              onChange={() => this.setState({showDetails: ! showDetails})}
+              onChange={this.onToggleDetails}
             >
               {'Show Details'}
             </Button>
@@ -169,12 +188,8 @@ export default class extends Component {
           <PlayerFrame
             ref={'player'}
             width={210}
-            onRun={() => {
-              this.setState({runtimeError: null})
-            }}
-            onError={(e) => {
-              this.setState({runtimeError: e})
-            }}
+            onRun={this.onPlayerRun}
+            onError={this.onPlayerError}
           />
         </div>
       </div>

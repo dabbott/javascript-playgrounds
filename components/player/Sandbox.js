@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
+import pureRender from 'pure-render-decorator'
 
 const prefix = `
 var require = function(name) {
@@ -24,6 +25,7 @@ const suffix = `
 
 const prefixLineCount = prefix.split('\n').length - 1
 
+@pureRender
 export default class extends Component {
 
   static defaultProps = {
