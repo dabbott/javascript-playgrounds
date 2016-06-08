@@ -1,5 +1,12 @@
 const messages = [
-  ['Invariant Violation: Element type is invalid', (message) => {
+  // IE 10
+  [`TypeError: Unable to get property 'pos' of undefined or null reference`, (message) => {
+    return {
+      summary: `This web player isn't supported for your web browser.`,
+      description: `Please use the latest Google Chrome, Safari, Firefox, or Internet Explorer to use the React Native Web Player.`
+    }
+  }],
+  [`Invariant Violation: Element type is invalid`, (message) => {
     const ownerName = message.match(/`(.*)`/)
     const byOwner = ownerName ? ` by ${ownerName[0]} ` : ' '
     return {
