@@ -13,6 +13,7 @@ const styles = prefixObject({
 export default class extends Component {
 
   static defaultProps = {
+    platform: 'ios',
     width: 300,
     onError: () => {},
     onRun: () => {},
@@ -76,7 +77,7 @@ export default class extends Component {
   }
 
   render() {
-    const {width} = this.props
+    const {width, platform} = this.props
     const {id} = this.state
 
     return id && (
@@ -85,7 +86,7 @@ export default class extends Component {
         ref={'iframe'}
         width={width}
         frameBorder={0}
-        src={`player.html?id=${id}&width=${width}`}
+        src={`player.html?id=${id}&width=${width}&platform=${platform}`}
       />
     )
   }

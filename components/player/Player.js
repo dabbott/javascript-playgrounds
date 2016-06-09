@@ -8,10 +8,10 @@ import Sandbox from './Sandbox'
 @pureRender
 export default class extends Component {
   render() {
-    const {id, width} = this.props
+    const {id, width, platform} = this.props
 
     return (
-      <Phone width={width}>
+      <Phone width={width} device={platform}>
         <Sandbox id={id} />
       </Phone>
     )

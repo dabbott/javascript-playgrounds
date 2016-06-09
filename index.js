@@ -19,9 +19,10 @@ const style = prefix({
 })
 
 const {
-  showHeader = "true",
+  showHeader = 'true',
   title = 'React Native Web Player',
   code = DefaultCode,
+  platform = 'ios',
 } = QueryString
 
 const root = (
@@ -30,6 +31,7 @@ const root = (
       showHeader={showHeader !== "false"}
       title={title}
       value={code}
+      platform={platform}
     />
   </div>
 )
