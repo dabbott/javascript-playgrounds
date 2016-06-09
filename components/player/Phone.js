@@ -3,6 +3,7 @@ import pureRender from 'pure-render-decorator'
 
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 
+// Devices have pixel density of 2, but we also zoom in for visibility at small sizes.
 const dimensions = {
   ios: {
     deviceImageUrl: 'https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/iphone-6-silver.png',
@@ -10,13 +11,17 @@ const dimensions = {
     deviceImageHeight: 1738,
     screenWidth: 750,
     screenHeight: 1334,
+    devicePixelDensity: 2,
+    zoom: 1.5,
   },
   android: {
-    deviceImageUrl: 'https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/google-nexus-4.png',
-    deviceImageWidth: 860,
-    deviceImageHeight: 1668,
-    screenWidth: 768,
-    screenHeight: 1280,
+    deviceImageUrl: 'https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/google-nexus-5x.png',
+    deviceImageWidth: 1204,
+    deviceImageHeight: 2432,
+    screenWidth: 1080,
+    screenHeight: 1920,
+    devicePixelDensity: 2,
+    zoom: 2,
   },
 }
 
@@ -26,14 +31,16 @@ export default class extends Component {
   static defaultProps = {
     width: 300,
     device: 'ios',
+    scale: 1,
   }
 
   render() {
-    const {children, width, device} = this.props
-    const {deviceImageUrl, deviceImageWidth, deviceImageHeight, screenWidth, screenHeight} = dimensions[device]
+    const {children, width, device, scale: initialScale} = this.props
+    const {deviceImageUrl, deviceImageWidth, deviceImageHeight, devicePixelDensity, screenWidth, screenHeight, zoom} = dimensions[device]
 
-    const scale = width / deviceImageWidth
-    const height = scale * deviceImageHeight
+    const imageScale = width / deviceImageWidth
+    const height = imageScale * deviceImageHeight
+    const scale = initialScale * devicePixelDensity * zoom
 
     const styles = prefixObject({
       container: {
@@ -45,7 +52,7 @@ export default class extends Component {
         width: deviceImageWidth,
         height: deviceImageHeight,
         backgroundImage: `url(${deviceImageUrl})`,
-        transform: `scale(${scale}, ${scale})`,
+        transform: `scale(${imageScale}, ${imageScale})`,
         transformOrigin: '0 0 0px',
         display: 'flex',
         alignItems: 'center',
@@ -53,13 +60,13 @@ export default class extends Component {
       },
       screen: {
         backgroundColor: 'white',
-        width: screenWidth / 2,
-        height: screenHeight / 2,
+        width: screenWidth / scale,
+        height: screenHeight / scale,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'stretch',
         position: 'relative',
-        transform: `scale(${2}, ${2})`,
+        transform: `scale(${scale}, ${scale})`,
         overflow: 'hidden',
       },
     })

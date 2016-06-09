@@ -142,7 +142,7 @@ export default class extends Component {
   }
 
   render() {
-    const {value, title, showHeader, platform} = this.props
+    const {value, title, showHeader, platform, scale} = this.props
     const {compilerError, runtimeError, showDetails} = this.state
 
     const error = compilerError || runtimeError
@@ -188,6 +188,7 @@ export default class extends Component {
           <PlayerFrame
             ref={'player'}
             width={210}
+            scale={scale}
             platform={platform}
             onRun={this.onPlayerRun}
             onError={this.onPlayerError}

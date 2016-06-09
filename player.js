@@ -22,8 +22,9 @@ const root = (
   <div style={style}>
     <Player
       id={QueryString.id || '0'}
-      width={parseInt(QueryString.width) || 210}
+      width={parseFloat(QueryString.width) || 210}
       platform={QueryString.platform || 'ios'}
+      scale={parseFloat(QueryString.scale) || 1}
     />
   </div>
 )

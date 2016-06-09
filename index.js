@@ -23,6 +23,7 @@ const {
   title = 'React Native Web Player',
   code = DefaultCode,
   platform = 'ios',
+  scale = '1',
 } = QueryString
 
 const root = (
@@ -32,6 +33,7 @@ const root = (
       title={title}
       value={code}
       platform={platform}
+      scale={parseFloat(scale)}
     />
   </div>
 )
