@@ -1,9 +1,9 @@
-export default `import React, {
+export default `import React, { Component, } from 'react';
+import {
   AppRegistry,
-  Component,
   StyleSheet,
   Text,
-  View
+  View,
 } from 'react-native';
 
 class App extends Component {

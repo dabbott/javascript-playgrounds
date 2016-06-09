@@ -19,8 +19,7 @@ const style = prefix({
 })
 
 const {
-  showHeader = 'true',
-  title = 'React Native Web Player',
+  title = '',
   code = DefaultCode,
   platform = 'ios',
   scale = '1',
@@ -29,7 +28,6 @@ const {
 const root = (
   <div style={style}>
     <Workspace
-      showHeader={showHeader !== "false"}
       title={title}
       value={code}
       platform={platform}

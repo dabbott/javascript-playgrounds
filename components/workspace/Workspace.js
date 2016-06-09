@@ -64,7 +64,6 @@ export default class extends Component {
   static defaultProps = {
     value: '',
     title: 'Live Editor',
-    showHeader: true,
   }
 
   constructor(props) {
@@ -142,7 +141,7 @@ export default class extends Component {
   }
 
   render() {
-    const {value, title, showHeader, platform, scale} = this.props
+    const {value, title, platform, scale} = this.props
     const {compilerError, runtimeError, showDetails} = this.state
 
     const error = compilerError || runtimeError
@@ -151,7 +150,7 @@ export default class extends Component {
     return (
       <div style={styles.container}>
         <div style={styles.left}>
-          {showHeader && (
+          {title && (
             <Header
               text={title}
             />
