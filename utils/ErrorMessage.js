@@ -6,6 +6,12 @@ const messages = [
       description: `Please use the latest Google Chrome, Safari, Firefox, or Internet Explorer to use the React Native Web Player.`
     }
   }],
+  [`TypeError: inst.render is not a function`, (message) => {
+    return {
+      summary: `Invalid component or undefined render method.`,
+      description: `No 'render' method found on the returned component instance: you may have forgotten to define 'render', returned null/false from a stateless component, or tried to render an element whose type is a function that isn't a React component.`,
+    }
+  }],
   [`Invariant Violation: Element type is invalid`, (message) => {
     const ownerName = message.match(/`(.*)`/)
     const byOwner = ownerName ? ` by ${ownerName[0]} ` : ' '
