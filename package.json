@@ -1,6 +1,6 @@
 {
   "name": "react-native-web-player",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Run React Native apps in your browser!",
   "main": "index.js",
   "scripts": {

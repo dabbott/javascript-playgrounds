@@ -7,5 +7,11 @@ publish-gh-pages:
 	git add --all *-bundle.js
 	git commit -m "New release"
 	git push -f origin gh-pages:gh-pages
+
+ifdef TAG
+	git tag $(TAG)
+	git push origin $(TAG)
+endif
+
 	git checkout master
 	git branch -D gh-pages
