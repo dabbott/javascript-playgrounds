@@ -64,6 +64,9 @@ export default class extends Component {
   static defaultProps = {
     value: '',
     title: 'Live Editor',
+    onChange: () => {},
+    platform: null,
+    scale: null,
   }
 
   constructor(props) {
@@ -126,6 +129,7 @@ export default class extends Component {
 
   onCodeChange(value) {
     babelWorker.postMessage(value)
+    this.props.onChange(value)
   }
 
   onToggleDetails(showDetails) {

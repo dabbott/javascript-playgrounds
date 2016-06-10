@@ -87,7 +87,7 @@ export default class extends Component {
         ref={'iframe'}
         width={width}
         frameBorder={0}
-        src={`player.html?id=${id}&width=${width}&platform=${platform}&scale=${scale}`}
+        src={`player.html#id=${id}&width=${width}&platform=${platform}&scale=${scale}`}
       />
     )
   }

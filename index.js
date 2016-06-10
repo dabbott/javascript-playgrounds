@@ -5,7 +5,7 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
 import Workspace from './components/workspace/Workspace'
-import QueryString from './utils/QueryString'
+import { getHashString, setHashString } from './utils/HashString'
 import DefaultCode from './constants/DefaultCode'
 import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
 
@@ -23,7 +23,7 @@ const {
   code = DefaultCode,
   platform = 'ios',
   scale = '1',
-} = QueryString
+} = getHashString()
 
 const root = (
   <div style={style}>
@@ -32,6 +32,7 @@ const root = (
       value={code}
       platform={platform}
       scale={parseFloat(scale)}
+      onChange={setHashString}
     />
   </div>
 )
