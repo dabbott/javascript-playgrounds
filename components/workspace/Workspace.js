@@ -67,6 +67,7 @@ export default class extends Component {
     onChange: () => {},
     platform: null,
     scale: null,
+    width: null,
     assetRoot: null,
   }
 
@@ -146,7 +147,7 @@ export default class extends Component {
   }
 
   render() {
-    const {value, title, platform, scale, assetRoot} = this.props
+    const {value, title, platform, scale, width, assetRoot} = this.props
     const {compilerError, runtimeError, showDetails} = this.state
 
     const error = compilerError || runtimeError
@@ -191,7 +192,7 @@ export default class extends Component {
         <div style={styles.right}>
           <PlayerFrame
             ref={'player'}
-            width={210}
+            width={width}
             scale={scale}
             platform={platform}
             assetRoot={assetRoot}

@@ -22,6 +22,7 @@ const {
   title = '',
   code = DefaultCode,
   platform = 'ios',
+  width = '210',
   scale = '1',
   assetRoot = '',
 } = getHashString()
@@ -34,6 +35,7 @@ const root = (
       platform={platform}
       assetRoot={assetRoot}
       scale={parseFloat(scale)}
+      width={parseFloat(width)}
       onChange={setHashString}
     />
   </div>
