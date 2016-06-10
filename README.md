@@ -8,7 +8,7 @@ Run react native apps in your browser!
 Include the web player in an iframe.
 
 ```html
-<iframe width="880" height="425" src={`//cdn.rawgit.com/dabbott/react-native-web-player/gh-pages/index.html`}></iframe>
+<iframe width="880" height="425" frameborder="0" src="//cdn.rawgit.com/dabbott/react-native-web-player/gh-pages/index.html"></iframe>
 ```
 
 This url uses rawgit to hit MaxCDN for performance. If you prefer, you may access the gh-pages branch directly, or download it and host it elsewhere.
