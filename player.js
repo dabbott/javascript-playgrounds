@@ -19,6 +19,7 @@ const {
   width = '210',
   platform = 'ios',
   scale = '1',
+  assetRoot = '',
 } = getHashString()
 
 const root = (
@@ -28,6 +29,7 @@ const root = (
       width={parseFloat(width)}
       scale={parseFloat(scale)}
       platform={platform}
+      assetRoot={assetRoot}
     />
   </div>
 )

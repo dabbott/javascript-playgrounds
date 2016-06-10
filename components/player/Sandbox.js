@@ -1,25 +1,34 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
+import ReactNative from 'react-native-web'
 import pureRender from 'pure-render-decorator'
 
-const prefix = `
-var require = function(name) {
+const _require = (assetRoot = '', name) => {
   if (name === 'react-native') {
-    return window._ReactNative;
+    return ReactNative
   } else if (name === 'react') {
-    return window._React;
-  } else {
-    return {};
-  }
-};
+    return React
 
+  // Resolve local asset paths
+  } else if (name.match(/^\.{1,2}\//)) {
+    if (! assetRoot.match(/\/$/)) {
+      assetRoot += '/'
+    }
+
+    return {uri: assetRoot + name}
+  } else {
+    return {}
+  }
+}
+
+const prefix = `
 var exports = {};
 
 (function(module, exports, require) {
 `
 
 const suffix = `
-})({ exports: exports }, exports, require);
+})({ exports: exports }, exports, window._require);
 ;
 `
 
@@ -30,6 +39,7 @@ export default class extends Component {
 
   static defaultProps = {
     code: '',
+    assetRoot: '',
     onRun: () => {},
     onError: () => {},
   }
@@ -120,8 +130,7 @@ export default class extends Component {
   }
 
   evaluate(code) {
-    window._ReactNative = require('react-native-web')
-    window._React = require('react')
+    window._require = _require.bind(null, this.props.assetRoot)
 
     const wrapped = prefix + code + suffix
 
