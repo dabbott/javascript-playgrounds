@@ -17,6 +17,7 @@ export default class extends Component {
     width: 300,
     scale: 1,
     assetRoot: '',
+    runApp: 'App',
     onError: () => {},
     onRun: () => {},
   }
@@ -79,7 +80,7 @@ export default class extends Component {
   }
 
   render() {
-    const {width, scale, platform, assetRoot} = this.props
+    const {width, scale, platform, assetRoot, runApp} = this.props
     const {id} = this.state
 
     return id && (
@@ -88,7 +89,7 @@ export default class extends Component {
         ref={'iframe'}
         width={width}
         frameBorder={0}
-        src={`player.html#id=${id}&width=${width}&platform=${platform}&scale=${scale}&assetRoot=${assetRoot}`}
+        src={`player.html#id=${id}&width=${width}&platform=${platform}&scale=${scale}&assetRoot=${assetRoot}&runApp=${runApp}`}
       />
     )
   }

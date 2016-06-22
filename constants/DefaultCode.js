@@ -32,4 +32,4 @@ const styles = StyleSheet.create({
   },
 });
 
-AppRegistry.registerComponent('MyApp', () => App);`
+AppRegistry.registerComponent('App', () => App);`

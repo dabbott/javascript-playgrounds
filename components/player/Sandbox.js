@@ -40,6 +40,7 @@ export default class extends Component {
   static defaultProps = {
     code: '',
     assetRoot: '',
+    runApp: 'App',
     onRun: () => {},
     onError: () => {},
   }
@@ -113,7 +114,9 @@ export default class extends Component {
     try {
       this.evaluate(code)
 
-      AppRegistry.runApplication('MyApp', {
+      const {runApp} = this.props
+
+      AppRegistry.runApplication(runApp, {
         rootTag: screenElement,
       })
     } catch (e) {
