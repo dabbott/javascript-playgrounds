@@ -25,7 +25,6 @@ const {
   width = '210',
   scale = '1',
   assetRoot = '',
-  runApp = 'App'
 } = getHashString()
 
 const root = (
@@ -35,7 +34,6 @@ const root = (
       value={code}
       platform={platform}
       assetRoot={assetRoot}
-      runApp={runApp}
       scale={parseFloat(scale)}
       width={parseFloat(width)}
       onChange={setHashString}

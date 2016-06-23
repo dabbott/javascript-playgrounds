@@ -20,7 +20,6 @@ const {
   platform = 'ios',
   scale = '1',
   assetRoot = '',
-  runApp = 'App'
 } = getHashString()
 
 const root = (
@@ -31,7 +30,6 @@ const root = (
       scale={parseFloat(scale)}
       platform={platform}
       assetRoot={assetRoot}
-      runApp={runApp}
     />
   </div>
 )

@@ -69,7 +69,6 @@ export default class extends Component {
     scale: null,
     width: null,
     assetRoot: null,
-    runApp: null,
   }
 
   constructor(props) {
@@ -148,7 +147,7 @@ export default class extends Component {
   }
 
   render() {
-    const {value, title, platform, scale, width, assetRoot, runApp} = this.props
+    const {value, title, platform, scale, width, assetRoot} = this.props
     const {compilerError, runtimeError, showDetails} = this.state
 
     const error = compilerError || runtimeError
@@ -197,7 +196,6 @@ export default class extends Component {
             scale={scale}
             platform={platform}
             assetRoot={assetRoot}
-            runApp={runApp}
             onRun={this.onPlayerRun}
             onError={this.onPlayerError}
           />

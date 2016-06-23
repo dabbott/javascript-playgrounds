@@ -1,7 +1,13 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
-import ReactNative from 'react-native-web'
+import ReactNative, { AppRegistry } from 'react-native-web'
 import pureRender from 'pure-render-decorator'
+
+const APP_NAME = 'App'
+
+// Override registerComponent in order to ignore the name used
+const registerComponent = AppRegistry.registerComponent.bind(AppRegistry)
+AppRegistry.registerComponent = (name, f) => registerComponent(APP_NAME, f)
 
 const _require = (assetRoot = '', name) => {
   if (name === 'react-native') {
@@ -40,7 +46,6 @@ export default class extends Component {
   static defaultProps = {
     code: '',
     assetRoot: '',
-    runApp: 'App',
     onRun: () => {},
     onError: () => {},
   }
@@ -103,8 +108,6 @@ export default class extends Component {
   }
 
   runApplication(code) {
-    const {AppRegistry} = require('react-native-web')
-
     const screenElement = this.refs.root
 
     this.resetApplication()
@@ -114,9 +117,7 @@ export default class extends Component {
     try {
       this.evaluate(code)
 
-      const {runApp} = this.props
-
-      AppRegistry.runApplication(runApp, {
+      AppRegistry.runApplication(APP_NAME, {
         rootTag: screenElement,
       })
     } catch (e) {
