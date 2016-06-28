@@ -2,28 +2,7 @@ import React, { Component } from 'react'
 import pureRender from 'pure-render-decorator'
 
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
-
-// Devices have pixel density of 2, but we also zoom in for visibility at small sizes.
-const dimensions = {
-  ios: {
-    deviceImageUrl: 'https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/iphone-6-silver.png',
-    deviceImageWidth: 870,
-    deviceImageHeight: 1738,
-    screenWidth: 750,
-    screenHeight: 1334,
-    devicePixelDensity: 2,
-    zoom: 1.5,
-  },
-  android: {
-    deviceImageUrl: 'https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/google-nexus-5x.png',
-    deviceImageWidth: 1204,
-    deviceImageHeight: 2432,
-    screenWidth: 1080,
-    screenHeight: 1920,
-    devicePixelDensity: 2,
-    zoom: 2,
-  },
-}
+import PHONES from '../../constants/Phones'
 
 @pureRender
 export default class extends Component {
@@ -36,7 +15,7 @@ export default class extends Component {
 
   render() {
     const {children, width, device, scale: initialScale} = this.props
-    const {deviceImageUrl, deviceImageWidth, deviceImageHeight, devicePixelDensity, screenWidth, screenHeight, zoom} = dimensions[device]
+    const {deviceImageUrl, deviceImageWidth, deviceImageHeight, devicePixelDensity, screenWidth, screenHeight, zoom} = PHONES[device]
 
     const imageScale = width / deviceImageWidth
     const height = imageScale * deviceImageHeight
