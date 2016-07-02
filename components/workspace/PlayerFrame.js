@@ -37,14 +37,7 @@ export default class extends Component {
       id: Math.random().toString().slice(2)
     })
 
-    window.addEventListener('message', (e) => {
-      let data
-      try {
-        data = JSON.parse(e.data)
-      } catch (err) {
-        return
-      }
-
+    window.addEventListener('message', ({data}) => {
       const {id, type, payload} = data
 
       if (id !== this.state.id) {
@@ -67,13 +60,18 @@ export default class extends Component {
   }
 
   runApplication(code) {
-    this.props.onRun()
+    const {iframe} = this.refs
+
+    this.props.onRun(iframe)
     switch (this.status) {
       case 'loading':
         this.code = code
       break
       case 'ready':
-        this.refs.iframe.contentWindow.postMessage(code, '*')
+        iframe.contentWindow.postMessage({
+          type: 'code',
+          payload: code,
+        }, '*')
       break
     }
   }

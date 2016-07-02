@@ -8,6 +8,7 @@ import Status from './Status'
 import Overlay from './Overlay'
 import Button from './Button'
 import About from './About'
+import Inspector from './Inspector'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
@@ -77,9 +78,11 @@ export default class extends Component {
       compilerError: null,
       runtimeError: null,
       showDetails: false,
+      showInspector: true,
     }
     this.onCodeChange = this.onCodeChange.bind(this)
     this.onToggleDetails = this.onToggleDetails.bind(this)
+    this.onToggleInspector = this.onToggleInspector.bind(this)
     this.onPlayerRun = this.onPlayerRun.bind(this)
     this.onPlayerError = this.onPlayerError.bind(this)
     this.onBabelWorkerMessage = this.onBabelWorkerMessage.bind(this)
@@ -97,6 +100,15 @@ export default class extends Component {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    const {compiledCode, showInspector} = this.state
+
+    // Run the application again when the inspector is opened
+    if (showInspector && ! prevState.showInspector && compiledCode) {
+      this.runApplication(compiledCode)
+    }
+  }
+
   runApplication(value) {
     this.refs.player.runApplication(value)
   }
@@ -108,12 +120,13 @@ export default class extends Component {
   onCompile(data) {
     switch (data.type) {
       case 'code':
+        const {code} = data
+
         this.setState({
           compilerError: null,
           showDetails: false,
+          compiledCode: code,
         })
-
-        const {code} = data
 
         if (code) {
           this.runApplication(code)
@@ -138,8 +151,15 @@ export default class extends Component {
     this.setState({showDetails})
   }
 
-  onPlayerRun() {
-    this.setState({runtimeError: null})
+  onToggleInspector(showInspector) {
+    this.setState({showInspector})
+  }
+
+  onPlayerRun(iframe) {
+    this.setState({
+      runtimeError: null,
+      iframe,
+    })
   }
 
   onPlayerError(message) {
@@ -148,7 +168,7 @@ export default class extends Component {
 
   render() {
     const {value, title, platform, scale, width, assetRoot} = this.props
-    const {compilerError, runtimeError, showDetails} = this.state
+    const {compilerError, runtimeError, showDetails, showInspector, iframe} = this.state
 
     const error = compilerError || runtimeError
     const isError = !! error
@@ -187,7 +207,19 @@ export default class extends Component {
             >
               {'Show Details'}
             </Button>
+            <Button
+              active={showInspector}
+              onChange={this.onToggleInspector}
+            >
+              {'Inspector'}
+            </Button>
           </Status>
+          {showInspector && (
+            <Inspector
+              iframe={iframe}
+              ref={'inspector'}
+            />
+          )}
         </div>
         <div style={styles.right}>
           <PlayerFrame

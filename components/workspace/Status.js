@@ -8,7 +8,6 @@ let styles = {
     flex: '0 0 40px',
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: 'white',
     borderTop: '1px solid #F7F7F7',
@@ -17,6 +16,7 @@ let styles = {
     paddingRight: 7,
   },
   text: {
+    flex: 1,
     color: '#D8D8D8',
     fontSize: 13,
     fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',

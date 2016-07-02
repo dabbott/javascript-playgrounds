@@ -10,6 +10,7 @@ module.exports = {
   entry: {
     index: path.join(DIRECTORY, 'index.js'),
     player: path.join(DIRECTORY, 'player.js'),
+    devtools: path.join(DIRECTORY, 'devtools.js'),
     vendor: ['react', 'react-dom'],
   },
   module: {
@@ -30,6 +31,11 @@ module.exports = {
       },
     ]
   },
+  resolve: {
+    alias: {
+      react: path.join(DIRECTORY, 'node_modules/react'),
+    },
+  },
   node: {
     // From babel-standalone:
     // Mock Node.js modules that Babel require()s but that we don't
@@ -47,7 +53,11 @@ module.exports = {
     }
   },
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin("vendor", "vendor-bundle.js"),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: "vendor",
+      filename: "vendor-bundle.js",
+      chunks: ["vendor"],
+    }),
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin()
   ]

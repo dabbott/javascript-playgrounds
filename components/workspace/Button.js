@@ -20,6 +20,7 @@ const baseStyles = {
     borderRadius: 3,
     cursor: 'pointer',
     transition: 'border-color 0.2s',
+    marginLeft: 6,
   },
   text: {
     fontSize: 13,

@@ -55,8 +55,17 @@ export default class extends Component {
   }
 
   componentDidMount() {
-    window.onmessage = (e) => {
-      this.runApplication(e.data)
+    window.onmessage = ({data}) => {
+      try {
+        const {type, payload} = data
+
+        if (type === 'code') {
+          this.runApplication(payload)
+        }
+      } catch (err) {
+        console.log('Player frame failed to handle message', data)
+        console.log(err)
+      }
     }
 
     window.onerror = (message, source, line) => {
@@ -65,10 +74,10 @@ export default class extends Component {
       return true
     }
 
-    parent.postMessage(JSON.stringify({
+    parent.postMessage({
       id: this.props.id,
       type: 'ready',
-    }), '*')
+    }, '*')
   }
 
   buildErrorMessage(e) {
@@ -100,11 +109,11 @@ export default class extends Component {
   }
 
   throwError(message) {
-    parent.postMessage(JSON.stringify({
+    parent.postMessage({
       id: this.props.id,
       type: 'error',
       payload: message,
-    }), '*')
+    }, '*')
   }
 
   runApplication(code) {
