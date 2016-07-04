@@ -59,7 +59,7 @@ export default class extends Component {
   }
 
   componentWillUpdate(nextProps) {
-    const {errorLineNumber: nextLineNumber} = nextProps
+    const {errorLineNumber: nextLineNumber, highlightRange} = nextProps
     const {errorLineNumber: prevLineNumber} = this.props
 
     if (this.cm) {
@@ -69,6 +69,19 @@ export default class extends Component {
 
       if (typeof nextLineNumber === 'number') {
         this.cm.addLineClass(nextLineNumber, "background", "cm-line-error")
+      }
+
+      if (this.marker) {
+        this.marker.clear()
+      }
+
+      if (highlightRange) {
+        const {start, end} = highlightRange
+        const from = {line: start.line - 1, ch: start.column}
+        const to = {line: end.line - 1, ch: end.column}
+        this.marker = this.cm.markText(from, to, {
+          css: 'background: rgba(0,0,0,0.1);',
+        })
       }
     }
   }

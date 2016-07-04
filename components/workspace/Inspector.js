@@ -18,6 +18,10 @@ const styles = prefixObject({
 @pureRender
 export default class extends Component {
 
+  static defaultProps = {
+    onSelect: () => {},
+  }
+
   constructor() {
     super()
     this.state = {}
@@ -42,12 +46,28 @@ export default class extends Component {
   start({contentWindow}) {
     this.setState({
       alreadyFoundReact: true,
-      inject(done) {
+      inject: (done) => {
         const wall = {
-          listen(fn) {
-            contentWindow.parent.addEventListener('message', evt => fn(evt.data))
+          listen: (fn) => {
+            contentWindow.parent.addEventListener('message', ({data}) => {
+              fn(data)
+
+              const {type, events} = data
+              const {panel} = this.refs
+
+              if (panel && type === 'many-events') {
+                events.forEach(({type, evt}) => {
+                  if (type === 'event' && evt === 'select') {
+                    const store = this.refs.panel._store
+                    const node = store.get(store.selected)
+
+                    this.props.onSelect(node.get('key'))
+                  }
+                })
+              }
+            })
           },
-          send(data) {
+          send: (data) => {
             contentWindow.postMessage(data, '*')
           },
         }
@@ -62,7 +82,7 @@ export default class extends Component {
     return (
       <div style={styles.container}>
         {alreadyFoundReact && (
-          <Panel {...this.state} />
+          <Panel ref={'panel'} {...this.state} />
         )}
       </div>
     )

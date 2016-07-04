@@ -25,6 +25,7 @@
   "dependencies": {
     "babel-core": "^6.3.13",
     "babel-preset-react-native": "^1.9.0",
+    "babel-traverse": "^6.10.4",
     "codemirror": "dabbott/CodeMirror#better-jsx-es6",
     "inline-style-prefixer": "^1.0.4",
     "json-loader": "^0.5.4",

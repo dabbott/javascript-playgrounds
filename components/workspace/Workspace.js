@@ -79,12 +79,14 @@ export default class extends Component {
       runtimeError: null,
       showDetails: false,
       showInspector: true,
+      sourceElements: null,
     }
     this.onCodeChange = this.onCodeChange.bind(this)
     this.onToggleDetails = this.onToggleDetails.bind(this)
     this.onToggleInspector = this.onToggleInspector.bind(this)
     this.onPlayerRun = this.onPlayerRun.bind(this)
     this.onPlayerError = this.onPlayerError.bind(this)
+    this.onSelectComponent = this.onSelectComponent.bind(this)
     this.onBabelWorkerMessage = this.onBabelWorkerMessage.bind(this)
     babelWorker.addEventListener("message", this.onBabelWorkerMessage)
   }
@@ -120,12 +122,13 @@ export default class extends Component {
   onCompile(data) {
     switch (data.type) {
       case 'code':
-        const {code} = data
+        const {code, elements} = data
 
         this.setState({
           compilerError: null,
           showDetails: false,
           compiledCode: code,
+          sourceElements: elements,
         })
 
         if (code) {
@@ -136,7 +139,8 @@ export default class extends Component {
         const {error} = data
 
         this.setState({
-          compilerError: getErrorDetails(error.message)
+          compilerError: getErrorDetails(error.message),
+          sourceElements: null,
         })
       break
     }
@@ -166,9 +170,24 @@ export default class extends Component {
     this.setState({runtimeError: getErrorDetails(message)})
   }
 
+  onSelectComponent(key) {
+    if (key) {
+      const {sourceElements} = this.state
+      const elements = sourceElements.filter(element => element.key === key)
+
+      if (elements.length > 0) {
+        this.setState({selectedComponent: elements[0]})
+
+        return
+      }
+    }
+
+    this.setState({selectedComponent: null})
+  }
+
   render() {
     const {value, title, platform, scale, width, assetRoot} = this.props
-    const {compilerError, runtimeError, showDetails, showInspector, iframe} = this.state
+    const {compilerError, runtimeError, showDetails, showInspector, iframe, selectedComponent} = this.state
 
     const error = compilerError || runtimeError
     const isError = !! error
@@ -185,6 +204,7 @@ export default class extends Component {
             value={value}
             onChange={this.onCodeChange}
             errorLineNumber={isError && error.lineNumber}
+            highlightRange={selectedComponent && selectedComponent.loc}
           />
           {showDetails && (
             <div style={styles.overlayContainer}>
@@ -218,6 +238,7 @@ export default class extends Component {
             <Inspector
               iframe={iframe}
               ref={'inspector'}
+              onSelect={this.onSelectComponent}
             />
           )}
         </div>
