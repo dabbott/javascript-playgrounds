@@ -28,9 +28,9 @@
     "inline-style-prefixer": "^1.0.4",
     "json-loader": "^0.5.4",
     "pure-render-decorator": "^1.1.1",
-    "react": "^0.14.3",
-    "react-dom": "^0.14.3",
-    "react-native-web": "0.0.25"
+    "react": "^15.2.0",
+    "react-dom": "^15.2.0",
+    "react-native-web": "0.0.29"
   },
   "devDependencies": {
     "babel-cli": "^6.3.17",
