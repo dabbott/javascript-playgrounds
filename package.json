@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "npm run build",
     "build": "webpack --config webpack/webpack.prod.config.js --sort-assets-by --progress",
     "start": "webpack-dev-server --config webpack/webpack.dev.config.js --inline --hot --colors --quiet",
     "clean": "rm *-bundle.js",
