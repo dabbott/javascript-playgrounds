@@ -19,6 +19,7 @@ The iframe accepts the following parameters *after the hash* in the url:
 - `scale` - Zoom the device screen. Defaults to `1`.
 - `platform` - One of `ios` or `android`. Defaults to `ios`. Currently this changes the phone image, but may also have an effect on how the code is executed in the future.
 - `assetRoot` - Specifies the root url for asset `require`s. E.g. to require `http://localhost:8080/images/hello.png`, you could set `assetRoot=http%3A%2F%2Flocalhost%3A8080%2F` and write `require('./images/hello.png')` in your code.
+- `vendorComponents` - JSON encoded array of 3rd party components to make available to the sandbox. The format is an array of a 3 part array, with the first being the require name, the second being the global namespace location, and the third being the url. E.g. to load DD.Feed (require name of dd-feed): [[ 'dd-feed', 'DD.Feed', 'http://vendor-url/scripts/dd.feed.js']]
 
 The easiest way to set the `code` parameter is to edit the code in the web player and copy and paste the url when you're done (the url updates automatically as you type).
 
