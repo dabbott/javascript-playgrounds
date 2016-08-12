@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import ReactNative, { AppRegistry } from 'react-native-web'
 import pureRender from 'pure-render-decorator'
-import VendorComponents from '../../vendor-components.js'
+import VendorComponents from './VendorComponents'
 
 const APP_NAME = 'App'
 
@@ -23,9 +23,13 @@ const _require = (assetRoot = '', name) => {
 
     return {uri: assetRoot + name}
   } else {
-    for (var i = 0; i < VendorComponents.length; ++i) {
-      if (VendorComponents[i].name === name) {
-        return VendorComponents[i].value
+    // If we have vendor components registered and loaded,
+    // allow for them to be resolved here
+    var components = VendorComponents.get()
+    var componentNames = Object.keys(components)
+    for (var i = 0; i < componentNames.length; ++i) {
+      if (componentNames[i] === name) {
+        return components[componentNames[i]] || {}
       }
     }
     return {}

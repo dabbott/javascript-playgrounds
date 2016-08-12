@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom'
 import Player from './components/player/Player'
 import { getHashString } from './utils/HashString'
 import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
-import Dimensions from 'dd-dimensions'
+import VendorComponents from './components/player/VendorComponents'
 
 const style = prefix({
   display: 'flex',
@@ -21,9 +21,8 @@ const {
   platform = 'ios',
   scale = '1',
   assetRoot = '',
+  vendorComponents = '[]'
 } = getHashString()
-
-//Dimensions.override('window', { fontScale: 1, height: 600, width: 200, scale: 1 })
 
 const root = (
   <div style={style}>
@@ -42,4 +41,7 @@ const mount = document.getElementById('react-root')
 // Set mount node to flex in a vendor-prefixed way
 prefixAndApply({ display: 'flex' }, mount)
 
-ReactDOM.render(root, mount)
+// if we have vendor components, we need to pre-load those
+// otherwise, we can just render normally
+const components = JSON.parse(vendorComponents)
+VendorComponents.load(components, () => ReactDOM.render(root, mount))
