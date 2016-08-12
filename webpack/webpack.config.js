@@ -46,6 +46,14 @@ module.exports = {
       filename: "babel-worker-bundle.js"
     }
   },
+  resolve: {
+    alias: {
+      'react-native': 'react-native-web'
+//       'react-native' : './react-native-web-stub.js',
+//       'react' : './react-stub.js',
+//       'react-dom' : './react-dom-stub.js'
+    },
+  },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin("vendor", "vendor-bundle.js"),
     new webpack.optimize.DedupePlugin(),

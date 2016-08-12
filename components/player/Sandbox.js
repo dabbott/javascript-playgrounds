@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import ReactNative, { AppRegistry } from 'react-native-web'
 import pureRender from 'pure-render-decorator'
+import VendorComponents from '../../vendor-components.js'
 
 const APP_NAME = 'App'
 
@@ -14,7 +15,6 @@ const _require = (assetRoot = '', name) => {
     return ReactNative
   } else if (name === 'react') {
     return React
-
   // Resolve local asset paths
   } else if (name.match(/^\.{1,2}\//)) {
     if (! assetRoot.match(/\/$/)) {
@@ -23,6 +23,11 @@ const _require = (assetRoot = '', name) => {
 
     return {uri: assetRoot + name}
   } else {
+    for (var i = 0; i < VendorComponents.length; ++i) {
+      if (VendorComponents[i].name === name) {
+        return VendorComponents[i].value
+      }
+    }
     return {}
   }
 }

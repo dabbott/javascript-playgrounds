@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom'
 import Player from './components/player/Player'
 import { getHashString } from './utils/HashString'
 import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
+import Dimensions from 'dd-dimensions'
 
 const style = prefix({
   display: 'flex',
@@ -21,6 +22,8 @@ const {
   scale = '1',
   assetRoot = '',
 } = getHashString()
+
+//Dimensions.override('window', { fontScale: 1, height: 600, width: 200, scale: 1 })
 
 const root = (
   <div style={style}>

@@ -3,23 +3,33 @@ import pureRender from 'pure-render-decorator'
 
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 import PHONES from '../../constants/Phones'
+import Dimensions from 'dd-dimensions'
+
+
+//Dimensions.override('window', { fontScale: 1, height: 1, width: 1, scale: 1 })
 
 @pureRender
 export default class extends Component {
 
   static defaultProps = {
-    width: 300,
+    width: 500,
     device: 'ios',
     scale: 1,
   }
 
   render() {
     const {children, width, device, scale: initialScale} = this.props
-    const {deviceImageUrl, deviceImageWidth, deviceImageHeight, devicePixelDensity, screenWidth, screenHeight, zoom} = PHONES[device]
+    var {deviceImageUrl, deviceImageWidth, deviceImageHeight, devicePixelDensity, screenWidth, screenHeight, zoom} = PHONES[device]
+
+    //devicePixelDensity = 1
+    //screenWidth = width
+    //zoom = 1
 
     const imageScale = width / deviceImageWidth
     const height = imageScale * deviceImageHeight
-    const scale = initialScale * devicePixelDensity * zoom
+    const scale = 0.75 * initialScale * devicePixelDensity * zoom
+
+    Dimensions.override('window', { fontScale: 0.5, height: screenHeight / scale, width: screenWidth / scale, scale: 0.5 })
 
     const styles = prefixObject({
       container: {
