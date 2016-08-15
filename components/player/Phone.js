@@ -15,7 +15,7 @@ export default class extends Component {
 
   render() {
     const {children, width, device, scale: initialScale} = this.props
-    var {deviceImageUrl, deviceImageWidth, deviceImageHeight, devicePixelDensity, screenWidth, screenHeight, zoom} = PHONES[device]
+    const {deviceImageUrl, deviceImageWidth, deviceImageHeight, devicePixelDensity, screenWidth, screenHeight, zoom} = PHONES[device]
 
     const imageScale = width / deviceImageWidth
     const height = imageScale * deviceImageHeight
@@ -26,7 +26,6 @@ export default class extends Component {
         width,
         height,
         margin: '0 auto',
-        overflow: 'hidden',
       },
       phone: {
         width: deviceImageWidth,
