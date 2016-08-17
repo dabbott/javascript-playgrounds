@@ -25,6 +25,7 @@ const {
   width = '210',
   scale = '1',
   assetRoot = '',
+  vendorComponents = '[]'
 } = getHashString()
 
 const root = (
@@ -36,6 +37,7 @@ const root = (
       assetRoot={assetRoot}
       scale={parseFloat(scale)}
       width={parseFloat(width)}
+      vendorComponents={JSON.parse(vendorComponents)}
       onChange={setHashString}
     />
   </div>

@@ -17,6 +17,7 @@ export default class extends Component {
     width: 300,
     scale: 1,
     assetRoot: '',
+    vendorComponents: [],
     onError: () => {},
     onRun: () => {},
   }
@@ -79,8 +80,11 @@ export default class extends Component {
   }
 
   render() {
-    const {width, scale, platform, assetRoot} = this.props
+    const {width, scale, platform, assetRoot, vendorComponents} = this.props
     const {id} = this.state
+
+    // Encode vendor components and load into player frame
+    const vendorComponentsEncoded = encodeURIComponent(JSON.stringify(vendorComponents))
 
     return id && (
       <iframe
@@ -88,7 +92,7 @@ export default class extends Component {
         ref={'iframe'}
         width={width}
         frameBorder={0}
-        src={`player.html#id=${id}&width=${width}&platform=${platform}&scale=${scale}&assetRoot=${assetRoot}`}
+        src={`player.html#id=${id}&width=${width}&platform=${platform}&scale=${scale}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}`}
       />
     )
   }
