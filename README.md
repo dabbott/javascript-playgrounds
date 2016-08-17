@@ -1,14 +1,14 @@
 # React Native Web Player
 Run react native apps in your browser!
 
-[Try it out!](https://npmcdn.com/react-native-web-player@1.2.0/index.html#title=React%20Native%20Web%20Player)
+[Try it out!](https://npmcdn.com/react-native-web-player@1.2.2/index.html#title=React%20Native%20Web%20Player)
 
 ### Instructions
 
 Include the web player in an iframe.
 
 ```html
-<iframe width="880" height="425" frameborder="0" src="//npmcdn.com/react-native-web-player@1.2.0/index.html"></iframe>
+<iframe width="880" height="425" frameborder="0" src="//npmcdn.com/react-native-web-player@1.2.2/index.html"></iframe>
 ```
 
 The iframe accepts the following parameters *after the hash* in the url:
@@ -38,7 +38,7 @@ This project contains static assets that run standalone in the browser. You don'
 The example URLs on this page use npmcdn.
 
 ```html
-<iframe width="880" height="425" frameborder="0" src="//npmcdn.com/react-native-web-player@1.2.0/index.html"></iframe>
+<iframe width="880" height="425" frameborder="0" src="//npmcdn.com/react-native-web-player@1.2.2/index.html"></iframe>
 ```
 
 ##### MaxCDN
@@ -46,7 +46,7 @@ The example URLs on this page use npmcdn.
 Another hosting option is rawgit + MaxCDN. You may find this option more performant. It also serves over `http` instead of just `https`, if you don't want to serve mixed content.
 
 ```html
-<iframe width="880" height="425" frameborder="0" src="//cdn.rawgit.com/dabbott/react-native-web-player/v1.2.0/index.html"></iframe>
+<iframe width="880" height="425" frameborder="0" src="//cdn.rawgit.com/dabbott/react-native-web-player/v1.2.2/index.html"></iframe>
 ```
 
 ##### gh-pages
@@ -59,9 +59,9 @@ If you prefer, you may access the gh-pages branch directly. This has the advanta
 
 ### Examples
 
-- Custom code - https://npmcdn.com/react-native-web-player@1.2.0/index.html#platform=ios&code=import%20React%2C%20%7B%20Component%2C%20%7D%20from%20'react'%3B%0Aimport%20%7B%20AppRegistry%2C%20Text%2C%20%7D%20from%20'react-native'%3B%0A%0Aconst%20App%20%3D%20()%20%3D%3E%20%3CText%3EHello%20World%3C%2FText%3E%3B%0A%0AAppRegistry.registerComponent('App'%2C%20()%20%3D%3E%20App)%3B
-- Android device - https://npmcdn.com/react-native-web-player@1.2.0/index.html#platform=android
-- Custom title - https://npmcdn.com/react-native-web-player@1.2.0/index.html#title=Hello%20Title
+- Custom code - https://npmcdn.com/react-native-web-player@1.2.2/index.html#platform=ios&code=import%20React%2C%20%7B%20Component%2C%20%7D%20from%20'react'%3B%0Aimport%20%7B%20AppRegistry%2C%20Text%2C%20%7D%20from%20'react-native'%3B%0A%0Aconst%20App%20%3D%20()%20%3D%3E%20%3CText%3EHello%20World%3C%2FText%3E%3B%0A%0AAppRegistry.registerComponent('App'%2C%20()%20%3D%3E%20App)%3B
+- Android device - https://npmcdn.com/react-native-web-player@1.2.2/index.html#platform=android
+- Custom title - https://npmcdn.com/react-native-web-player@1.2.2/index.html#title=Hello%20Title
 
 ## Development
 
