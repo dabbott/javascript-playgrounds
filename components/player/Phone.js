@@ -8,7 +8,7 @@ import PHONES from '../../constants/Phones'
 export default class extends Component {
 
   static defaultProps = {
-    width: 300,
+    width: 500,
     device: 'ios',
     scale: 1,
   }
