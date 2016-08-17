@@ -17,7 +17,7 @@
     "url": "git+https://github.com/dabbott/react-native-web-player.git"
   },
   "author": "devinabbott@gmail.com",
-  "license": "BSD",
+  "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/dabbott/react-native-web-player/issues"
   },
