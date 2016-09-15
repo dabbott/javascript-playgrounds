@@ -31,7 +31,7 @@
     "pure-render-decorator": "^1.1.1",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
-    "react-native-web": "0.0.43",
+    "react-native-web": "0.0.45",
     "scriptjs": "^2.5.8"
   },
   "devDependencies": {
