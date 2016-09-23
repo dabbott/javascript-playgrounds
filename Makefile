@@ -1,17 +1,15 @@
 BIN = ./node_modules/.bin
 
 publish-gh-pages:
-	git checkout master
+ifdef TAG
+	git checkout tags/$(TAG) 
 	npm run build
 	git checkout -b gh-pages
 	git add --all *-bundle.js -f
 	git commit -m "New release"
+	git tag gh-$(TAG)
+	git push origin gh-$(TAG)	
 	git push -f origin gh-pages:gh-pages
-
-ifdef TAG
-	git tag $(TAG)
-	git push origin $(TAG)
-endif
-
-	git checkout master
+	git checkout tags/$(TAG) 
 	git branch -D gh-pages
+endif
