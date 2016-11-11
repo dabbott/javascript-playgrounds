@@ -23,7 +23,7 @@ The iframe accepts the following parameters *after the hash* in the url:
 - `scale` - Zoom the device screen. Defaults to `1`.
 - `platform` - One of `ios` or `android`. Defaults to `ios`. Currently this changes the phone image, but may also have an effect on how the code is executed in the future.
 - `assetRoot` - Specifies the root url for asset `require`s. E.g. to require `http://localhost:8080/images/hello.png`, you could set `assetRoot=http%3A%2F%2Flocalhost%3A8080%2F` and write `require('./images/hello.png')` in your code.
-- `vendorComponents` - JSON encoded array of 3rd party components to make available to the sandbox. The format is an array of a 3-element arrays. The first element is the `require()` name, the second element is the global namespace location (e.g. `window.moment`), and the third element is the source url. E.g. to load moment.js: set `vendorComponents` to the url-encoded value `encodeURIComponent([["moment", "moment", "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"]])`
+- `vendorComponents` - JSON encoded array of 3rd party components to make available to the sandbox. The format is an array of a 3-element arrays. The first element is the `require()` name, the second element is the global namespace location (e.g. `window.moment`), and the third element is the source url. E.g. to load moment.js: set `vendorComponents` to the url-encoded value `encodeURIComponent('[["moment", "moment", "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"]]')`
 
 The easiest way to set the `code` parameter is to edit the code in the web player and copy and paste the url when you're done (the url updates automatically as you type).
 
