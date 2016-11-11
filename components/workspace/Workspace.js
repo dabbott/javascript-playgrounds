@@ -72,18 +72,15 @@ export default class extends Component {
     vendorComponents: []
   }
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      compilerError: null,
-      runtimeError: null,
-      showDetails: false,
-    }
-    this.onCodeChange = this.onCodeChange.bind(this)
-    this.onToggleDetails = this.onToggleDetails.bind(this)
-    this.onPlayerRun = this.onPlayerRun.bind(this)
-    this.onPlayerError = this.onPlayerError.bind(this)
-    this.onBabelWorkerMessage = this.onBabelWorkerMessage.bind(this)
+  state = {
+    compilerError: null,
+    runtimeError: null,
+    showDetails: false,
+  }
+
+  constructor() {
+    super()
+
     babelWorker.addEventListener("message", this.onBabelWorkerMessage)
   }
 
@@ -98,15 +95,15 @@ export default class extends Component {
     }
   }
 
-  runApplication(value) {
+  runApplication = (value) => {
     this.refs.player.runApplication(value)
   }
 
-  onBabelWorkerMessage({data}) {
+  onBabelWorkerMessage = ({data}) => {
     this.onCompile(JSON.parse(data))
   }
 
-  onCompile(data) {
+  onCompile = (data) => {
     switch (data.type) {
       case 'code':
         this.setState({
@@ -130,20 +127,20 @@ export default class extends Component {
     }
   }
 
-  onCodeChange(value) {
+  onCodeChange = (value) => {
     babelWorker.postMessage(value)
     this.props.onChange(value)
   }
 
-  onToggleDetails(showDetails) {
+  onToggleDetails = (showDetails) => {
     this.setState({showDetails})
   }
 
-  onPlayerRun() {
+  onPlayerRun = () => {
     this.setState({runtimeError: null})
   }
 
-  onPlayerError(message) {
+  onPlayerError = (message) => {
     this.setState({runtimeError: getErrorDetails(message)})
   }
 
