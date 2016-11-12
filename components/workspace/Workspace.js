@@ -9,6 +9,7 @@ import Overlay from './Overlay'
 import Button from './Button'
 import About from './About'
 import Tabs from './Tabs'
+import Fullscreen from './Fullscreen'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
@@ -74,6 +75,7 @@ export default class extends Component {
     assetRoot: null,
     vendorComponents: [],
     externalStyles: {},
+    fullscreen: false,
   }
 
   constructor(props) {
@@ -184,7 +186,7 @@ export default class extends Component {
   }
 
   render() {
-    const {files, title, platform, scale, width, assetRoot, vendorComponents, externalStyles} = this.props
+    const {files, title, platform, scale, width, assetRoot, vendorComponents, externalStyles, fullscreen} = this.props
     const {compilerError, runtimeError, showDetails, activeTab} = this.state
 
     const filenames = Object.keys(files)
@@ -200,7 +202,11 @@ export default class extends Component {
               text={title}
               headerStyle={externalStyles.header}
               textStyle={externalStyles.headerText}
-            />
+            >
+              {fullscreen && (
+                <Fullscreen textStyle={externalStyles.headerText} />
+              )}
+            </Header>
           )}
           {filenames.length > 1 && (
             <Tabs
@@ -210,7 +216,11 @@ export default class extends Component {
               tabStyle={externalStyles.tab}
               textStyle={externalStyles.tabText}
               activeTextStyle={externalStyles.tabTextActive}
-            />
+            >
+              {fullscreen && !title && (
+                <Fullscreen textStyle={externalStyles.tabText} />
+              )}
+            </Tabs>
           )}
           <Editor
             key={activeTab}

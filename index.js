@@ -3,6 +3,7 @@ require('./styles/index.css')
 
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
+import screenfull from 'screenfull'
 
 import Workspace from './components/workspace/Workspace'
 import { getHashString, setHashString } from './utils/HashString'
@@ -30,6 +31,7 @@ let {
   assetRoot = '',
   vendorComponents = '[]',
   styles = '{}',
+  fullscreen = 'false',
 } = getHashString()
 
 const parsedFiles = JSON.parse(files)
@@ -69,6 +71,7 @@ const root = (
       width={parseFloat(width)}
       vendorComponents={JSON.parse(vendorComponents)}
       externalStyles={JSON.parse(styles)}
+      fullscreen={fullscreen === 'true' && screenfull.enabled}
       onChange={setHashString}
     />
   </div>
