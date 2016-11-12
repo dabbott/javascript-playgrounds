@@ -14,7 +14,7 @@ export default class VendorComponents {
 
   // Get a hash of registered vendor components, or a specific component by name
   static get(name = null) {
-    if (name) {
+    if (typeof name === 'string') {
       return components[name]
     } else {
       return components
