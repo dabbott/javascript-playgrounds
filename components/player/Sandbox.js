@@ -122,11 +122,14 @@ export default class extends Component {
       }
 
       return {uri: assetRoot + name}
-    } else {
 
-      // If we have vendor components registered and loaded,
-      // allow for them to be resolved here
-      return VendorComponents.get(name) || {}
+    // If we have vendor components registered and loaded,
+    // allow for them to be resolved here
+    } else if (VendorComponents.get(name)) {
+      return VendorComponents.get(name)
+    } else {
+      console.error(`Failed to resolve module ${name}`)
+      return {}
     }
   }
 
