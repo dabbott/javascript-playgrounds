@@ -21,18 +21,24 @@ const style = prefix({
 const {
   title = '',
   code = DefaultCode,
+  files = '[]',
+  initialTab = 'index.js',
   platform = 'ios',
   width = '210',
   scale = '1',
   assetRoot = '',
-  vendorComponents = '[]'
+  vendorComponents = '[]',
 } = getHashString()
+
+const parsedFiles = JSON.parse(files)
+const normalizedFiles = parsedFiles.length === 0 ? [['index.js', code]] : parsedFiles
 
 const root = (
   <div style={style}>
     <Workspace
       title={title}
-      value={code}
+      files={normalizedFiles}
+      initialTab={initialTab}
       platform={platform}
       assetRoot={assetRoot}
       scale={parseFloat(scale)}
