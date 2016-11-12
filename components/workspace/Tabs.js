@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import pureRender from 'pure-render-decorator'
 
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 
 const styles = prefixObject({
   container: {
@@ -41,19 +41,45 @@ export default class extends Component {
     tabs: [],
     activeTab: null,
     onClickTab: () => {},
+    textStyle: null,
+    activeTextStyle: null,
+    tabStyle: null,
   }
 
   onClickTab = (tab) => this.props.onClickTab(tab)
 
+  getComputedStyles = () => {
+    const {tabStyle} = this.props
+
+    return {
+      container: tabStyle
+        ? prefix({...styles.container, ...tabStyle})
+        : styles.container,
+    }
+  }
+
+  getTextStyle = (tab) => {
+    const {activeTab, textStyle, activeTextStyle} = this.props
+
+    if (tab === activeTab) {
+      const base = textStyle ? prefix({...styles.activeText, ...textStyle}) : styles.activeText
+
+      return activeTextStyle ? prefix({...base, ...activeTextStyle}) : base
+    } else {
+      return textStyle ? prefix({...styles.text, ...textStyle}) : styles.text
+    }
+  }
+
   render() {
-    const {tabs, activeTab} = this.props
+    const {tabs} = this.props
+    const computedStyles = this.getComputedStyles()
 
     return (
-      <div style={styles.container}>
+      <div style={computedStyles.container}>
         {tabs.map(tab => (
           <div
             key={tab}
-            style={tab === activeTab ? styles.activeText : styles.text}
+            style={this.getTextStyle(tab)}
             onClick={this.onClickTab.bind(this, tab)}
           >
             {tab}

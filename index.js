@@ -29,6 +29,7 @@ let {
   scale = '1',
   assetRoot = '',
   vendorComponents = '[]',
+  styles = '{}',
 } = getHashString()
 
 const parsedFiles = JSON.parse(files)
@@ -67,6 +68,7 @@ const root = (
       scale={parseFloat(scale)}
       width={parseFloat(width)}
       vendorComponents={JSON.parse(vendorComponents)}
+      externalStyles={JSON.parse(styles)}
       onChange={setHashString}
     />
   </div>

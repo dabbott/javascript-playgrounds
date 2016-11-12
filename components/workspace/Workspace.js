@@ -73,6 +73,7 @@ export default class extends Component {
     width: null,
     assetRoot: null,
     vendorComponents: [],
+    externalStyles: {},
   }
 
   constructor(props) {
@@ -183,7 +184,7 @@ export default class extends Component {
   }
 
   render() {
-    const {files, title, platform, scale, width, assetRoot, vendorComponents} = this.props
+    const {files, title, platform, scale, width, assetRoot, vendorComponents, externalStyles} = this.props
     const {compilerError, runtimeError, showDetails, activeTab} = this.state
 
     const filenames = Object.keys(files)
@@ -197,6 +198,8 @@ export default class extends Component {
           {title && (
             <Header
               text={title}
+              headerStyle={externalStyles.header}
+              textStyle={externalStyles.headerText}
             />
           )}
           {filenames.length > 1 && (
@@ -204,6 +207,9 @@ export default class extends Component {
               tabs={filenames}
               activeTab={activeTab}
               onClickTab={this.onClickTab}
+              tabStyle={externalStyles.tab}
+              textStyle={externalStyles.tabText}
+              activeTextStyle={externalStyles.tabTextActive}
             />
           )}
           <Editor
