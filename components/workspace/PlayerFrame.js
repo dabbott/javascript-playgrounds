@@ -31,6 +31,7 @@ export default class extends Component {
 
     this.status = 'loading'
     this.fileMap = null
+    this.entry = null
   }
 
   componentDidMount() {
@@ -56,8 +57,9 @@ export default class extends Component {
         case 'ready':
           this.status = 'ready'
           if (this.fileMap) {
-            this.runApplication(this.fileMap)
+            this.runApplication(this.fileMap, this.entry)
             this.fileMap = null
+            this.entry = null
           }
         break
         case 'error':
@@ -67,14 +69,15 @@ export default class extends Component {
     })
   }
 
-  runApplication(fileMap) {
+  runApplication(fileMap, entry) {
     this.props.onRun()
     switch (this.status) {
       case 'loading':
         this.fileMap = fileMap
+        this.entry = entry
       break
       case 'ready':
-        this.refs.iframe.contentWindow.postMessage(fileMap, '*')
+        this.refs.iframe.contentWindow.postMessage({fileMap, entry}, '*')
       break
     }
   }

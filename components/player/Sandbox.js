@@ -90,7 +90,7 @@ export default class extends Component {
     }), '*')
   }
 
-  require = (fileMap, name) => {
+  require = (fileMap, entry, name) => {
     let {assetRoot} = this.props
 
     if (name === 'react-native') {
@@ -105,6 +105,10 @@ export default class extends Component {
       const filename = Object.keys(fileMap).find(x => `${name}.js` === `./${x}`)
 
       if (filename) {
+        if (filename === entry) {
+          throw new Error(`Requiring entry file ${entry} would cause an infinite loop`)
+        }
+
         if (!window._requireCache[filename]) {
           this.evaluate(filename, fileMap[filename])
         }
@@ -119,14 +123,14 @@ export default class extends Component {
 
       return {uri: assetRoot + name}
     } else {
-      
+
       // If we have vendor components registered and loaded,
       // allow for them to be resolved here
       return VendorComponents.get(name) || {}
     }
   }
 
-  runApplication(fileMap) {
+  runApplication({fileMap, entry}) {
     const screenElement = this.refs.root
 
     this.resetApplication()
@@ -134,11 +138,8 @@ export default class extends Component {
     this.props.onRun()
 
     try {
-      window._require = this.require.bind(this, fileMap)
+      window._require = this.require.bind(this, fileMap, entry)
       window._requireCache = {}
-
-      const entry = 'index.js'
-      const indexFile = fileMap[entry]
 
       this.evaluate(entry, fileMap[entry])
 

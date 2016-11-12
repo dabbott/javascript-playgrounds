@@ -18,10 +18,11 @@ const style = prefix({
   overflow: 'hidden',
 })
 
-const {
+let {
   title = '',
   code = DefaultCode,
   files = '[]',
+  entry = 'index.js',
   initialTab = 'index.js',
   platform = 'ios',
   width = '210',
@@ -31,13 +32,35 @@ const {
 } = getHashString()
 
 const parsedFiles = JSON.parse(files)
-const normalizedFiles = parsedFiles.length === 0 ? [['index.js', code]] : parsedFiles
+let fileMap
+
+if (parsedFiles.length > 0) {
+
+  // Build a map of {filename => code}
+  fileMap = parsedFiles.reduce((fileMap, [filename, code]) => {
+    fileMap[filename] = code
+    return fileMap
+  }, {})
+
+  // If entry file is invalid, choose the first file
+  if (!fileMap.hasOwnProperty(entry)) {
+    entry = parsedFiles[0][0]
+  }
+} else {
+  // If no files are given, use the code param
+  fileMap = {[entry]: code}
+}
+
+if (!fileMap.hasOwnProperty(initialTab)) {
+  initialTab = entry
+}
 
 const root = (
   <div style={style}>
     <Workspace
       title={title}
-      files={normalizedFiles}
+      files={fileMap}
+      entry={entry}
       initialTab={initialTab}
       platform={platform}
       assetRoot={assetRoot}

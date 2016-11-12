@@ -64,8 +64,9 @@ export default class extends Component {
 
   static defaultProps = {
     title: 'Live Editor',
+    files: {['index.js']: ''},
+    entry: 'index.js',
     initialTab: 'index.js',
-    files: [['index.js', '']],
     onChange: () => {},
     platform: null,
     scale: null,
@@ -77,15 +78,13 @@ export default class extends Component {
   constructor(props) {
     super()
 
-    const {initialTab, files} = props
+    const {initialTab} = props
 
     this.state = {
       compilerError: null,
       runtimeError: null,
       showDetails: false,
-      activeTab: files.find(
-        ([filename]) => filename === initialTab
-      ) ? initialTab : 'index.js',
+      activeTab: initialTab,
     }
 
     this.codeCache = {}
@@ -103,15 +102,21 @@ export default class extends Component {
       const {files} = this.props
 
       // Cache and compile each file
-      files.forEach(([filename, code]) => {
+      Object.keys(files).forEach(filename => {
+        const code = files[filename]
+
         this.codeCache[filename] = code
         babelWorker.postMessage({filename, code})
       })
     }
   }
 
-  runApplication = (value) => {
-    this.refs.player.runApplication(value)
+  runApplication = () => {
+    const {babelCache} = this
+    const {entry} = this.props
+    const {player} = this.refs
+
+    player.runApplication(babelCache, entry)
   }
 
   onBabelWorkerMessage = ({data}) => {
@@ -125,8 +130,8 @@ export default class extends Component {
       babelCache[filename] = code
 
       // Run the app once we've transformed each file at least once
-      if (Object.keys(babelCache).length >= files.length) {
-        this.runApplication(babelCache)
+      if (Object.keys(files).every(filename => babelCache[filename])) {
+        this.runApplication()
       }
     }
   }
@@ -147,15 +152,15 @@ export default class extends Component {
     }
   }
 
-  onCodeChange = (value) => {
+  onCodeChange = (code) => {
     const {activeTab} = this.state
 
     babelWorker.postMessage({
       filename: activeTab,
-      code: value,
+      code,
     })
 
-    this.codeCache[activeTab] = value
+    this.codeCache[activeTab] = code
     this.props.onChange(this.codeCache)
   }
 
@@ -177,15 +182,11 @@ export default class extends Component {
     this.setState({activeTab: tab})
   }
 
-  getFileCode = (filename) => {
-    const {files} = this.props
-
-    return files.find(([name]) => name === filename)[1]
-  }
-
   render() {
     const {files, title, platform, scale, width, assetRoot, vendorComponents} = this.props
     const {compilerError, runtimeError, showDetails, activeTab} = this.state
+
+    const filenames = Object.keys(files)
 
     const error = compilerError || runtimeError
     const isError = !! error
@@ -198,16 +199,16 @@ export default class extends Component {
               text={title}
             />
           )}
-          {files.length > 1 && (
+          {filenames.length > 1 && (
             <Tabs
-              tabs={files.map(([name]) => name)}
+              tabs={filenames}
               activeTab={activeTab}
               onClickTab={this.onClickTab}
             />
           )}
           <Editor
             key={activeTab}
-            initialValue={this.getFileCode(activeTab)}
+            initialValue={files[activeTab]}
             filename={activeTab}
             onChange={this.onCodeChange}
             errorLineNumber={isError && error.lineNumber}
