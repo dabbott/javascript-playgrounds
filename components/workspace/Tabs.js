@@ -15,7 +15,8 @@ const styles = prefixObject({
     zIndex: 1000,
   },
   text: {
-    color: '#AAA',
+    userSelect: 'none',
+    color: 'rgba(255,255,255,0.6)',
     fontSize: 13,
     fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
     lineHeight: '40px',
