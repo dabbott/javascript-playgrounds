@@ -12,9 +12,13 @@ const getObjectFromKeyPath = (data, keyPath) => {
 
 export default class VendorComponents {
 
-  // Get a hash of registered vendor components
-  static get() {
-    return components
+  // Get a hash of registered vendor components, or a specific component by name
+  static get(name = null) {
+    if (typeof name === 'string') {
+      return components[name]
+    } else {
+      return components
+    }
   }
 
   // Register a vendor component

@@ -16,6 +16,7 @@ const styles = prefixObject({
     color: '#FFF',
     fontSize: 13,
     fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
+    fontWeight: 'bold',
     lineHeight: '40px',
     padding: '0 20px',
   },

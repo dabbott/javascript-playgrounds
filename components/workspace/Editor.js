@@ -25,11 +25,13 @@ const styles = prefixObject({
   },
 })
 
+const docCache = {}
+
 @pureRender
 export default class extends Component {
 
   static defaultProps = {
-    value: '',
+    initialValue: '',
     onChange: () => {},
   }
 
@@ -40,21 +42,34 @@ export default class extends Component {
 
   componentDidMount() {
     if (typeof navigator !== 'undefined') {
+      const {filename, initialValue, onChange} = this.props
+
       requireAddons()
+      const CodeMirror = require('codemirror')
 
-      const {value, onChange} = this.props
+      if (!docCache[filename]) {
+        docCache[filename] = new CodeMirror.Doc(initialValue, options.mode)
+      }
 
-      this.cm = require('codemirror')(
+      this.cm = CodeMirror(
         this.refs.editor,
         {
           ...options,
-          value,
+          value: docCache[filename],
         }
       )
 
       this.cm.on('changes', (cm) => {
         onChange(cm.getValue())
       })
+    }
+  }
+
+  componentWillUnmount() {
+    if (typeof navigator !== 'undefined') {
+      const CodeMirror = require('codemirror')
+
+      this.cm.swapDoc(new CodeMirror.Doc('', options.mode))
     }
   }
 

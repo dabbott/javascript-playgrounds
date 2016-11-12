@@ -36,14 +36,26 @@ const buildHashString = (pairs = {}) => {
   return '#' + hs.join('&')
 }
 
-export const setHashString = (code) => {
+export const setHashString = (fileMap) => {
+  const multiFile = Object.keys(fileMap).length > 1
+  const code = fileMap['index.js']
+
   const options = {
     ...getHashString(),
     code,
   }
 
-  if (! code) {
+  // If there's no code in the editor, delete the code param
+  if (!code) {
     delete options.code
+  }
+
+  // If we have multiple files, use the `files` param instead of `code`
+  if (multiFile) {
+    delete options.code
+
+    const files = Object.keys(fileMap).map(filename => [filename, fileMap[filename]])
+    options.files = JSON.stringify(files)
   }
 
   try {

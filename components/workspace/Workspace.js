@@ -8,6 +8,7 @@ import Status from './Status'
 import Overlay from './Overlay'
 import Button from './Button'
 import About from './About'
+import Tabs from './Tabs'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
@@ -62,24 +63,32 @@ const styles = prefixObject({
 export default class extends Component {
 
   static defaultProps = {
-    value: '',
     title: 'Live Editor',
+    files: {['index.js']: ''},
+    entry: 'index.js',
+    initialTab: 'index.js',
     onChange: () => {},
     platform: null,
     scale: null,
     width: null,
     assetRoot: null,
-    vendorComponents: []
+    vendorComponents: [],
   }
 
-  state = {
-    compilerError: null,
-    runtimeError: null,
-    showDetails: false,
-  }
-
-  constructor() {
+  constructor(props) {
     super()
+
+    const {initialTab} = props
+
+    this.state = {
+      compilerError: null,
+      runtimeError: null,
+      showDetails: false,
+      activeTab: initialTab,
+    }
+
+    this.codeCache = {}
+    this.babelCache = {}
 
     babelWorker.addEventListener("message", this.onBabelWorkerMessage)
   }
@@ -90,36 +99,52 @@ export default class extends Component {
 
   componentDidMount() {
     if (typeof navigator !== 'undefined') {
-      const {value} = this.props
-      babelWorker.postMessage(value)
+      const {files} = this.props
+
+      // Cache and compile each file
+      Object.keys(files).forEach(filename => {
+        const code = files[filename]
+
+        this.codeCache[filename] = code
+        babelWorker.postMessage({filename, code})
+      })
     }
   }
 
-  runApplication = (value) => {
-    this.refs.player.runApplication(value)
+  runApplication = () => {
+    const {babelCache} = this
+    const {entry} = this.props
+    const {player} = this.refs
+
+    player.runApplication(babelCache, entry)
   }
 
   onBabelWorkerMessage = ({data}) => {
-    this.onCompile(JSON.parse(data))
+    const {babelCache} = this
+    const {files} = this.props
+    const {filename, type, code, error} = JSON.parse(data)
+
+    this.updateStatus(type, error)
+
+    if (type === 'code') {
+      babelCache[filename] = code
+
+      // Run the app once we've transformed each file at least once
+      if (Object.keys(files).every(filename => babelCache[filename])) {
+        this.runApplication()
+      }
+    }
   }
 
-  onCompile = (data) => {
-    switch (data.type) {
+  updateStatus = (type, error) => {
+    switch (type) {
       case 'code':
         this.setState({
           compilerError: null,
           showDetails: false,
         })
-
-        const {code} = data
-
-        if (code) {
-          this.runApplication(code)
-        }
       break
       case 'error':
-        const {error} = data
-
         this.setState({
           compilerError: getErrorDetails(error.message)
         })
@@ -127,9 +152,16 @@ export default class extends Component {
     }
   }
 
-  onCodeChange = (value) => {
-    babelWorker.postMessage(value)
-    this.props.onChange(value)
+  onCodeChange = (code) => {
+    const {activeTab} = this.state
+
+    babelWorker.postMessage({
+      filename: activeTab,
+      code,
+    })
+
+    this.codeCache[activeTab] = code
+    this.props.onChange(this.codeCache)
   }
 
   onToggleDetails = (showDetails) => {
@@ -140,13 +172,21 @@ export default class extends Component {
     this.setState({runtimeError: null})
   }
 
+  // TODO: Runtime errors should indicate which file they're coming from,
+  // and only cause a line highlight on that file.
   onPlayerError = (message) => {
     this.setState({runtimeError: getErrorDetails(message)})
   }
 
+  onClickTab = (tab) => {
+    this.setState({activeTab: tab})
+  }
+
   render() {
-    const {value, title, platform, scale, width, assetRoot, vendorComponents} = this.props
-    const {compilerError, runtimeError, showDetails} = this.state
+    const {files, title, platform, scale, width, assetRoot, vendorComponents} = this.props
+    const {compilerError, runtimeError, showDetails, activeTab} = this.state
+
+    const filenames = Object.keys(files)
 
     const error = compilerError || runtimeError
     const isError = !! error
@@ -159,8 +199,17 @@ export default class extends Component {
               text={title}
             />
           )}
+          {filenames.length > 1 && (
+            <Tabs
+              tabs={filenames}
+              activeTab={activeTab}
+              onClickTab={this.onClickTab}
+            />
+          )}
           <Editor
-            value={value}
+            key={activeTab}
+            initialValue={files[activeTab]}
+            filename={activeTab}
             onChange={this.onCodeChange}
             errorLineNumber={isError && error.lineNumber}
           />

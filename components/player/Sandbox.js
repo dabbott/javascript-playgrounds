@@ -10,40 +10,15 @@ const APP_NAME = 'App'
 const registerComponent = AppRegistry.registerComponent.bind(AppRegistry)
 AppRegistry.registerComponent = (name, f) => registerComponent(APP_NAME, f)
 
-const _require = (assetRoot = '', name) => {
-  if (name === 'react-native') {
-    return ReactNative
-  } else if (name === 'react') {
-    return React
-  // Resolve local asset paths
-  } else if (name.match(/^\.{1,2}\//)) {
-    if (! assetRoot.match(/\/$/)) {
-      assetRoot += '/'
-    }
-
-    return {uri: assetRoot + name}
-  } else {
-    // If we have vendor components registered and loaded,
-    // allow for them to be resolved here
-    var components = VendorComponents.get()
-    var componentNames = Object.keys(components)
-    for (var i = 0; i < componentNames.length; ++i) {
-      if (componentNames[i] === name) {
-        return components[componentNames[i]] || {}
-      }
-    }
-    return {}
-  }
-}
-
 const prefix = `
 var exports = {};
 
 (function(module, exports, require) {
 `
 
-const suffix = `
+const getSuffix = (filename) => `
 })({ exports: exports }, exports, window._require);
+window._requireCache['${filename}'] = exports;
 ;
 `
 
@@ -53,7 +28,6 @@ const prefixLineCount = prefix.split('\n').length - 1
 export default class extends Component {
 
   static defaultProps = {
-    code: '',
     assetRoot: '',
     onRun: () => {},
     onError: () => {},
@@ -116,7 +90,50 @@ export default class extends Component {
     }), '*')
   }
 
-  runApplication(code) {
+  require = (fileMap, entry, name) => {
+    let {assetRoot} = this.props
+
+    if (name === 'react-native') {
+      return ReactNative
+    } else if (name === 'react') {
+      return React
+
+    // If name begins with . or ..
+    } else if (name.match(/^\.{1,2}\//)) {
+
+      // Check if we're referencing another tab
+      const filename = Object.keys(fileMap).find(x => `${name}.js` === `./${x}`)
+
+      if (filename) {
+        if (filename === entry) {
+          throw new Error(`Requiring entry file ${entry} would cause an infinite loop`)
+        }
+
+        if (!window._requireCache[filename]) {
+          this.evaluate(filename, fileMap[filename])
+        }
+
+        return window._requireCache[filename]
+      }
+
+      // Resolve local asset paths
+      if (! assetRoot.match(/\/$/)) {
+        assetRoot += '/'
+      }
+
+      return {uri: assetRoot + name}
+
+    // If we have vendor components registered and loaded,
+    // allow for them to be resolved here
+    } else if (VendorComponents.get(name)) {
+      return VendorComponents.get(name)
+    } else {
+      console.error(`Failed to resolve module ${name}`)
+      return {}
+    }
+  }
+
+  runApplication({fileMap, entry}) {
     const screenElement = this.refs.root
 
     this.resetApplication()
@@ -124,7 +141,10 @@ export default class extends Component {
     this.props.onRun()
 
     try {
-      this.evaluate(code)
+      window._require = this.require.bind(this, fileMap, entry)
+      window._requireCache = {}
+
+      this.evaluate(entry, fileMap[entry])
 
       AppRegistry.runApplication(APP_NAME, {
         rootTag: screenElement,
@@ -142,10 +162,8 @@ export default class extends Component {
     ReactDOM.unmountComponentAtNode(screenElement)
   }
 
-  evaluate(code) {
-    window._require = _require.bind(null, this.props.assetRoot)
-
-    const wrapped = prefix + code + suffix
+  evaluate(filename, code) {
+    const wrapped = prefix + code + getSuffix(filename)
 
     eval(wrapped)
   }
