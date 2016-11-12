@@ -13,6 +13,7 @@ const styles = prefixObject({
     backgroundColor: '#3B3738',
     boxShadow: '0 1px 1px rgba(0,0,0,0.2)',
     zIndex: 1000,
+    overflow: 'hidden',
   },
   text: {
     userSelect: 'none',
@@ -26,6 +27,9 @@ const styles = prefixObject({
     borderBottomColor: '#1990B8',
     borderBottomWidth: 0,
     transition: 'border-width 0.1s, color 0.1s',
+  },
+  spacer: {
+    flex: '1 1 auto',
   },
 })
 
@@ -72,7 +76,7 @@ export default class extends Component {
   }
 
   render() {
-    const {tabs} = this.props
+    const {children, tabs} = this.props
     const computedStyles = this.getComputedStyles()
 
     return (
@@ -86,6 +90,8 @@ export default class extends Component {
             {tab}
           </div>
         ))}
+        <div style={styles.spacer} />
+        {children}
       </div>
     )
   }

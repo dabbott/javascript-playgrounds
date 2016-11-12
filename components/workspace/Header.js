@@ -17,8 +17,12 @@ const styles = prefixObject({
     fontSize: 13,
     fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
     fontWeight: 'bold',
-    lineHeight: '40px',
     padding: '0 20px',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  spacer: {
+    flex: '1 1 auto',
   },
 })
 
@@ -45,7 +49,7 @@ export default class extends Component {
   }
 
   render() {
-    const {text} = this.props
+    const {children, text} = this.props
     const computedStyles = this.getComputedStyles()
 
     return (
@@ -53,6 +57,8 @@ export default class extends Component {
         <div style={computedStyles.text}>
           {text}
         </div>
+        <div style={styles.spacer} />
+        {children}
       </div>
     )
   }
