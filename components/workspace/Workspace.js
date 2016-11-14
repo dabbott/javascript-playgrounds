@@ -31,6 +31,7 @@ const styles = prefixObject({
     alignItems: 'stretch',
     minWidth: 0,
     minHeight: 0,
+    overflow: 'hidden', // Clip box shadows
   },
   right: {
     position: 'relative',
