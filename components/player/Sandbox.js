@@ -4,6 +4,9 @@ import ReactNative, { AppRegistry } from 'react-native-web'
 import pureRender from 'pure-render-decorator'
 import VendorComponents from './VendorComponents'
 
+// Make regeneratorRuntime globally available for async/await
+window.regeneratorRuntime = require('regenerator-runtime')
+
 const APP_NAME = 'App'
 
 // Override registerComponent in order to ignore the name used
