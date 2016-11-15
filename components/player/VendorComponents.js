@@ -2,6 +2,8 @@ import $scriptjs from 'scriptjs'
 import React from 'react'
 import ReactNative from 'react-native-web'
 
+import * as Networking from '../../utils/Networking'
+
 // Stubs for registering and getting vendor components
 const components = {}
 const requires = {}
@@ -45,7 +47,7 @@ export default class VendorComponents {
   static loadModules(modules) {
     return Promise.all(
       modules.map(async ([name, url]) => {
-        const text = await fetch(url).then(body => body.text())
+        const text = await Networking.get(url)
 
         VendorComponents.define(name, text)
       })
