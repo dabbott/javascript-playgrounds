@@ -15,13 +15,14 @@ AppRegistry.registerComponent = (name, f) => registerComponent(APP_NAME, f)
 
 const prefix = `
 var exports = {};
+var module = {exports: exports};
 
 (function(module, exports, require) {
 `
 
 const getSuffix = (filename) => `
-})({ exports: exports }, exports, window._require);
-window._requireCache['${filename}'] = exports;
+})(module, exports, window._require);
+window._requireCache['${filename}'] = module.exports;
 ;
 `
 
@@ -94,6 +95,7 @@ export default class extends Component {
   }
 
   require = (fileMap, entry, name) => {
+    const {_requireCache} = window
     let {assetRoot} = this.props
 
     if (name === 'react-native') {
@@ -112,11 +114,11 @@ export default class extends Component {
           throw new Error(`Requiring entry file ${entry} would cause an infinite loop`)
         }
 
-        if (!window._requireCache[filename]) {
+        if (!_requireCache[filename]) {
           this.evaluate(filename, fileMap[filename])
         }
 
-        return window._requireCache[filename]
+        return _requireCache[filename]
       }
 
       // Resolve local asset paths
@@ -130,6 +132,15 @@ export default class extends Component {
     // allow for them to be resolved here
     } else if (VendorComponents.get(name)) {
       return VendorComponents.get(name)
+
+    } else if (VendorComponents.require(name)) {
+      const code = VendorComponents.require(name)
+
+      if (!_requireCache[name]) {
+        this.evaluate(name, code)
+      }
+
+      return _requireCache[name]
     } else {
       console.error(`Failed to resolve module ${name}`)
       return {}
