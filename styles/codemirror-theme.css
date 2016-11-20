@@ -45,3 +45,13 @@
   background-color: #FFDADA;
   animation: cm-line-warning 0.5s;
 }
+
+/* read-only styles */
+
+.read-only .CodeMirror, .read-only .CodeMirror-gutters {
+  background: rgb(238,238,238);
+}
+
+.read-only .CodeMirror-linenumber {
+  color: #BCBCBC;
+}

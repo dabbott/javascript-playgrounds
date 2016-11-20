@@ -34,11 +34,12 @@ export default class extends Component {
     initialValue: null,
     value: null,
     onChange: () => {},
+    readOnly: false,
   }
 
   componentDidMount() {
     if (typeof navigator !== 'undefined') {
-      const {filename, initialValue, value, onChange} = this.props
+      const {filename, initialValue, value, readOnly, onChange} = this.props
 
       requireAddons()
       const CodeMirror = require('codemirror')
@@ -51,6 +52,7 @@ export default class extends Component {
         this.refs.editor,
         {
           ...options,
+          readOnly,
           value: docCache[filename].linkedDoc({sharedHist: true}),
         }
       )
@@ -96,8 +98,10 @@ export default class extends Component {
   }
 
   render() {
+    const {readOnly} = this.props
+
     return (
-      <div style={styles.editorContainer}>
+      <div style={styles.editorContainer} className={readOnly && 'read-only'}>
         <div style={styles.editor} ref={'editor'} />
       </div>
     )

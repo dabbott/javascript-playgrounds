@@ -324,6 +324,7 @@ export default class extends Component {
         )}
         <Editor
           key={getTranspilerId(activeTab)}
+          readOnly={true}
           value={transpilerCache[getTranspilerId(activeTab)]}
           filename={getTranspilerId(activeTab)}
         />
