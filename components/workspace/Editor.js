@@ -31,31 +31,27 @@ const docCache = {}
 export default class extends Component {
 
   static defaultProps = {
-    initialValue: '',
+    initialValue: null,
+    value: null,
     onChange: () => {},
-  }
-
-  constructor() {
-    super()
-    this.state = {}
   }
 
   componentDidMount() {
     if (typeof navigator !== 'undefined') {
-      const {filename, initialValue, onChange} = this.props
+      const {filename, initialValue, value, onChange} = this.props
 
       requireAddons()
       const CodeMirror = require('codemirror')
 
       if (!docCache[filename]) {
-        docCache[filename] = new CodeMirror.Doc(initialValue, options.mode)
+        docCache[filename] = new CodeMirror.Doc(initialValue || value || '', options.mode)
       }
 
       this.cm = CodeMirror(
         this.refs.editor,
         {
           ...options,
-          value: docCache[filename],
+          value: docCache[filename].linkedDoc({sharedHist: true}),
         }
       )
 
@@ -67,14 +63,21 @@ export default class extends Component {
 
   componentWillUnmount() {
     if (typeof navigator !== 'undefined') {
+      const {filename} = this.props
       const CodeMirror = require('codemirror')
 
+      // Store a reference to the current linked doc
+      const linkedDoc = this.cm.doc
+
       this.cm.swapDoc(new CodeMirror.Doc('', options.mode))
+
+      // Unlink the doc
+      docCache[filename].unlinkDoc(linkedDoc)
     }
   }
 
   componentWillUpdate(nextProps) {
-    const {errorLineNumber: nextLineNumber} = nextProps
+    const {errorLineNumber: nextLineNumber, value} = nextProps
     const {errorLineNumber: prevLineNumber} = this.props
 
     if (this.cm) {
@@ -84,6 +87,10 @@ export default class extends Component {
 
       if (typeof nextLineNumber === 'number') {
         this.cm.addLineClass(nextLineNumber, "background", "cm-line-error")
+      }
+
+      if (typeof value === 'string' && value !== this.cm.getValue()) {
+        this.cm.setValue(value)
       }
     }
   }

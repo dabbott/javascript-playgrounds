@@ -32,6 +32,8 @@ let {
   vendorComponents = '[]',
   styles = '{}',
   fullscreen = 'false',
+  panes = '["editor", "player"]',
+  transpilerTitle = '',
 } = getHashString()
 
 const parsedFiles = JSON.parse(files)
@@ -72,6 +74,8 @@ const root = (
       vendorComponents={JSON.parse(vendorComponents)}
       externalStyles={JSON.parse(styles)}
       fullscreen={fullscreen === 'true' && screenfull.enabled}
+      panes={JSON.parse(panes)}
+      transpilerTitle={transpilerTitle}
       onChange={setHashString}
     />
   </div>

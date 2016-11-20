@@ -6,13 +6,13 @@ const Babel = require('babel-core')
 import plugins from './utils/BabelPlugins'
 
 onmessage = function(event) {
-  const {code: value, filename} = event.data
+  const {code: value, filename, options} = event.data
   let output
 
   try {
     const code = Babel.transform(value, {
       plugins,
-      retainLines: true,
+      ...options,
     }).code
 
     output = {
