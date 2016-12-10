@@ -3,7 +3,7 @@ require('./styles/reset.css')
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-import Player from './components/player/Player'
+import Sandbox from './components/player/Sandbox'
 import { getHashString } from './utils/HashString'
 import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
 import VendorComponents from './components/player/VendorComponents'
@@ -17,20 +17,14 @@ const style = prefix({
 
 const {
   id = '0',
-  width = '210',
-  platform = 'ios',
-  scale = '1',
   assetRoot = '',
   vendorComponents = '[]'
 } = getHashString()
 
 const root = (
   <div style={style}>
-    <Player
+    <Sandbox
       id={id}
-      width={parseFloat(width)}
-      scale={parseFloat(scale)}
-      platform={platform}
       assetRoot={assetRoot}
     />
   </div>

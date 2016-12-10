@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import pureRender from 'pure-render-decorator'
 
+import Phone from './Phone'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
 const styles = prefixObject({
@@ -90,13 +91,18 @@ export default class extends Component {
     const vendorComponentsEncoded = encodeURIComponent(JSON.stringify(vendorComponents))
 
     return id && (
-      <iframe
-        style={styles.iframe}
-        ref={'iframe'}
+      <Phone
         width={width}
-        frameBorder={0}
-        src={`player.html#id=${id}&width=${width}&platform=${platform}&scale=${scale}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}`}
-      />
+        device={platform}
+        scale={scale}
+      >
+        <iframe
+          style={styles.iframe}
+          ref={'iframe'}
+          frameBorder={0}
+          src={`player.html#id=${id}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}`}
+        />
+      </Phone>
     )
   }
 }
