@@ -163,6 +163,9 @@ export default class extends Component {
       AppRegistry.runApplication(APP_NAME, {
         rootTag: screenElement,
       })
+
+      // After rendering, add {overflow: hidden} to prevent scrollbars
+      screenElement.firstElementChild.style.overflow = 'hidden'
     } catch (e) {
       const message = this.buildErrorMessage(e)
       this.throwError(message)
