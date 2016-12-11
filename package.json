@@ -29,9 +29,9 @@
     "inline-style-prefixer": "^2.0.4",
     "json-loader": "^0.5.4",
     "pure-render-decorator": "^1.1.1",
-    "react": "^15.3.0",
-    "react-dom": "^15.3.0",
-    "react-native-web": "0.0.49",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "react-native-web": "0.0.56",
     "regenerator-runtime": "^0.9.5",
     "screenfull": "^3.0.2",
     "scriptjs": "^2.5.8"
