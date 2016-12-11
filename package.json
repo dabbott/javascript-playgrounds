@@ -31,7 +31,7 @@
     "pure-render-decorator": "^1.1.1",
     "react": "15.3.2",
     "react-dom": "15.3.2",
-    "react-native-web": "0.0.55",
+    "react-native-web": "0.0.56",
     "regenerator-runtime": "^0.9.5",
     "screenfull": "^3.0.2",
     "scriptjs": "^2.5.8"

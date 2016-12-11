@@ -7,6 +7,8 @@ import { prefixObject } from '../../utils/PrefixInlineStyles'
 const styles = prefixObject({
   iframe: {
     flex: '1 1 auto',
+    minWidth: 0,
+    minHeight: 0,
   },
 })
 

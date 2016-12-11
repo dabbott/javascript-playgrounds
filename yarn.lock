@@ -3648,9 +3648,9 @@ react-dom@~15.3.2, react-dom@15.3.2:
   version "15.3.2"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-15.3.2.tgz#c46b0aa5380d7b838e7a59c4a7beff2ed315531f"
 
-react-native-web@0.0.55:
-  version "0.0.55"
-  resolved "https://registry.yarnpkg.com/react-native-web/-/react-native-web-0.0.55.tgz#7e74f05a18415148e5a45ec42779b79a5b767218"
+react-native-web@0.0.56:
+  version "0.0.56"
+  resolved "https://registry.yarnpkg.com/react-native-web/-/react-native-web-0.0.56.tgz#2a3811b30d79987e68011acd269dc77c27314505"
   dependencies:
     animated "^0.1.3"
     array-find-index "^1.0.2"

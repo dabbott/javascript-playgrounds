@@ -26,6 +26,7 @@ export default class extends Component {
         width,
         height,
         margin: '0 auto',
+        position: 'relative',
       },
       phone: {
         width: deviceImageWidth,
@@ -48,14 +49,23 @@ export default class extends Component {
         transform: `scale(${scale}, ${scale})`,
         overflow: 'hidden',
       },
+      overlay: {
+        position: 'absolute',
+        top: (deviceImageHeight - screenHeight) / 2 * imageScale,
+        left: (deviceImageWidth - screenWidth) / 2 * imageScale,
+        width: screenWidth * imageScale,
+        height: screenHeight * imageScale,
+        display: 'flex',
+      },
     })
 
     return (
       <div style={styles.container}>
         <div style={styles.phone}>
-          <div style={styles.screen}>
-            {children}
-          </div>
+          <div style={styles.screen} />
+        </div>
+        <div style={styles.overlay}>
+          {children}
         </div>
       </div>
     )
