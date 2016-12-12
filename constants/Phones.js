@@ -29,8 +29,6 @@ export default {
     deviceImageHeight: 1738,
     screenWidth: 750,
     screenHeight: 1334,
-    devicePixelDensity: 2,
-    zoom: 1.5,
   },
   android: {
     deviceImageUrl: 'https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/google-nexus-5x.png',
@@ -38,7 +36,5 @@ export default {
     deviceImageHeight: 2432,
     screenWidth: 1080,
     screenHeight: 1920,
-    devicePixelDensity: 2,
-    zoom: 2,
   },
 }
