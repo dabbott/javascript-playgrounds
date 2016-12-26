@@ -40,9 +40,9 @@ This component is a simple wrapper around the `iframe` that handles encoding par
 
 A `umd` build of this React component is available in the `dist` directory.
 
-#### As Iframe
+#### As `iframe`
 
-If you're not using React, include the web player in an iframe.
+If you're not using React, include the web player in an `iframe`.
 
 ```html
 <iframe width="880" height="425" frameborder="0" src="//cdn.rawgit.com/dabbott/react-native-web-player/gh-v1.8.1/index.html"></iframe>
@@ -100,9 +100,9 @@ When using the iframe directly, the following parameters must be JSON encoded *a
 
 ##### Notes on setting parameters:
 
-The easiest way to set the `code` parameter is to edit the code in the web player and copy and paste the url when you're done (the url updates automatically as you type).
+When used as an `iframe`, the easiest way to set the `code` parameter is to edit the code in the web player and copy and paste the url when you're done (the url updates automatically as you type).
 
-Alternately, you can manually url-encode the parameters. You can do so via the JavaScript console.
+Alternately, you can manually url-encode the parameters. You can do so programmatically or via the JavaScript console.
 ```JavaScript
 encodeURIComponent('Hello World')
 # => "Hello%20World"
