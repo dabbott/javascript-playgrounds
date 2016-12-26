@@ -3,9 +3,15 @@ Run react native apps in your browser!
 
 [Try it out!](https://cdn.rawgit.com/dabbott/react-native-web-player/gh-v1.8.1/index.html#title=React%20Native%20Web%20Player)
 
+### About
+
+This project uses [`react-native-web`](https://github.com/necolas/react-native-web) to create an environment for learning and experimenting with React Native.  
+
+The web player is implemented as an `iframe` for easy, performant inclusion in any webpage. Transpilation is done in a web worker so the main thread isn't blocked as the page loads.
+
 ### Usage
 
-The web player may be included in your site either as a React component or directly as an iframe.
+The web player may be included in your site either as a React component or directly as an `iframe`.
 
 #### As React Component
 
@@ -15,7 +21,7 @@ If you're using React:
 npm install --save react-native-web-player
 ```
 
-Then
+Then:
 
 ```js
 import WebPlayer from 'react-native-web-player'
@@ -27,7 +33,10 @@ export default () => (
 )
 ```
 
-This component is a wrapper around the `iframe` that handles encoding parameters for you.
+This component is a simple wrapper around the `iframe` that handles encoding parameters for you. While it passes most props along to the `iframe`, it has a few extra props:
+
+- **`style`** - The style of the `div` which wraps the `iframe` (the iframe has `100%` width and height)
+- **`baseURL`** - Optionally, specify a custom url to load the player from. This url should not include a hash. Defaults to the `//cdn.rawgit.com` url as described below.
 
 A `umd` build of this React component is available in the `dist` directory.
 
@@ -43,7 +52,7 @@ If you're not using React, include the web player in an iframe.
 
 The React component accepts the following props. Props don't need to be URI-encoded or JSON-encoded, as this is handled automatically.
 
-The iframe accepts the following parameters *after the hash* in the url. You must URI encode every parameter.
+The `iframe` accepts the following parameters *after the hash* in the url. You must URI encode every parameter.
 
 - **`code`** - The code to show/run in the player. Defaults to the sample app.
 - **`title`** - An optional title for the player. By default, there is no title.
@@ -52,7 +61,7 @@ The iframe accepts the following parameters *after the hash* in the url. You mus
 - **`platform`** - One of `ios` or `android`. Defaults to `ios`. Currently this changes the phone image, but may also have an effect on how the code is executed in the future.
 - **`entry`** - The filename of the entry file. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`.
 - **`initialTab`** - The filename of the tab to show by default. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`.
-- **`fullscreen`** - Show a button to enable fullscreen editing. Defaults to `false`. Note that the iframe must have the `allowfullscreen` attribute for this to work (in React, `allowFullScreen`).
+- **`fullscreen`** - Show a button to enable fullscreen editing. Defaults to `false`. Note that the iframe must have the `allowfullscreen` attribute for this to work.
 - **`assetRoot`** - Specifies the root url for asset `require`s. E.g. to require `http://localhost:8080/images/hello.png`, you could set `assetRoot` to `'http://localhost:8080/'` and write `require('./images/hello.png')` in your code.
 - **`transpilerTitle`** - An optional title for the transpiler output pane. By default, there is no title.
 
@@ -89,7 +98,7 @@ When using the iframe directly, the following parameters must be JSON encoded *a
 
   Example usage: `{header: {backgroundColor: 'red'}}`
 
-###### Notes on setting parameters:
+##### Notes on setting parameters:
 
 The easiest way to set the `code` parameter is to edit the code in the web player and copy and paste the url when you're done (the url updates automatically as you type).
 
