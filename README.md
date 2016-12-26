@@ -7,7 +7,7 @@ Run react native apps in your browser!
 
 The web player may be included in your site either as a React component or directly as an iframe.
 
-##### As React Component
+#### As React Component
 
 If you're using React:
 
@@ -31,7 +31,7 @@ This component is a wrapper around the `iframe` that handles encoding parameters
 
 A `umd` build of this React component is available in the `dist` directory.
 
-##### As Iframe
+#### As Iframe
 
 If you're not using React, include the web player in an iframe.
 
@@ -45,20 +45,20 @@ The React component accepts the following props. Props don't need to be URI-enco
 
 The iframe accepts the following parameters *after the hash* in the url. You must URI encode every parameter.
 
-- `code` - The code to show/run in the player. Defaults to the sample app.
-- `title` - An optional title for the player. By default, there is no title.
-- `width` - The width of the device. Defaults to `210`.
-- `scale` - Zoom the device screen. Defaults to `1`.
-- `platform` - One of `ios` or `android`. Defaults to `ios`. Currently this changes the phone image, but may also have an effect on how the code is executed in the future.
-- `entry` - The filename of the entry file. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`.
-- `initialTab` - The filename of the tab to show by default. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`.
-- `fullscreen` - Show a button to enable fullscreen editing. Defaults to `false`. Note that the iframe must have the `allowfullscreen` attribute for this to work (in React, `allowFullScreen`).
-- `assetRoot` - Specifies the root url for asset `require`s. E.g. to require `http://localhost:8080/images/hello.png`, you could set `assetRoot` to `'http://localhost:8080/'` and write `require('./images/hello.png')` in your code.
-- `transpilerTitle` - An optional title for the transpiler output pane. By default, there is no title.
+- **`code`** - The code to show/run in the player. Defaults to the sample app.
+- **`title`** - An optional title for the player. By default, there is no title.
+- **`width`** - The width of the device. Defaults to `210`.
+- **`scale`** - Zoom the device screen. Defaults to `1`.
+- **`platform`** - One of `ios` or `android`. Defaults to `ios`. Currently this changes the phone image, but may also have an effect on how the code is executed in the future.
+- **`entry`** - The filename of the entry file. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`.
+- **`initialTab`** - The filename of the tab to show by default. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`.
+- **`fullscreen`** - Show a button to enable fullscreen editing. Defaults to `false`. Note that the iframe must have the `allowfullscreen` attribute for this to work (in React, `allowFullScreen`).
+- **`assetRoot`** - Specifies the root url for asset `require`s. E.g. to require `http://localhost:8080/images/hello.png`, you could set `assetRoot` to `'http://localhost:8080/'` and write `require('./images/hello.png')` in your code.
+- **`transpilerTitle`** - An optional title for the transpiler output pane. By default, there is no title.
 
 When using the iframe directly, the following parameters must be JSON encoded *and then also* URI encoded:
 
-- `files` - Array of files to show, one per tab. The format is an array of 2-element arrays, where the first element is the filename (e.g. `index.js`) and the second is the code.
+- **`files`** - Array of files to show, one per tab. The format is an array of 2-element arrays, where the first element is the filename (e.g. `index.js`) and the second is the code.
 
   Example usage: `[['index.js', 'console.log(1)'], ['foo.js', 'console.log(2)']]`
 
@@ -66,18 +66,18 @@ When using the iframe directly, the following parameters must be JSON encoded *a
 
   Use the `entry` and `initialTab` parameters to control which file is executed first and which tab is shown by default.
 
-- `panes` - Array of panes to show. Each element is one of:
+- **`panes`** - Array of panes to show. Each element is one of:
 `editor`, `player`, `transpiler`.
 
   The default value is: `['editor', 'player']`
 
-- `vendorComponents` - Array of 3rd party components to make available to the sandbox. The format is an array of either 2-element or 3-element arrays.
+- **`vendorComponents`** - Array of 3rd party components to make available to the sandbox. The format is an array of either 2-element or 3-element arrays.
 
   - To use a CommonJS `require`-style loader, pass a 2-element array, where the first element is the `require()` name, and the second is the source url. E.g. to load moment.js: set `vendorComponents` to the value `[['moment', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js']]`
 
   - To load a component as a property on `window`, pass a 3-element array, where the first element is the `require()` name, the second element is the window property name (e.g. `window.moment`), and the third element is the source url. E.g. to load moment.js: set `vendorComponents` to the value `[['moment', 'moment', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js']]`
 
-- `styles` - An object containing style objects. If you're familiar with React Native, this is the `foo` in `StyleSheet.create(foo)`. Styles passed will be vendor-prefixed automatically. The following named styles can be used to override default styling.
+- **`styles`** - An object containing style objects. If you're familiar with React Native, this is the `foo` in `StyleSheet.create(foo)`. Styles passed will be vendor-prefixed automatically. The following named styles can be used to override default styling.
 
   - `header`
   - `headerText`
