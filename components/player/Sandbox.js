@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import ReactNative, { AppRegistry } from 'react-native-web'
 import pureRender from 'pure-render-decorator'
+
 import VendorComponents from './VendorComponents'
+import { prefixObject } from '../../utils/PrefixInlineStyles'
 
 // Make regeneratorRuntime globally available for async/await
 window.regeneratorRuntime = require('regenerator-runtime')
@@ -13,6 +15,7 @@ const APP_NAME = 'App'
 const registerComponent = AppRegistry.registerComponent.bind(AppRegistry)
 AppRegistry.registerComponent = (name, f) => {
   registerComponent(APP_NAME, f)
+  window._registeredThunk = f
   window._didRegisterComponent = true
 }
 
@@ -30,6 +33,15 @@ window._requireCache['${filename}'] = module.exports;
 `
 
 const prefixLineCount = prefix.split('\n').length - 1
+
+const styles = prefixObject({
+  root: {
+    flex: '1 1 auto',
+    alignSelf: 'stretch',
+    width: '100%',
+    height: '100%',
+  },
+})
 
 @pureRender
 export default class extends Component {
@@ -103,6 +115,8 @@ export default class extends Component {
 
     if (name === 'react-native') {
       return ReactNative
+    } else if (name === 'react-dom') {
+      return ReactDOM
     } else if (name === 'react') {
       return React
 
@@ -153,7 +167,9 @@ export default class extends Component {
   runApplication({fileMap, entry}) {
     const screenElement = this.refs.root
 
-    this.resetApplication()
+    if (window._didRegisterComponent) {
+      this.resetApplication()
+    }
 
     this.props.onRun()
 
@@ -175,16 +191,19 @@ export default class extends Component {
 
       // If no component was registered, bail out
       if (!window._didRegisterComponent) {
-        this.throwError(
-          `WebPlayerError: No component exported as default or registered with
-          \`AppRegistry.registerComponent\`.`.replace('\n', ' ')
-        )
         return
       }
 
-      AppRegistry.runApplication(APP_NAME, {
-        rootTag: screenElement,
-      })
+      // Render the registered component. This works for both React Native
+      // and React Web, whereas AppRegistry.runApplication renders with some
+      // additional styles which aren't correct for the root of a web react app.
+      const RegisteredComponent = window._registeredThunk()
+      ReactDOM.render(<RegisteredComponent />, screenElement)
+
+      // TODO Should we still AppRegistry when running a React Native app?
+      // AppRegistry.runApplication(APP_NAME, {
+      //   rootTag: screenElement,
+      // })
 
       // After rendering, add {overflow: hidden} to prevent scrollbars
       if (screenElement.firstElementChild) {
@@ -211,7 +230,11 @@ export default class extends Component {
 
   render() {
     return (
-      <div ref={"root"} />
+      <div
+        ref={'root'}
+        id={'app'}
+        style={styles.root}
+      />
     )
   }
 }
