@@ -51,7 +51,6 @@ export default class extends Component {
 
     return (
       <div style={styles.container}>
-        <div style={styles.phone} />
         <div style={styles.screen} />
         <div style={styles.overlay}>
           {children}

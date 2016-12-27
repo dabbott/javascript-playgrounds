@@ -86,7 +86,7 @@ export default class extends Component {
   }
 
   renderFrame = () => {
-    const {width, assetRoot, vendorComponents} = this.props
+    const {assetRoot, vendorComponents} = this.props
     const {id} = this.state
 
     if (!id) return null
@@ -96,7 +96,7 @@ export default class extends Component {
 
     return (
       <iframe
-        style={{...styles.iframe, width}}
+        style={styles.iframe}
         ref={'iframe'}
         frameBorder={0}
         src={`player.html#id=${id}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}`}
