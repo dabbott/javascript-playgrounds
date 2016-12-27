@@ -63,6 +63,7 @@ export default class WebPlayer extends Component {
 
   static propTypes = {
     style: PropTypes.any,
+    className: PropTypes.string,
     baseURL: PropTypes.string,
 
     // Passthrough
@@ -91,6 +92,7 @@ export default class WebPlayer extends Component {
 
     const params = {...props}
     delete params.style
+    delete params.className
     delete params.baseURL
 
     const encodedParams = encodeParams(params)
@@ -108,10 +110,13 @@ export default class WebPlayer extends Component {
 
   render() {
     const {hash} = this
-    const {style, baseURL} = this.props
+    const {style, className, baseURL} = this.props
 
     return (
-      <div style={style}>
+      <div
+        style={style}
+        className={className}
+      >
         <iframe
           style={styles.iframe}
           frameBorder={0}
