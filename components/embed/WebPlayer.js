@@ -44,7 +44,7 @@ const encodeParams = (params) => {
   }, {})
 }
 
-const WEB_PLAYER_VERSION = '1.8.1'
+const WEB_PLAYER_VERSION = '1.9.0'
 const WEB_PLAYER_URL = `//cdn.rawgit.com/dabbott/react-native-web-player/gh-v${WEB_PLAYER_VERSION}/index.html`
 
 const styles = {
