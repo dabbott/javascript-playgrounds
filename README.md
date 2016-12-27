@@ -95,6 +95,7 @@ When using the iframe directly, the following parameters must be JSON encoded *a
   - `tabTextActive`
   - `transpilerHeader`
   - `transpilerHeaderText`
+  - `playerPane`
 
   Example usage: `{header: {backgroundColor: 'red'}}`
 

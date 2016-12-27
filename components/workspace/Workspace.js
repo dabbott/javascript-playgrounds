@@ -333,10 +333,14 @@ export default class extends Component {
   }
 
   renderPlayer = (key) => {
-    const {width, scale, platform, assetRoot, vendorComponents} = this.props
+    const {width, scale, platform, assetRoot, vendorComponents, externalStyles} = this.props
+
+    const style = externalStyles.playerPane
+      ? {...styles.playerPane, ...externalStyles.playerPane}
+      : styles.playerPane
 
     return (
-      <div key={key} style={styles.playerPane}>
+      <div key={key} style={style}>
         <PlayerFrame
           ref={'player'}
           width={width}

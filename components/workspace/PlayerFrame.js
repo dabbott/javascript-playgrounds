@@ -85,25 +85,39 @@ export default class extends Component {
     }
   }
 
-  render() {
-    const {width, scale, platform, assetRoot, vendorComponents} = this.props
+  renderFrame = () => {
+    const {width, assetRoot, vendorComponents} = this.props
     const {id} = this.state
+
+    if (!id) return null
 
     // Encode vendor components and load into player frame
     const vendorComponentsEncoded = encodeURIComponent(JSON.stringify(vendorComponents))
 
-    return id && (
+    return (
+      <iframe
+        style={{...styles.iframe, width}}
+        ref={'iframe'}
+        frameBorder={0}
+        src={`player.html#id=${id}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}`}
+      />
+    )
+  }
+
+  render() {
+    const {width, scale, platform} = this.props
+
+    if (platform === 'web') {
+      return this.renderFrame()
+    }
+
+    return (
       <Phone
         width={width}
         device={platform}
         scale={scale}
       >
-        <iframe
-          style={styles.iframe}
-          ref={'iframe'}
-          frameBorder={0}
-          src={`player.html#id=${id}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}`}
-        />
+        {this.renderFrame()}
       </Phone>
     )
   }
