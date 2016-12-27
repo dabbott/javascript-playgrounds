@@ -15,7 +15,6 @@ const APP_NAME = 'App'
 const registerComponent = AppRegistry.registerComponent.bind(AppRegistry)
 AppRegistry.registerComponent = (name, f) => {
   registerComponent(APP_NAME, f)
-  window._registeredThunk = f
   window._didRegisterComponent = true
 }
 
@@ -194,16 +193,9 @@ export default class extends Component {
         return
       }
 
-      // Render the registered component. This works for both React Native
-      // and React Web, whereas AppRegistry.runApplication renders with some
-      // additional styles which aren't correct for the root of a web react app.
-      const RegisteredComponent = window._registeredThunk()
-      ReactDOM.render(<RegisteredComponent />, screenElement)
-
-      // TODO Should we still AppRegistry when running a React Native app?
-      // AppRegistry.runApplication(APP_NAME, {
-      //   rootTag: screenElement,
-      // })
+      AppRegistry.runApplication(APP_NAME, {
+        rootTag: screenElement,
+      })
 
       // After rendering, add {overflow: hidden} to prevent scrollbars
       if (screenElement.firstElementChild) {
