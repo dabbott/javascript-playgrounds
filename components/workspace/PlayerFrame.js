@@ -21,6 +21,8 @@ export default class extends Component {
     scale: 1,
     assetRoot: '',
     vendorComponents: [],
+    playerStyleSheet: '',
+    playerCSS: '',
     onError: () => {},
     onRun: () => {},
   }
@@ -86,20 +88,20 @@ export default class extends Component {
   }
 
   renderFrame = () => {
-    const {assetRoot, vendorComponents} = this.props
+    const {assetRoot, vendorComponents, playerStyleSheet, playerCSS} = this.props
     const {id} = this.state
 
     if (!id) return null
 
-    // Encode vendor components and load into player frame
     const vendorComponentsEncoded = encodeURIComponent(JSON.stringify(vendorComponents))
+    const css = encodeURIComponent(playerCSS)
 
     return (
       <iframe
         style={styles.iframe}
         ref={'iframe'}
         frameBorder={0}
-        src={`player.html#id=${id}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}`}
+        src={`player.html#id=${id}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}&styleSheet=${playerStyleSheet}&css=${css}`}
       />
     )
   }

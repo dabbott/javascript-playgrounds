@@ -9,6 +9,7 @@ import Workspace from './components/workspace/Workspace'
 import { getHashString, setHashString } from './utils/HashString'
 import DefaultCode from './constants/DefaultCode'
 import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
+import { appendCSS } from './utils/Styles'
 
 const style = prefix({
   flex: '1 1 auto',
@@ -34,7 +35,14 @@ let {
   fullscreen = 'false',
   panes = '["editor", "player"]',
   transpilerTitle = '',
+  playerStyleSheet = 'reset',
+  playerCSS = '',
+  workspaceCSS = '',
 } = getHashString()
+
+if (workspaceCSS) {
+  appendCSS(workspaceCSS)
+}
 
 const parsedFiles = JSON.parse(files)
 let fileMap
@@ -76,6 +84,8 @@ const root = (
       fullscreen={fullscreen === 'true' && screenfull.enabled}
       panes={JSON.parse(panes)}
       transpilerTitle={transpilerTitle}
+      playerStyleSheet={playerStyleSheet}
+      playerCSS={playerCSS}
       onChange={setHashString}
     />
   </div>

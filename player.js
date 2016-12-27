@@ -1,11 +1,10 @@
-require('./styles/reset.css')
-
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
 import Sandbox from './components/player/Sandbox'
 import { getHashString } from './utils/HashString'
 import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
+import { appendCSS } from './utils/Styles'
 import VendorComponents from './components/player/VendorComponents'
 
 const style = prefix({
@@ -18,8 +17,20 @@ const style = prefix({
 const {
   id = '0',
   assetRoot = '',
-  vendorComponents = '[]'
+  vendorComponents = '[]',
+  styleSheet = 'reset',
+  css = '',
 } = getHashString()
+
+if (styleSheet === 'reset') {
+  require('./styles/reset.css')
+}
+
+require('./styles/player.css')
+
+if (css) {
+  appendCSS(css)
+}
 
 const root = (
   <div style={style}>

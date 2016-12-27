@@ -65,6 +65,9 @@ The `iframe` accepts the following parameters *after the hash* in the url. You m
 - **`fullscreen`** - Show a button to enable fullscreen editing. Defaults to `false`. Note that the iframe must have the `allowfullscreen` attribute for this to work.
 - **`assetRoot`** - Specifies the root url for asset `require`s. E.g. to require `http://localhost:8080/images/hello.png`, you could set `assetRoot` to `'http://localhost:8080/'` and write `require('./images/hello.png')` in your code.
 - **`transpilerTitle`** - An optional title for the transpiler output pane. By default, there is no title.
+- **`workspaceCSS`** - An optional CSS string to apply to the workspace `iframe`.
+- **`playerCSS`** - An optional CSS string to apply to the player's `iframe`.
+- **`playerStyleSheet`** - One of `reset` or `none`. When `reset`, the meyerweb CSS reset is applied to the player's `iframe`. Defaults to `reset`.
 
 When using the iframe directly, the following parameters must be JSON encoded *and then also* URI encoded:
 

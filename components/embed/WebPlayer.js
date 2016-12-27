@@ -13,6 +13,9 @@ const paramSchema = {
   width: 'text',
   scale: 'text',
   assetRoot: 'text',
+  workspaceCSS: 'text',
+  playerCSS: 'text',
+  playerStyleSheet: 'text',
 
   // JSON-encoded
   files: 'json',
@@ -77,6 +80,9 @@ export default class WebPlayer extends Component {
     width: PropTypes.number,
     scale: PropTypes.number,
     assetRoot: PropTypes.string,
+    workspaceCSS: PropTypes.string,
+    playerCSS: PropTypes.string,
+    playerStyleSheet: PropTypes.string,
     files: PropTypes.array,
     vendorComponents: PropTypes.array,
     panes: PropTypes.array,

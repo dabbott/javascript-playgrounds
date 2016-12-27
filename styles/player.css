@@ -1,0 +1,15 @@
+html, body, #react-root, #react-root > [data-reactroot] {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+#react-root {
+  display: flex;
+  font-family: 'helvetica';
+}
+
+:focus {
+  outline: none;
+}
