@@ -11,7 +11,10 @@ const APP_NAME = 'App'
 
 // Override registerComponent in order to ignore the name used
 const registerComponent = AppRegistry.registerComponent.bind(AppRegistry)
-AppRegistry.registerComponent = (name, f) => registerComponent(APP_NAME, f)
+AppRegistry.registerComponent = (name, f) => {
+  registerComponent(APP_NAME, f)
+  window._didRegisterComponent = true
+}
 
 const prefix = `
 var exports = {};
@@ -157,15 +160,36 @@ export default class extends Component {
     try {
       window._require = this.require.bind(this, fileMap, entry)
       window._requireCache = {}
+      window._didRegisterComponent = false
 
       this.evaluate(entry, fileMap[entry])
+
+      // Attempt to register the default export of the entry file
+      if (!window._didRegisterComponent) {
+        const EntryComponent = window._requireCache[entry]
+
+        if (EntryComponent && EntryComponent.default) {
+          AppRegistry.registerComponent(APP_NAME, () => EntryComponent.default)
+        }
+      }
+
+      // If no component was registered, bail out
+      if (!window._didRegisterComponent) {
+        this.throwError(
+          `WebPlayerError: No component exported as default or registered with
+          \`AppRegistry.registerComponent\`.`.replace('\n', ' ')
+        )
+        return
+      }
 
       AppRegistry.runApplication(APP_NAME, {
         rootTag: screenElement,
       })
 
       // After rendering, add {overflow: hidden} to prevent scrollbars
-      screenElement.firstElementChild.style.overflow = 'hidden'
+      if (screenElement.firstElementChild) {
+        screenElement.firstElementChild.style.overflow = 'hidden'
+      }
     } catch (e) {
       const message = this.buildErrorMessage(e)
       this.throwError(message)
