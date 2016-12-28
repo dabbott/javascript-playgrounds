@@ -12,14 +12,20 @@ module.exports = {
     libraryTarget: 'umd',
   },
   module: {
-    loaders: [
+    rules: [
       {
-        test: /\.js$/,
+        test: /\.js/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: { cacheDirectory: true }
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+            },
+          },
+        ]
       },
-    ]
+    ],
   },
   externals: {
     react: {
@@ -39,8 +45,6 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
       output: {
         comments: false,
@@ -51,6 +55,6 @@ module.exports = {
         screw_ie8: true,
         warnings: true,
       }
-    })
+    }),
   ],
 }
