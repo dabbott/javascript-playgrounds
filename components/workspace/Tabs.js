@@ -44,8 +44,10 @@ export default class extends Component {
 
   static defaultProps = {
     tabs: [],
+    titles: [],
     activeTab: null,
     onClickTab: () => {},
+    compareTabs: (a, b) => a === b,
     textStyle: null,
     activeTextStyle: null,
     tabStyle: null,
@@ -64,9 +66,9 @@ export default class extends Component {
   }
 
   getTextStyle = (tab) => {
-    const {activeTab, textStyle, activeTextStyle} = this.props
+    const {activeTab, textStyle, activeTextStyle, compareTabs} = this.props
 
-    if (tab === activeTab) {
+    if (compareTabs(tab, activeTab)) {
       const base = textStyle ? prefix({...styles.activeText, ...textStyle}) : styles.activeText
 
       return activeTextStyle ? prefix({...base, ...activeTextStyle}) : base
@@ -76,20 +78,24 @@ export default class extends Component {
   }
 
   render() {
-    const {children, tabs} = this.props
+    const {children, tabs, titles} = this.props
     const computedStyles = this.getComputedStyles()
 
     return (
       <div style={computedStyles.container}>
-        {tabs.map(tab => (
-          <div
-            key={tab}
-            style={this.getTextStyle(tab)}
-            onClick={this.onClickTab.bind(this, tab)}
-          >
-            {tab}
-          </div>
-        ))}
+        {tabs.map((tab, i) => {
+          const title = titles.length > 0 ? titles[i] : tab
+
+          return (
+            <div
+              key={title}
+              style={this.getTextStyle(tab)}
+              onClick={this.onClickTab.bind(this, tab)}
+            >
+              {title}
+            </div>
+          )
+        })}
         <div style={styles.spacer} />
         {children}
       </div>

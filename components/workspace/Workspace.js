@@ -9,6 +9,7 @@ import Overlay from './Overlay'
 import Button from './Button'
 import About from './About'
 import Tabs from './Tabs'
+import TabContainer from './TabContainer'
 import Fullscreen from './Fullscreen'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
@@ -21,6 +22,13 @@ const babelWorker = new BabelWorker()
 const transpilerPrefix = '@babel-'
 const getTranspilerId = (filename) => `${transpilerPrefix}${filename}`
 const isTranspilerId = (filename) => filename.indexOf(transpilerPrefix) === 0
+
+const containsPane = (panes, target) =>
+  panes.some(pane => (
+    typeof pane === 'string'
+      ? pane === target
+      : containsPane(pane.children, target)
+  ))
 
 const styles = prefixObject({
   container: {
@@ -74,6 +82,24 @@ const styles = prefixObject({
     display: 'flex',
     alignItems: 'stretch',
   },
+  column: {
+    flex: '1',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    minWidth: 0,
+    minHeight: 0,
+    overflow: 'hidden',
+  },
+  row: {
+    flex: '1',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    minWidth: 0,
+    minHeight: 0,
+    overflow: 'hidden',
+  },
 })
 
 @pureRender
@@ -108,12 +134,19 @@ export default class extends Component {
       showDetails: false,
       activeTab: initialTab,
       transpilerCache: {},
-      transpilerVisible: panes.indexOf('transpiler') >= 0,
-      playerVisible: panes.indexOf('player') >= 0,
+      transpilerVisible: containsPane(panes, 'transpiler'),
+      playerVisible: containsPane(panes, 'player'),
     }
 
     this.codeCache = {}
     this.playerCache = {}
+
+    // Map pane names to render methods
+    this.paneMap = {
+      editor: this.renderEditor,
+      transpiler: this.renderTranspiler,
+      player: this.renderPlayer,
+    }
 
     babelWorker.addEventListener("message", this.onBabelWorkerMessage)
   }
@@ -152,9 +185,8 @@ export default class extends Component {
   }
 
   runApplication = () => {
-    const {playerCache} = this
+    const {playerCache, player} = this
     const {entry} = this.props
-    const {player} = this.refs
 
     player.runApplication(playerCache, entry)
   }
@@ -344,7 +376,7 @@ export default class extends Component {
     return (
       <div key={key} style={style}>
         <PlayerFrame
-          ref={'player'}
+          ref={ref => this.player = ref}
           width={width}
           scale={scale}
           platform={platform}
@@ -359,18 +391,50 @@ export default class extends Component {
     )
   }
 
-  render() {
-    const {panes} = this.props
+  renderPane = (pane, i) => {
+    const {externalStyles} = this.props
 
-    const renderPane = {
-      editor: this.renderEditor,
-      transpiler: this.renderTranspiler,
-      player: this.renderPlayer,
+    if (typeof pane === 'string') {
+      return this.paneMap[pane](i)
+    }
+
+    const {children, type} = pane
+
+    if (type === 'stack') {
+      const tabs = children.map((child, i) => ({
+        title: typeof child === 'string' ? child : child.title,
+        index: i,
+        pane: child,
+      }))
+
+      return (
+        <TabContainer
+          tabs={tabs}
+          titles={tabs.map(x => x.title)}
+          initialTab={tabs[0]}
+          tabStyle={externalStyles.tab}
+          textStyle={externalStyles.tabText}
+          activeTextStyle={externalStyles.tabTextActive}
+          renderHiddenContent={true}
+          compareTabs={(a, b) => a.index === b.index}
+          renderContent={tab => this.renderPane(tab.pane, tab.index)}
+        />
+      )
     }
 
     return (
+      <div key={i} style={styles[type === 'row' ? 'row' : 'column']}>
+        {children.map(this.renderPane)}
+      </div>
+    )
+  }
+
+  render() {
+    const {panes} = this.props
+
+    return (
       <div style={styles.container}>
-        {panes.map((pane, i) => renderPane[pane](i))}
+        {panes.map(this.renderPane)}
       </div>
     )
   }
