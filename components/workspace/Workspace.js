@@ -14,7 +14,7 @@ import Fullscreen from './Fullscreen'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
-const BabelWorker = require("worker!../../babel-worker.js")
+const BabelWorker = require("worker-loader!../../babel-worker.js")
 const babelWorker = new BabelWorker()
 
 // Utilities for determining which babel worker responses are for the player vs

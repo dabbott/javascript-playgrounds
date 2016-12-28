@@ -13,22 +13,24 @@ module.exports = {
     vendor: ['react', 'react-dom'],
   },
   module: {
-    loaders: [
+    rules: [
       {
-        test: /\.js$/,
+        test: /\.js/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: { cacheDirectory: true }
-      },
-      {
-        test: /\.json$/,
-        loader: 'json-loader'
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+            },
+          },
+        ]
       },
       {
         test: /\.css$/,
-        loader: "style-loader!css-loader"
+        use: ['style-loader', 'css-loader'],
       },
-    ]
+    ],
   },
   node: {
     // From babel-standalone:
@@ -41,14 +43,16 @@ module.exports = {
   output: {
     filename: '[name]-bundle.js'
   },
-  worker: {
-    output: {
-      filename: "babel-worker-bundle.js"
-    }
-  },
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin("vendor", "vendor-bundle.js"),
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.OccurenceOrderPlugin()
-  ]
+    new webpack.optimize.CommonsChunkPlugin('vendor'),
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        worker: {
+          output: {
+            filename: "babel-worker-bundle.js",
+          }
+        },
+      },
+    }),
+  ],
 }
