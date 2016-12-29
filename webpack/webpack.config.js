@@ -15,7 +15,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js/,
+        test: /\.js$/,
         exclude: /node_modules/,
         use: [
           {
@@ -49,7 +49,7 @@ module.exports = {
       options: {
         worker: {
           output: {
-            filename: "babel-worker-bundle.js",
+            filename: '[hash]-worker-bundle.js',
           }
         },
       },
