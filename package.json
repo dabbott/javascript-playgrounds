@@ -39,6 +39,7 @@
     "babel-preset-stage-1": "^6.3.13",
     "babel-runtime": "^6.3.19",
     "codemirror": "dabbott/CodeMirror#better-jsx-es6",
+    "coffee-script": "^1.12.2",
     "css-loader": "^0.23.1",
     "eslint": "3.10.2",
     "eslint-config-airbnb": "^13.0.0",
