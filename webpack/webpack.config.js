@@ -8,8 +8,8 @@ module.exports = {
     contentBase: DIRECTORY
   },
   entry: {
-    index: path.join(DIRECTORY, 'index.js'),
-    player: path.join(DIRECTORY, 'player.js'),
+    index: path.join(DIRECTORY, 'src', 'index.js'),
+    player: path.join(DIRECTORY, 'src', 'player.js'),
     vendor: ['react', 'react-dom'],
   },
   module: {

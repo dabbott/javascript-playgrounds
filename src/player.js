@@ -23,10 +23,10 @@ const {
 } = getHashString()
 
 if (styleSheet === 'reset') {
-  require('./styles/reset.css')
+  require('../styles/reset.css')
 }
 
-require('./styles/player.css')
+require('../styles/player.css')
 
 if (css) {
   appendCSS(css)

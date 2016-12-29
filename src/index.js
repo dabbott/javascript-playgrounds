@@ -1,5 +1,5 @@
-require('./styles/reset.css')
-require('./styles/index.css')
+require('../styles/reset.css')
+require('../styles/index.css')
 
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'

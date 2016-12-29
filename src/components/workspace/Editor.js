@@ -4,8 +4,8 @@ import pureRender from 'pure-render-decorator'
 import { options, requireAddons } from '../../utils/CodeMirror'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
-require("../../node_modules/codemirror/lib/codemirror.css")
-require("../../styles/codemirror-theme.css")
+require('codemirror/lib/codemirror.css')
+require('../../../styles/codemirror-theme.css')
 
 // Work around a codemirror + flexbox + chrome issue by creating an absolute
 // positioned parent and flex grandparent of the codemirror element.
