@@ -1,0 +1,51 @@
+{
+  "extends": ["airbnb/base"],
+  "parserOptions": {
+    "ecmaVersion": 7,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "impliedStrict": true,
+      "jsx": true
+    }
+  },
+  "ecmaFeatures": {
+    "experimentalObjectRestSpread": true
+  },
+  "env": {
+    "mocha": true,
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "globals": {
+    "React": true,
+    "__DEV__": true
+  },
+  "parser": "babel-eslint",
+  "plugins": [
+    "react"
+  ],
+  "rules": {
+    "arrow-body-style": "off",
+    "camelcase": "off",
+    "class-methods-use-this": "off",
+    "comma-dangle": "off",
+    "generator-star-spacing": "off",
+    "global-require": "off",
+    "import/extensions": "off",
+    "import/no-unresolved": "off",
+    "new-parens": "off",
+    "no-console": "off",
+    "no-mixed-operators": "off",
+    "no-param-reassign": "off",
+    "no-restricted-syntax": "off",
+    "no-underscore-dangle": "off",
+    "no-use-before-define": "off",
+    "object-curly-spacing": "off",
+    "padded-blocks": "off",
+    "react/jsx-uses-react": "warn",
+    "react/jsx-uses-vars": "warn",
+    "react/react-in-jsx-scope": "warn",
+    "semi": "off"
+  }
+}
