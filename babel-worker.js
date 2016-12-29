@@ -6,7 +6,7 @@ const Babel = require('babel-core')
 import plugins from './utils/BabelPlugins'
 
 onmessage = function(event) {
-  const {code: value, filename, options} = event.data
+  const {code: value, id, filename, options} = event.data
   let output
 
   try {
@@ -17,12 +17,14 @@ onmessage = function(event) {
 
     output = {
       filename,
+      id,
       type: 'code',
       code,
     }
   } catch (e) {
     output = {
       filename,
+      id,
       type: 'error',
       error: {
         message: e.message.replace('unknown', e.name),

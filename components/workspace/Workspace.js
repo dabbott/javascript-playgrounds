@@ -14,12 +14,13 @@ import Fullscreen from './Fullscreen'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
-const BabelWorker = require("worker-loader!../../babel-worker.js")
-const babelWorker = new BabelWorker()
+import CompilationManager from '../../compilation/CompilationManager'
+const compilationManager = new CompilationManager()
+// const prettyCompilationManager = new CompilationManager()
 
-// Utilities for determining which babel worker responses are for the player vs
+// Utilities for determining which compiler worker responses are for the player vs
 // the transpiler view, since we encode this information in the filename.
-const transpilerPrefix = '@babel-'
+const transpilerPrefix = '@compiler-'
 const getTranspilerId = (filename) => `${transpilerPrefix}${filename}`
 const isTranspilerId = (filename) => filename.indexOf(transpilerPrefix) === 0
 
@@ -139,7 +140,6 @@ export default class extends Component {
     }
 
     this.codeCache = {}
-    this.playerCache = {}
 
     // Map pane names to render methods
     this.paneMap = {
@@ -148,26 +148,30 @@ export default class extends Component {
       player: this.renderPlayer,
     }
 
-    babelWorker.addEventListener("message", this.onBabelWorkerMessage)
+    compilationManager.on('compile', this.onCompile)
+    compilationManager.on('error', this.onCompileError)
   }
 
   componentWillUnmount() {
-    babelWorker.removeEventListener("message", this.onBabelWorkerMessage)
+    compilationManager.removeListener('compile', this.onCompile)
+    compilationManager.removeListener('error', this.onCompileError)
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     if (typeof navigator !== 'undefined') {
       const {files} = this.props
       const {playerVisible, transpilerVisible} = this.state
 
+      const filesToCompile = []
+
       // Cache and compile each file
-      Object.keys(files).forEach(filename => {
+      Object.keys(files).forEach((filename) => {
         const code = files[filename]
 
         this.codeCache[filename] = code
 
         if (playerVisible) {
-          babelWorker.postMessage({
+          filesToCompile.push({
             filename,
             code,
             options: {retainLines: true},
@@ -175,47 +179,57 @@ export default class extends Component {
         }
 
         if (transpilerVisible) {
-          babelWorker.postMessage({
+          filesToCompile.push({
             filename: getTranspilerId(filename),
             code,
           })
         }
       })
+
+      compilationManager.compileFiles(filesToCompile)
     }
   }
 
-  runApplication = () => {
-    const {playerCache, player} = this
+  runApplication = (fileMap) => {
+    const {player} = this
     const {entry} = this.props
 
-    player.runApplication(playerCache, entry)
+    const compiledEntryFile = compilationManager.getFile(entry)
+    if (!compiledEntryFile) return
+
+    player.runApplication(fileMap, compiledEntryFile.filename)
   }
 
-  onBabelWorkerMessage = ({data}) => {
-    const {playerCache} = this
-    const {files} = this.props
-    const {transpilerCache} = this.state
-    const {filename, type, code, error} = JSON.parse(data)
+  onCompile = (fileMap) => {
+    const {transpilerVisible, transpilerCache} = this.state
 
-    this.updateStatus(type, error)
+    if (transpilerVisible) {
+      const transpilerMap = Object
+        .keys(fileMap)
+        .reduce((transpilerMap, filename) => {
+          if (isTranspilerId(filename)) {
+            transpilerMap[filename] = fileMap[filename]
+          }
 
-    if (type === 'code') {
-      if (isTranspilerId(filename)) {
-        this.setState({
-          transpilerCache: {
-            ...transpilerCache,
-            [filename]: code,
-          },
-        })
-      } else {
-        playerCache[filename] = code
+          return transpilerMap
+        }, {})
 
-        // Run the app once we've transformed each file at least once
-        if (Object.keys(files).every(filename => playerCache[filename])) {
-          this.runApplication()
-        }
-      }
+      this.setState({
+        transpilerCache: {
+          ...transpilerCache,
+          ...transpilerMap,
+        },
+      })
     }
+
+    this.updateStatus('code')
+    this.runApplication(fileMap)
+  }
+
+  onCompileError = (errors) => {
+    const error = errors[0]
+
+    this.updateStatus('error', error)
   }
 
   updateStatus = (type, error) => {
@@ -237,8 +251,10 @@ export default class extends Component {
   onCodeChange = (code) => {
     const {activeTab, transpilerVisible, playerVisible} = this.state
 
+    const filesToCompile = []
+
     if (playerVisible) {
-      babelWorker.postMessage({
+      filesToCompile.push({
         filename: activeTab,
         code,
         options: {retainLines: true},
@@ -246,11 +262,13 @@ export default class extends Component {
     }
 
     if (transpilerVisible) {
-      babelWorker.postMessage({
+      filesToCompile.push({
         filename: getTranspilerId(activeTab),
         code,
       })
     }
+
+    compilationManager.compileFiles(filesToCompile)
 
     this.codeCache[activeTab] = code
     this.props.onChange(this.codeCache)
