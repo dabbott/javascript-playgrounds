@@ -41,7 +41,7 @@ module.exports = {
     net: 'empty'
   },
   output: {
-    filename: '[name]-bundle.js'
+    filename: 'build/[name]-bundle.js'
   },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin('vendor'),

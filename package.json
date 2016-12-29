@@ -11,7 +11,7 @@
     "prepublish": "npm run build && npm run dist",
     "build": "webpack --config webpack/webpack.prod.config.js --sort-assets-by --progress",
     "start": "webpack-dev-server --config webpack/webpack.dev.config.js --inline --hot --colors --quiet",
-    "clean": "rm *-bundle.js",
+    "clean": "rm *-bundle.js; rm build/*-bundle.js",
     "analyze": "webpack --config webpack/webpack.prod.config.js --sort-assets-by --progress --json | webpack-bundle-size-analyzer",
     "gh-pages": "make",
     "dist": "webpack --config webpack/webpack-embed.config.js --sort-assets-by --progress"
