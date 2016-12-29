@@ -3,7 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactNative from 'react-native-web'
 
-import * as Networking from '../../utils/Networking'
+import * as Networking from './Networking'
 
 // Stubs for registering and getting vendor components
 const components = {}

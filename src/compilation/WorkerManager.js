@@ -45,7 +45,7 @@ export default class Compiler {
 
     switch (ext) {
       case '.coffee':
-        WorkerClass = await import('worker-loader?inline!../coffeescript-worker.js')
+        WorkerClass = await import('worker-loader?inline!./worker/coffeescript-worker.js')
         break
 
       default:
@@ -55,7 +55,7 @@ export default class Compiler {
           return workerCache[ext]
         }
 
-        WorkerClass = await import('worker-loader?inline!../babel-worker.js')
+        WorkerClass = await import('worker-loader?inline!./worker/babel-worker.js')
     }
 
     const worker = new WorkerClass()

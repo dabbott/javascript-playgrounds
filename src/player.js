@@ -5,7 +5,7 @@ import Sandbox from './components/player/Sandbox'
 import { getHashString } from './utils/HashString'
 import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
 import { appendCSS } from './utils/Styles'
-import VendorComponents from './components/player/VendorComponents'
+import VendorComponents from './utils/VendorComponents'
 
 const style = prefix({
   display: 'flex',

@@ -3,7 +3,7 @@ const Babel = require('babel-core')
 // Ensure consistency with react-native's babel plugins by directly using
 // the babel-preset-react-native. It's intended for usage in node, so we
 // have to require it slightly differently to get it to work in the browser.
-import plugins from './utils/BabelPlugins'
+import plugins from '../../utils/BabelPlugins'
 
 onmessage = function(event) {
   const {code: value, id, filename, options} = event.data
