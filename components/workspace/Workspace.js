@@ -134,9 +134,9 @@ export default class extends Component {
       runtimeError: null,
       showDetails: false,
       activeTab: initialTab,
-      transpilerCache: {},
       transpilerVisible: containsPane(panes, 'transpiler'),
       playerVisible: containsPane(panes, 'player'),
+      compiledFiles: [],
     }
 
     this.codeCache = {}
@@ -190,40 +190,25 @@ export default class extends Component {
     }
   }
 
-  runApplication = (fileMap) => {
+  runApplication = (files) => {
     const {player} = this
     const {entry} = this.props
 
-    const compiledEntryFile = compilationManager.getFile(entry)
+    const compiledEntryFile = files.find(file => file.originalFilename === entry)
     if (!compiledEntryFile) return
+
+    const fileMap = Object.assign(
+      ...files.map(file => ({[file.filename]: file.code}))
+    )
 
     player.runApplication(fileMap, compiledEntryFile.filename)
   }
 
-  onCompile = (fileMap) => {
-    const {transpilerVisible, transpilerCache} = this.state
-
-    if (transpilerVisible) {
-      const transpilerMap = Object
-        .keys(fileMap)
-        .reduce((transpilerMap, filename) => {
-          if (isTranspilerId(filename)) {
-            transpilerMap[filename] = fileMap[filename]
-          }
-
-          return transpilerMap
-        }, {})
-
-      this.setState({
-        transpilerCache: {
-          ...transpilerCache,
-          ...transpilerMap,
-        },
-      })
-    }
+  onCompile = (files) => {
+    this.setState({compiledFiles: files})
 
     this.updateStatus('code')
-    this.runApplication(fileMap)
+    this.runApplication(files)
   }
 
   onCompileError = (errors) => {
@@ -363,7 +348,11 @@ export default class extends Component {
 
   renderTranspiler = (key) => {
     const {externalStyles, transpilerTitle} = this.props
-    const {activeTab, transpilerCache} = this.state
+    const {activeTab, compiledFiles} = this.state
+
+    const file = compiledFiles.find(
+      file => file.originalFilename === getTranspilerId(activeTab)
+    )
 
     return (
       <div key={key} style={styles.transpilerPane}>
@@ -377,7 +366,7 @@ export default class extends Component {
         <Editor
           key={getTranspilerId(activeTab)}
           readOnly={true}
-          value={transpilerCache[getTranspilerId(activeTab)]}
+          value={file ? file.code : ''}
           filename={getTranspilerId(activeTab)}
         />
       </div>

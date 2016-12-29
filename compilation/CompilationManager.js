@@ -4,63 +4,47 @@ import WorkerManager from './WorkerManager'
 
 export default class CompilationManager extends EventEmitter {
 
-  cache = {}
+  cache = []
   workerManager = new WorkerManager()
 
+  mergeFiles = (prev, next) => {
+    const nextContains = file =>
+      next.find(x => file.filename === x.filename)
+
+    return [
+      ...prev.filter(file => !nextContains(file)),
+      ...next,
+    ]
+  }
+
   compileFiles = async (files = []) => {
-    const {workerManager, cache} = this
+    const {workerManager} = this
 
-    const compiled = await Promise.all(
-      files.map(workerManager.compile)
-    )
-
-    files.forEach((file, i) => {
-      const {filename} = file
-
-      cache[filename] = compiled[i]
+    const compiled = (
+      await Promise.all(
+        files.map(workerManager.compile)
+      )
+    ).map((file, i) => {
+      return ({
+        ...file,
+        originalFilename: files[i].filename
+      })
     })
 
-    const errors = this.getErrors(cache)
+    this.cache = this.mergeFiles(this.cache, compiled)
+
+    const errors = this.cache
+      .filter(file => !!file.error)
+      .map(file => file.error)
 
     if (errors.length > 0) {
       this.emit('error', errors)
     } else {
-      this.emit('compile', this.getCompiledCodeMap(cache))
+      this.emit('compile', this.cache)
     }
 
     return compiled
   }
 
-  getCompiledFileMap = (compiledFileMap) => {
-    return Object
-      .values(compiledFileMap)
-      .reduce((fileMap, file) => {
-        fileMap[file.filename] = file
-
-        return fileMap
-      }, {})
-  }
-
-  getCompiledCodeMap = (compiledFileMap) => {
-    return Object
-      .values(compiledFileMap)
-      .reduce((fileMap, file) => {
-        fileMap[file.filename] = file.code
-
-        return fileMap
-      }, {})
-  }
-
-  getErrors = (compiledFileMap) => {
-    return Object
-      .values(compiledFileMap)
-      .filter(file => !!file.error)
-      .map(file => file.error)
-  }
-
-  getFile = (filename) => {
-    const {cache} = this
-
-    return cache[filename]
-  }
+  getFiles = () => this.cache
 }

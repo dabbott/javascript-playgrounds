@@ -4,6 +4,8 @@ onmessage = function (event) {
   const {code: value, id, filename, options} = event.data
   let output
 
+  const outputFilename = filename.replace(/\.coffee$/, '.js')
+
   try {
     const code = CoffeeScript.compile(value, {
       bare: true,
@@ -11,14 +13,14 @@ onmessage = function (event) {
     })
 
     output = {
-      filename,
+      filename: outputFilename,
       id,
       type: 'code',
       code,
     }
   } catch (e) {
     output = {
-      filename,
+      filename: outputFilename,
       id,
       type: 'error',
       error: {
