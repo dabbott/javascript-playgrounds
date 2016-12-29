@@ -4,7 +4,7 @@ const webpack = require('webpack')
 const DIRECTORY = path.dirname(__dirname)
 
 module.exports = {
-  entry: path.join(DIRECTORY, 'components', 'embed', 'WebPlayer.js'),
+  entry: path.join(DIRECTORY, 'src', 'components', 'embed', 'WebPlayer.js'),
   output: {
     path: path.join(DIRECTORY, 'dist'),
     filename: 'react-native-web-player.js',
