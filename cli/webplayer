@@ -1,3 +1,62 @@
 #!/usr/bin/env bash
 
-node cli/webplayer.js "$@"
+# BSD License
+#
+# For Yarn software
+#
+# Copyright (c) 2016-present, Yarn Contributors. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+#  * Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#
+#  * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+basedir=$(dirname "$(readlink "$0" || echo "$(echo "$0" | sed -e 's,\\,/,g')")")
+
+use_winpty=0
+
+case `uname` in
+  *CYGWIN*) basedir=`cygpath -w "$basedir"`;;
+  MSYS*|MINGW*) use_winpty=1;;
+esac
+
+command_exists() {
+  command -v "$1" >/dev/null 2>&1;
+}
+
+if command_exists node; then
+  if [ $use_winpty -eq 1 ]; then
+    winpty node "$basedir/webplayer.js" "$@"
+  else
+    node "$basedir/webplayer.js" "$@"
+  fi
+  ret=$?
+# Debian and Ubuntu use "nodejs" as the name of the binary, not "node", so we
+# search for that too. See:
+# https://lists.debian.org/debian-devel-announce/2012/07/msg00002.html
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=614907
+elif command_exists nodejs; then
+  nodejs "$basedir/webplayer.js" "$@"
+  ret=$?
+else
+  echo 'webplayer requires Node.js 4.0 or higher to be installed.'
+  ret=1
+fi
+
+exit $ret
