@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
+import HTMLDocument from 'react-html-document'
+import ReactDOMServer from 'react-dom/server'
 import pureRender from 'pure-render-decorator'
 
 import Phone from './Phone'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
+import { toBase64 } from '../../utils/Encode'
 
 const styles = prefixObject({
   iframe: {
@@ -82,7 +85,7 @@ export default class extends Component {
         this.entry = entry
       break
       case 'ready':
-        this.refs.iframe.contentWindow.postMessage({fileMap, entry}, '*')
+        this.iframe.contentWindow.postMessage({fileMap, entry}, '*')
       break
     }
   }
@@ -93,15 +96,40 @@ export default class extends Component {
 
     if (!id) return null
 
-    const vendorComponentsEncoded = encodeURIComponent(JSON.stringify(vendorComponents))
-    const css = encodeURIComponent(playerCSS)
+    const origin = window.location.origin
+
+    const state = {
+      id,
+      assetRoot,
+      vendorComponents,
+      playerStyleSheet,
+      playerCSS,
+    }
+
+    const html = ReactDOMServer.renderToStaticMarkup(
+      <HTMLDocument
+        title="Web Player"
+        metatags={[
+          {charSet: 'utf-8'},
+        ]}
+        scripts={[
+          `${origin}/build/vendor-bundle.js`,
+          `${origin}/build/player-bundle.js`,
+        ]}
+        universalState={state}
+      >
+        <div id={'react-root'} />
+      </HTMLDocument>
+    )
+
+    const encoded = toBase64('text/html', `<!DOCTYPE html>${html}`)
 
     return (
       <iframe
         style={styles.iframe}
-        ref={'iframe'}
+        ref={(ref) => { this.iframe = ref }}
         frameBorder={0}
-        src={`player.html#id=${id}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}&styleSheet=${playerStyleSheet}&css=${css}`}
+        src={encoded}
       />
     )
   }

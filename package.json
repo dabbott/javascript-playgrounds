@@ -51,6 +51,7 @@
     "pure-render-decorator": "^1.1.1",
     "react": "15.3.2",
     "react-dom": "15.3.2",
+    "react-html-document": "^3.1.0",
     "react-native-web": "0.0.56",
     "regenerator-runtime": "^0.9.5",
     "screenfull": "^3.0.2",
@@ -59,5 +60,6 @@
     "webpack": "v2.2.0-rc.3",
     "webpack-dev-server": "^1.14.0",
     "worker-loader": "^0.7.0"
-  }
+  },
+  "dependencies": {}
 }

@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
+import { getUniversalState } from 'react-html-document'
 
 import Sandbox from './components/player/Sandbox'
-import { getHashString } from './utils/HashString'
 import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
 import { appendCSS } from './utils/Styles'
 import VendorComponents from './utils/VendorComponents'
@@ -20,7 +20,7 @@ const {
   vendorComponents = '[]',
   styleSheet = 'reset',
   css = '',
-} = getHashString()
+} = getUniversalState()
 
 if (styleSheet === 'reset') {
   require('../styles/reset.css')
@@ -46,7 +46,5 @@ const mount = document.getElementById('react-root')
 // Set mount node to flex in a vendor-prefixed way
 prefixAndApply({ display: 'flex' }, mount)
 
-// if we have vendor components, we need to pre-load those
-// otherwise, we can just render normally
-const components = JSON.parse(vendorComponents)
-VendorComponents.load(components, () => ReactDOM.render(root, mount))
+// Preload vendor components
+VendorComponents.load(vendorComponents, () => ReactDOM.render(root, mount))
