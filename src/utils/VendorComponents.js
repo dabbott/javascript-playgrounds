@@ -55,17 +55,23 @@ export default class VendorComponents {
     )
   }
 
-  static loadExternals(modules) {
-    return Promise.all(
-      modules.map(async ([name, windowName, url]) => {
-        const text = await Networking.get(url)
+  static loadExternals(externals) {
+    return new Promise(resolve => {
+      if (externals.length === 0) {
+        resolve()
+        return
+      }
 
-        eval(text)
+      const urls = externals.map(vc => vc[2])
 
-        // VendorComponents.define(name, text)
-        VendorComponents.register(name, getObjectFromKeyPath(window, windowName))
+      $scriptjs(urls, () => {
+        externals.forEach(([requireName, windowName]) => {
+          // Inject into vendor components
+          VendorComponents.register(requireName, getObjectFromKeyPath(window, windowName))
+        })
+        resolve()
       })
-    )
+    })
   }
 
   // Load components from urls
