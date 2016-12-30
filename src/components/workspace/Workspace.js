@@ -234,6 +234,7 @@ export default class extends Component {
   }
 
   onCodeChange = (code) => {
+    const {entry} = this.props
     const {activeTab, transpilerVisible, playerVisible} = this.state
 
     const filesToCompile = []
@@ -256,7 +257,7 @@ export default class extends Component {
     compilationManager.compileFiles(filesToCompile)
 
     this.codeCache[activeTab] = code
-    this.props.onChange(this.codeCache)
+    this.props.onChange(this.codeCache, entry)
   }
 
   onToggleDetails = (showDetails) => {

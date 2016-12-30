@@ -13,8 +13,13 @@ const files = options.args.map(filename => [
   fs.readFileSync(filename, {encoding: 'utf8'}),
 ])
 
+const vendorComponents = options.vendor.length > 0
+  ? options.vendor.map(component => component.split(','))
+  : undefined
+
 const params = {
   files,
+  vendorComponents,
   title: options.title,
   panes: options.panes,
 }
@@ -64,7 +69,7 @@ const encodeParams = (params) => {
 }
 
 const WEB_PLAYER_VERSION = '1.9.1'
-const WEB_PLAYER_URL = `http://cdn.rawgit.com/dabbott/react-native-web-player/gh-v${WEB_PLAYER_VERSION}/index.html`
+const WEB_PLAYER_URL = options.baseUrl || `http://cdn.rawgit.com/dabbott/react-native-web-player/gh-v${WEB_PLAYER_VERSION}/index.html`
 
 const encodedParams = encodeParams(params)
 const hash = `#${createUrlParams(encodedParams)}`

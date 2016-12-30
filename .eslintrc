@@ -43,6 +43,7 @@
     "no-use-before-define": "off",
     "object-curly-spacing": "off",
     "padded-blocks": "off",
+    "prefer-default-export": "off",
     "react/jsx-uses-react": "warn",
     "react/jsx-uses-vars": "warn",
     "react/react-in-jsx-scope": "warn",

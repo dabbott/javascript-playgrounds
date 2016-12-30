@@ -6,6 +6,8 @@ const options = program
   .option('-t, --title <n>', 'Title of the player')
   .option('-p, --panes <items>', 'Player panes', val => val.split(','))
   .option('-d, --display-only', `Display the url but don't open it.`)
+  .option('-v, --vendor [value]', 'Vendor components', (val, memo) => [...memo, val], [])
+  .option('-b, --base-url [value]', 'Base url')
   .parse(process.argv)
 
 if (options.args.length === 0) {
