@@ -39,6 +39,7 @@ let {
   playerStyleSheet = 'reset',
   playerCSS = '',
   workspaceCSS = '',
+  environment = '',
 } = getHashString()
 
 if (workspaceCSS) {
@@ -88,6 +89,7 @@ const root = (
       transpilerTitle={transpilerTitle}
       playerStyleSheet={playerStyleSheet}
       playerCSS={playerCSS}
+      environment={environment}
       onChange={setHashString}
     />
   </div>

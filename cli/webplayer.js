@@ -51,6 +51,7 @@ const params = {
   scripts,
   title: options.title,
   panes: options.panes,
+  environment: options.environment,
 }
 
 const paramSchema = {
@@ -69,6 +70,7 @@ const paramSchema = {
   workspaceCSS: 'text',
   playerCSS: 'text',
   playerStyleSheet: 'text',
+  environment: 'text',
 
   // JSON-encoded
   files: 'json',

@@ -3,6 +3,7 @@ const program = require('commander')
 const options = program
   .version('0.0.1')
   .usage('[options] <file ...>')
+  .option('-e, --environment <n>', 'Web player environment')
   .option('-t, --title <n>', 'Title of the player')
   .option('-p, --panes <items>', 'Player panes', val => val.split(','))
   .option('-d, --display-only', `Display the url but don't open it.`)

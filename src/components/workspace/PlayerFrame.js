@@ -28,6 +28,7 @@ export default class extends Component {
     scripts: [],
     playerStyleSheet: '',
     playerCSS: '',
+    environment: '',
     onError: () => {},
     onRun: () => {},
   }
@@ -58,7 +59,7 @@ export default class extends Component {
   }
 
   createHTML = () => {
-    const {assetRoot, vendorComponents, scripts, playerStyleSheet, playerCSS} = this.props
+    const {assetRoot, vendorComponents, scripts, playerStyleSheet, playerCSS, environment} = this.props
 
     const state = {
       assetRoot,
@@ -75,7 +76,9 @@ export default class extends Component {
         ]}
         scripts={[
           `${window.location.origin}/build/player-bundle.js`,
-          `${window.location.origin}/build/react-native-environment-bundle.js`,
+          ...environment
+            ? [`${window.location.origin}/build/${environment}-environment-bundle.js`]
+            : [],
           ...scripts,
         ]}
         universalState={state}

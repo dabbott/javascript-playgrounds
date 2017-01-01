@@ -122,6 +122,7 @@ export default class extends Component {
     fullscreen: false,
     playerStyleSheet: null,
     playerCSS: null,
+    environment: null,
     panes: [],
   }
 
@@ -372,7 +373,18 @@ export default class extends Component {
   }
 
   renderPlayer = (key) => {
-    const {width, scale, platform, assetRoot, vendorComponents, scripts, externalStyles, playerStyleSheet, playerCSS} = this.props
+    const {
+      width,
+      scale,
+      platform,
+      assetRoot,
+      vendorComponents,
+      scripts,
+      externalStyles,
+      playerStyleSheet,
+      playerCSS,
+      environment,
+    } = this.props
 
     const style = externalStyles.playerPane
       ? {...styles.playerPane, ...externalStyles.playerPane}
@@ -390,6 +402,7 @@ export default class extends Component {
           scripts={scripts}
           playerStyleSheet={playerStyleSheet}
           playerCSS={playerCSS}
+          environment={environment}
           onRun={this.onPlayerRun}
           onError={this.onPlayerError}
         />
