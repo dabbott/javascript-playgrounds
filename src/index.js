@@ -31,6 +31,7 @@ let {
   scale = '1',
   assetRoot = '',
   vendorComponents = '[]',
+  scripts = '[]',
   styles = '{}',
   fullscreen = 'false',
   panes = '["editor", "player"]',
@@ -80,6 +81,7 @@ const root = (
       scale={parseFloat(scale)}
       width={parseFloat(width)}
       vendorComponents={JSON.parse(vendorComponents)}
+      scripts={JSON.parse(scripts)}
       externalStyles={JSON.parse(styles)}
       fullscreen={fullscreen === 'true' && screenfull.enabled}
       panes={JSON.parse(panes)}

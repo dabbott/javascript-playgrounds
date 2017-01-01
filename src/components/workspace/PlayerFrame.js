@@ -25,6 +25,7 @@ export default class extends Component {
     scale: 1,
     assetRoot: '',
     vendorComponents: [],
+    scripts: [],
     playerStyleSheet: '',
     playerCSS: '',
     onError: () => {},
@@ -57,7 +58,7 @@ export default class extends Component {
   }
 
   createHTML = () => {
-    const {assetRoot, vendorComponents, playerStyleSheet, playerCSS} = this.props
+    const {assetRoot, vendorComponents, scripts, playerStyleSheet, playerCSS} = this.props
 
     const state = {
       assetRoot,
@@ -73,7 +74,8 @@ export default class extends Component {
           {charSet: 'utf-8'},
         ]}
         scripts={[
-          `${window.location.origin}/build/player-bundle.js`
+          `${window.location.origin}/build/player-bundle.js`,
+          ...scripts,
         ]}
         universalState={state}
       >

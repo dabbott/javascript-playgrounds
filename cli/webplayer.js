@@ -17,6 +17,7 @@ const remoteScriptMap = {
   react: 'https://unpkg.com/react@15.4.1/dist/react.min.js',
   'react-dom': 'https://unpkg.com/react-dom@15.4.1/dist/react-dom.min.js',
   'react-native': 'https://unpkg.com/react-native-web@0.0.56/dist/ReactNative.js',
+  framer: 'https://cdn.rawgit.com/dabbott/95e54f6f8505b95d998976f3bd550ea1/raw/d0675f183a01ea07297580ed303b48b9a057bf6d/Framer.js',
 }
 
 const unpkgify = name => (
@@ -35,9 +36,19 @@ const vendorComponents = options.vendor.length > 0
       )
   : undefined
 
+const scripts = options.script.length > 0
+  ? options.script
+    .map(script => (
+      remoteScriptMap[script]
+        ? remoteScriptMap[script]
+        : script)
+    )
+  : undefined
+
 const params = {
   files,
   vendorComponents,
+  scripts,
   title: options.title,
   panes: options.panes,
 }
@@ -62,6 +73,7 @@ const paramSchema = {
   // JSON-encoded
   files: 'json',
   vendorComponents: 'json',
+  scripts: 'json',
   panes: 'json',
   styles: 'json',
 }
