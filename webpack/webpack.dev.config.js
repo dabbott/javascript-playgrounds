@@ -1,7 +1,8 @@
 const path = require('path')
 const webpack = require('webpack')
 
-const options = require('./webpack.config.js')
+const config = require('./webpack.config.js')
+const options = config[0]
 
 options.devtool = "source-map"
 
@@ -11,4 +12,4 @@ options.plugins.unshift(
   })
 )
 
-module.exports = options
+module.exports = config

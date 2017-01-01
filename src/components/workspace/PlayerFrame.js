@@ -75,6 +75,7 @@ export default class extends Component {
         ]}
         scripts={[
           `${window.location.origin}/build/player-bundle.js`,
+          `${window.location.origin}/build/react-native-environment-bundle.js`,
           ...scripts,
         ]}
         universalState={state}
@@ -97,7 +98,21 @@ export default class extends Component {
     })
 
     this.postMessage({
+      type: 'app:before',
+      payload: {
+        name: entry,
+      },
+    })
+
+    this.postMessage({
       type: 'module:require',
+      payload: {
+        name: entry,
+      },
+    })
+
+    this.postMessage({
+      type: 'app:after',
       payload: {
         name: entry,
       },

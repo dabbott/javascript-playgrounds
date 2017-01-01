@@ -87,6 +87,10 @@ class ModuleManager {
     return requireCache[name]
   }
 
+  resetRequireCache = () => {
+    this.requireCache = {}
+  }
+
 }
 
 const moduleManager = new ModuleManager()

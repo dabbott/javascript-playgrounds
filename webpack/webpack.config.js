@@ -3,7 +3,7 @@ const webpack = require('webpack')
 
 const DIRECTORY = path.dirname(__dirname)
 
-module.exports = {
+const main = {
   devServer: {
     contentBase: DIRECTORY
   },
@@ -57,3 +57,10 @@ module.exports = {
     hints: false,
   },
 }
+
+const config = [
+  main,
+  require('../environment/react-native/webpack.config.js'),
+]
+
+module.exports = config

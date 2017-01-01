@@ -1,7 +1,8 @@
 const path = require('path')
 const webpack = require('webpack')
 
-const options = require('./webpack.config.js')
+const config = require('./webpack.config.js')
+const options = config[0]
 
 options.plugins.unshift(
   new webpack.DefinePlugin({
@@ -23,4 +24,4 @@ options.plugins.push(
   })
 )
 
-module.exports = options
+module.exports = config
