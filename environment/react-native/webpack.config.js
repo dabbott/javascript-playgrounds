@@ -1,11 +1,10 @@
 const path = require('path')
-const webpack = require('webpack')
 
 const DIRECTORY = path.resolve(__dirname, '..', '..')
 
 module.exports = {
   entry: {
-    index: path.join(DIRECTORY, 'environment', 'react-native', 'index.js'),
+    index: path.resolve(DIRECTORY, 'environment', 'react-native', 'index.js'),
   },
   module: {
     rules: [

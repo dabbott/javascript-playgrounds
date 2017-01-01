@@ -79,9 +79,7 @@ export default class extends Component {
           ...scripts,
         ]}
         universalState={state}
-      >
-        <div id={'react-root'} />
-      </HTMLDocument>
+      />
     )
 
     return toBase64('text/html', `<!DOCTYPE html>${html}`)

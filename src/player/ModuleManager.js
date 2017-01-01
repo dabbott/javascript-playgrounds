@@ -65,12 +65,28 @@ class ModuleManager {
     }
   }
 
+  // Provide code for either an individual module or a map of modules
   provide = (name, code) => {
     const {requireCache, codeCache} = this
 
-    delete requireCache[name]
+    if (typeof name === 'string') {
+      delete requireCache[name]
 
-    codeCache[name] = code
+      codeCache[name] = code
+    } else {
+      Object.keys(name).forEach(key => this.provide(key, name[key]))
+    }
+  }
+
+  // Inject either an individual module or a map of modules into the requireCache
+  inject = (name, mod) => {
+    const {requireCache} = this
+
+    if (typeof name === 'string') {
+      requireCache[name] = mod
+    } else {
+      Object.keys(name).forEach(key => this.inject(key, name[key]))
+    }
   }
 
   require = (name) => {

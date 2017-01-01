@@ -33,7 +33,7 @@
     "generator-star-spacing": "off",
     "global-require": "off",
     "import/extensions": "off",
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
+    "import/no-extraneous-dependencies": "off",
     "import/no-unresolved": "off",
     "new-parens": "off",
     "no-console": "off",

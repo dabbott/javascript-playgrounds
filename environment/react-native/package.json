@@ -1,0 +1,17 @@
+{
+  "name": "webplayer-env-react-native",
+  "version": "1.0.0",
+  "description": "React Native environment for webplayer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "dabbott",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1",
+    "react-native-web": "0.0.56",
+    "regenerator-runtime": "^0.10.1"
+  }
+}
