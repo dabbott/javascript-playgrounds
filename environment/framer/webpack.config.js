@@ -4,7 +4,7 @@ const DIRECTORY = path.resolve(__dirname, '..', '..')
 
 module.exports = {
   entry: {
-    index: path.resolve(DIRECTORY, 'environment', 'react-native', 'index.js'),
+    index: path.resolve(DIRECTORY, 'environment', 'framer', 'index.js'),
   },
   module: {
     rules: [
@@ -26,7 +26,7 @@ module.exports = {
     webplayer: 'window.webplayer',
   },
   output: {
-    filename: './build/react-native-environment-bundle.js',
+    filename: './build/framer-environment-bundle.js',
   },
   performance: {
     hints: false,

@@ -61,6 +61,7 @@ const main = {
 const config = [
   main,
   require('../environment/react-native/webpack.config.js'),
+  require('../environment/framer/webpack.config.js'),
 ]
 
 module.exports = config

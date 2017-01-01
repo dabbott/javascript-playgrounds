@@ -7,6 +7,9 @@ const fs = require('fs')
 const execSync = require('child_process').execSync
 
 const options = require('./options')
+const getConfig = require('./config')
+
+const config = getConfig(options.preset)
 
 const files = options.args.map(filename => [
   path.basename(filename),
@@ -17,6 +20,7 @@ const remoteScriptMap = {
   react: 'https://unpkg.com/react@15.4.1/dist/react.min.js',
   'react-dom': 'https://unpkg.com/react-dom@15.4.1/dist/react-dom.min.js',
   'react-native': 'https://unpkg.com/react-native-web@0.0.56/dist/ReactNative.js',
+  redux: 'https://unpkg.com/redux/dist/redux.js',
   framer: 'https://cdn.rawgit.com/dabbott/95e54f6f8505b95d998976f3bd550ea1/raw/d0675f183a01ea07297580ed303b48b9a057bf6d/Framer.js',
 }
 
@@ -36,8 +40,9 @@ const vendorComponents = options.vendor.length > 0
       )
   : undefined
 
-const scripts = options.script.length > 0
-  ? options.script
+const combinedScripts = [...config.scripts, ...options.script]
+const scripts = combinedScripts.length > 0
+  ? combinedScripts
     .map(script => (
       remoteScriptMap[script]
         ? remoteScriptMap[script]
@@ -51,7 +56,7 @@ const params = {
   scripts,
   title: options.title,
   panes: options.panes,
-  environment: options.environment,
+  environment: options.environment || config.environment || undefined,
 }
 
 const paramSchema = {
@@ -108,7 +113,11 @@ const hash = `#${createUrlParams(encodedParams)}`
 const url = `${WEB_PLAYER_URL}${hash}`
 
 if (options.displayOnly) {
-  console.log('opening', url)
+  if (options.json) {
+    console.log('opening', WEB_PLAYER_URL, 'with params', params)
+  } else {
+    console.log('opening', url)
+  }
 } else {
   execSync(`open "${url}"`)
 }
