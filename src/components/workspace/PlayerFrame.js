@@ -6,6 +6,7 @@ import pureRender from 'pure-render-decorator'
 import Phone from './Phone'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import { toBase64 } from '../../utils/Encode'
+import * as Networking from '../../utils/Networking'
 
 const styles = prefixObject({
   iframe: {
@@ -33,73 +34,32 @@ export default class extends Component {
   constructor(props) {
     super(props)
 
-    this.state = {
-      id: null,
-    }
-
     this.status = 'loading'
-    this.fileMap = null
     this.entry = null
+    this.messageQueue = []
+
+    this.state = {
+      html: null,
+    }
   }
 
   componentDidMount() {
-    this.setState({
-      id: Math.random().toString().slice(2)
-    })
+    window.addEventListener('message', this.handleMessage)
 
-    window.addEventListener('message', (e) => {
-      let data
-      try {
-        data = JSON.parse(e.data)
-      } catch (err) {
-        return
-      }
-
-      const {id, type, payload} = data
-
-      if (id !== this.state.id) {
-        return
-      }
-
-      switch (type) {
-        case 'ready':
-          this.status = 'ready'
-          if (this.fileMap) {
-            this.runApplication(this.fileMap, this.entry)
-            this.fileMap = null
-            this.entry = null
-          }
-        break
-        case 'error':
-          this.props.onError(payload)
-        break
-      }
-    })
+    // Creating HTML prior to mount throws errors. The errors probably aren't
+    // meaningful, as they're related to the React debugging tools, but creating
+    // the HTML here makes them go away.
+    this.setState({html: this.createHTML()})
   }
 
-  runApplication(fileMap, entry) {
-    this.props.onRun()
-    switch (this.status) {
-      case 'loading':
-        this.fileMap = fileMap
-        this.entry = entry
-      break
-      case 'ready':
-        this.iframe.contentWindow.postMessage({fileMap, entry}, '*')
-      break
-    }
+  componentWillUnmount() {
+    window.removeEventListener('message', this.handleMessage)
   }
 
-  renderFrame = () => {
+  createHTML = () => {
     const {assetRoot, vendorComponents, playerStyleSheet, playerCSS} = this.props
-    const {id} = this.state
-
-    if (!id) return null
-
-    const origin = window.location.origin
 
     const state = {
-      id,
       assetRoot,
       vendorComponents,
       playerStyleSheet,
@@ -113,8 +73,7 @@ export default class extends Component {
           {charSet: 'utf-8'},
         ]}
         scripts={[
-          `${origin}/build/vendor-bundle.js`,
-          `${origin}/build/player-bundle.js`,
+          `${window.location.origin}/build/player-bundle.js`
         ]}
         universalState={state}
       >
@@ -122,16 +81,109 @@ export default class extends Component {
       </HTMLDocument>
     )
 
-    const encoded = toBase64('text/html', `<!DOCTYPE html>${html}`)
+    return toBase64('text/html', `<!DOCTYPE html>${html}`)
+  }
+
+  runApplication(files, entry) {
+    this.props.onRun()
+
+    files.forEach((file) => {
+      this.provideComponent({
+        name: file.filename,
+        code: file.code,
+      })
+    })
+
+    this.postMessage({
+      type: 'module:require',
+      payload: {
+        name: entry,
+      },
+    })
+  }
+
+  renderFrame = () => {
+    const {html} = this.state
+
+    if (!html) return null
 
     return (
       <iframe
         style={styles.iframe}
         ref={(ref) => { this.iframe = ref }}
         frameBorder={0}
-        src={encoded}
+        src={html}
+        onLoad={this.onFrameLoad}
       />
     )
+  }
+
+  onFrameLoad = async () => {
+    const {vendorComponents} = this.props
+
+    this.status = 'ready'
+
+    await this.provideVendorComponents(vendorComponents)
+  }
+
+  provideVendorComponents = async (components) => {
+    const fetched = await this.fetchComponents(components)
+
+    fetched.forEach(this.provideComponent)
+  }
+
+  provideComponent = ({name, code}) => {
+    this.postMessage({
+      type: 'module:provide',
+      payload: {name, code},
+    })
+  }
+
+  fetchComponents = async (components) => {
+    return Promise.all(
+      components.map(async ([name, url]) => {
+        const code = await Networking.get(url)
+        return {name, code}
+      })
+    )
+  }
+
+  postMessage = (message) => {
+    if (!this.iframe) {
+      this.messageQueue.push(message)
+    }
+
+    if (!message || !message.type) {
+      console.error('Invalid message for player', message)
+
+      return
+    }
+
+    this.iframe.contentWindow.postMessage(message, '*')
+  }
+
+  handleMessage = (event) => {
+    let data
+    try {
+      data = JSON.parse(event.data)
+    } catch (err) {
+      return
+    }
+
+    const {type, payload} = data
+
+    switch (type) {
+      case 'error': {
+        const {message, line} = payload
+
+        const str = typeof line === 'number'
+          ? `${message} (${line})`
+          : message
+
+        this.props.onError(str)
+        break
+      }
+    }
   }
 
   render() {

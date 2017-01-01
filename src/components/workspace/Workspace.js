@@ -197,11 +197,7 @@ export default class extends Component {
     const compiledEntryFile = files.find(file => file.originalFilename === entry)
     if (!compiledEntryFile) return
 
-    const fileMap = Object.assign(
-      ...files.map(file => ({[file.filename]: file.code}))
-    )
-
-    player.runApplication(fileMap, compiledEntryFile.filename)
+    player.runApplication(files, compiledEntryFile.filename)
   }
 
   onCompile = (files) => {

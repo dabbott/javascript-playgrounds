@@ -9,8 +9,7 @@ module.exports = {
   },
   entry: {
     index: path.join(DIRECTORY, 'src', 'index.js'),
-    player: path.join(DIRECTORY, 'src', 'player.js'),
-    vendor: ['react', 'react-dom'],
+    player: path.join(DIRECTORY, 'src', 'player', 'index.js'),
   },
   module: {
     rules: [
@@ -44,7 +43,6 @@ module.exports = {
     filename: 'build/[name]-bundle.js'
   },
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin('vendor'),
     new webpack.LoaderOptionsPlugin({
       options: {
         worker: {
@@ -55,4 +53,7 @@ module.exports = {
       },
     }),
   ],
+  performance: {
+    hints: false,
+  },
 }

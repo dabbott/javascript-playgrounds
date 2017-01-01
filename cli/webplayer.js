@@ -13,8 +13,26 @@ const files = options.args.map(filename => [
   fs.readFileSync(filename, {encoding: 'utf8'}),
 ])
 
+const remoteScriptMap = {
+  react: 'https://unpkg.com/react@15.4.1/dist/react.min.js',
+  'react-dom': 'https://unpkg.com/react-dom@15.4.1/dist/react-dom.min.js',
+  'react-native': 'https://unpkg.com/react-native-web@0.0.56/dist/ReactNative.js',
+}
+
+const unpkgify = name => (
+  remoteScriptMap[name]
+    ? remoteScriptMap[name]
+    : `https://unpkg.com/${name}`
+)
+
 const vendorComponents = options.vendor.length > 0
-  ? options.vendor.map(component => component.split(','))
+  ? options.vendor
+      .map(component => component.split(','))
+      .map(component => (
+        component.length === 1
+          ? [component[0], unpkgify(component[0])]
+          : component)
+      )
   : undefined
 
 const params = {
