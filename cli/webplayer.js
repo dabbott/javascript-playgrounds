@@ -30,8 +30,9 @@ const unpkgify = name => (
     : `https://unpkg.com/${name}`
 )
 
-const vendorComponents = options.vendor.length > 0
-  ? options.vendor
+const combinedVendorComponents = [...config.vendorComponents, ...options.vendor]
+const vendorComponents = combinedVendorComponents.length > 0
+  ? combinedVendorComponents
       .map(component => component.split(','))
       .map(component => (
         component.length === 1

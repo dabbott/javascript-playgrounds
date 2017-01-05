@@ -4,6 +4,7 @@ const fs = require('fs')
 
 const DEFAULTS = {
   scripts: [],
+  vendorComponents: [],
 }
 
 const readConfigFile = (environment) => {
