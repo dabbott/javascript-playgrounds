@@ -28,6 +28,12 @@ const styles = prefixObject({
     background: 'rgba(255,255,255,0.95)',
     borderLeft: '4px solid rgba(238,238,238,1)',
   },
+  entryRow: {
+    display: 'flex',
+  },
+  itemSpacer: {
+    width: 8,
+  },
 })
 
 const theme = {
@@ -63,6 +69,40 @@ export default class extends Component {
     }
   }
 
+  renderEntry = (entry) => {
+    let row = entry.data
+      .map((item, index) => (
+        <Inspector
+          key={index}
+          theme={theme}
+          data={item}
+        />
+      ))
+      .reduce((result, value, index, list) => {
+        result.push(value)
+
+        if (index !== list.length - 1) {
+          result.push(
+            <div
+              key={`s-${index}`}
+              style={styles.itemSpacer}
+            />
+          )
+        }
+
+        return result
+      }, [])
+
+    return (
+      <div
+        key={entry.id}
+        style={styles.entryRow}
+      >
+        {row}
+      </div>
+    )
+  }
+
   render() {
     const {maximize, logs} = this.props
 
@@ -72,13 +112,7 @@ export default class extends Component {
         ref={ref => this.container = ref}
       >
         <Overlay>
-          {logs.map(entry => (
-            <Inspector
-              theme={theme}
-              key={entry.id}
-              data={entry.data.length <= 1 ? entry.data[0] : entry.data}
-            />
-          ))}
+          {logs.map(this.renderEntry)}
         </Overlay>
       </div>
     )

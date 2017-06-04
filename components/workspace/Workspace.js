@@ -220,6 +220,7 @@ export default class extends Component {
 
         // Run the app once we've transformed each file at least once
         if (Object.keys(files).every(filename => playerCache[filename])) {
+          this.clearLogs()
           this.runApplication()
         }
       }
@@ -294,7 +295,18 @@ export default class extends Component {
       case 'log':
         this.setState({logs: logs.concat(payload)})
       break
+      case 'clear':
+        this.clearLogs()
+      break
     }
+  }
+
+  clearLogs() {
+    const {logs} = this.state
+
+    if (logs.length === 0) return
+
+    this.setState({logs: []})
   }
 
   onClickTab = (tab) => {

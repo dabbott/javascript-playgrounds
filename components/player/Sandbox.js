@@ -4,7 +4,7 @@ import ReactNative, { AppRegistry } from 'react-native-web'
 import pureRender from 'pure-render-decorator'
 
 import VendorComponents from './VendorComponents'
-import consoleProxy, { consoleLog } from './ConsoleProxy'
+import consoleProxy, { consoleLog, consoleClear } from './ConsoleProxy'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
 window._consoleProxy = consoleProxy
@@ -181,6 +181,7 @@ export default class extends Component {
       window._requireCache = {}
       window._didRegisterComponent = false
       consoleProxy.log = consoleLog.bind(consoleProxy, this.props.id)
+      consoleProxy.clear = consoleClear.bind(consoleProxy, this.props.id)
 
       this.evaluate(entry, fileMap[entry])
 
