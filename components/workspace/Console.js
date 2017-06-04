@@ -16,7 +16,7 @@ const styles = prefixObject({
     bottom: 0,
     height: '30%',
     borderTop: '1px solid #F8F8F8',
-    background: 'rgba(255,255,255,0.95)',
+    background: 'rgba(255,255,255,0.98)',
   },
   overlayMaximized: {
     position: 'absolute',
@@ -28,7 +28,7 @@ const styles = prefixObject({
     right: 0,
     bottom: 0,
     height: '100%',
-    background: 'rgba(255,255,255,0.95)',
+    background: 'rgba(255,255,255,0.98)',
     borderLeft: '4px solid rgba(238,238,238,1)',
   },
   entryRow: {
