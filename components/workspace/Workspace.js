@@ -11,6 +11,7 @@ import About from './About'
 import Tabs from './Tabs'
 import TabContainer from './TabContainer'
 import Fullscreen from './Fullscreen'
+import Logs from './Logs'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
@@ -81,6 +82,8 @@ const styles = prefixObject({
     borderTop: '1px solid #F8F8F8',
     display: 'flex',
     alignItems: 'stretch',
+    overflow: 'auto',
+    maxHeight: 300,
   },
   column: {
     flex: '1',
@@ -90,6 +93,7 @@ const styles = prefixObject({
     minWidth: 0,
     minHeight: 0,
     overflow: 'hidden',
+    position: 'relative',
   },
   row: {
     flex: '1',
@@ -99,6 +103,7 @@ const styles = prefixObject({
     minWidth: 0,
     minHeight: 0,
     overflow: 'hidden',
+    position: 'relative',
   },
 })
 
@@ -121,17 +126,20 @@ export default class extends Component {
     playerStyleSheet: null,
     playerCSS: null,
     panes: [],
+    logOptions: {},
   }
 
   constructor(props) {
     super()
 
-    const {initialTab, panes} = props
+    const {initialTab, panes, logOptions} = props
 
     this.state = {
       compilerError: null,
       runtimeError: null,
       showDetails: false,
+      showLogs: logOptions.visible,
+      logs: [],
       activeTab: initialTab,
       transpilerCache: {},
       transpilerVisible: containsPane(panes, 'transpiler'),
@@ -260,6 +268,10 @@ export default class extends Component {
     this.setState({showDetails})
   }
 
+  onToggleLogs = (showLogs) => {
+    this.setState({showLogs})
+  }
+
   onPlayerRun = () => {
     this.setState({runtimeError: null})
   }
@@ -268,6 +280,15 @@ export default class extends Component {
   // and only cause a line highlight on that file.
   onPlayerError = (message) => {
     this.setState({runtimeError: getErrorDetails(message)})
+  }
+
+  onPlayerLog = (payload) => {
+    const {logOptions} = this.props
+    const {logs} = this.state
+
+    if (!logOptions.enabled) return
+
+    this.setState({logs: logs.concat(payload)})
   }
 
   onClickTab = (tab) => {
@@ -367,26 +388,51 @@ export default class extends Component {
   }
 
   renderPlayer = (key) => {
-    const {width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS} = this.props
+    const {width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, logOptions} = this.props
+    const {showLogs, logs} = this.state
 
     const style = externalStyles.playerPane
       ? {...styles.playerPane, ...externalStyles.playerPane}
       : styles.playerPane
 
     return (
-      <div key={key} style={style}>
-        <PlayerFrame
-          ref={ref => this.player = ref}
-          width={width}
-          scale={scale}
-          platform={platform}
-          assetRoot={assetRoot}
-          vendorComponents={vendorComponents}
-          playerStyleSheet={playerStyleSheet}
-          playerCSS={playerCSS}
-          onRun={this.onPlayerRun}
-          onError={this.onPlayerError}
-        />
+      <div
+        key={key}
+        style={style}
+      >
+        <div style={styles.column}>
+          <div style={styles.row}>
+            <PlayerFrame
+              ref={ref => this.player = ref}
+              width={width}
+              scale={scale}
+              platform={platform}
+              assetRoot={assetRoot}
+              vendorComponents={vendorComponents}
+              playerStyleSheet={playerStyleSheet}
+              playerCSS={playerCSS}
+              onRun={this.onPlayerRun}
+              onError={this.onPlayerError}
+              onLog={this.onPlayerLog}
+            />
+            {logOptions.enabled && showLogs && (
+              <Logs
+                maximize={logOptions.maximized}
+                logs={logs}
+              />
+            )}
+          </div>
+          {logOptions.enabled && (logOptions.collapsible !== false) && (
+            <Status text={'Logs' + (showLogs ? '' : ` (${logs.length})`)}>
+              <Button
+                active={showLogs}
+                onChange={this.onToggleLogs}
+              >
+                {'Show Logs'}
+              </Button>
+            </Status>
+          )}
+        </div>
       </div>
     )
   }

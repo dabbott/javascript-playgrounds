@@ -21,6 +21,7 @@ AppRegistry.registerComponent = (name, f) => {
 const prefix = `
 var exports = {};
 var module = {exports: exports};
+var console = {log: window._logInParent};
 
 (function(module, exports, require) {
 `
@@ -176,6 +177,14 @@ export default class extends Component {
       window._require = this.require.bind(this, fileMap, entry)
       window._requireCache = {}
       window._didRegisterComponent = false
+      window._logInParent = (...args) => {
+        console.log(...args)
+        parent.postMessage(JSON.stringify({
+          id: this.props.id,
+          type: 'log',
+          payload: args,
+        }), '*')
+      }
 
       this.evaluate(entry, fileMap[entry])
 
