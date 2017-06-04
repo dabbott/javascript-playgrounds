@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import Inspector, { chromeLight } from 'react-inspector'
 import pureRender from 'pure-render-decorator'
 
-import Overlay from './Overlay'
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 
 const styles = prefixObject({
@@ -10,6 +9,8 @@ const styles = prefixObject({
     position: 'absolute',
     zIndex: 100,
     overflow: 'auto',
+    boxSizing: 'border-box',
+    padding: '4px 7px',
     left: 0,
     right: 0,
     bottom: 0,
@@ -21,6 +22,8 @@ const styles = prefixObject({
     position: 'absolute',
     zIndex: 100,
     overflow: 'auto',
+    boxSizing: 'border-box',
+    padding: '4px 7px',
     left: 0,
     right: 0,
     bottom: 0,
@@ -40,8 +43,8 @@ const theme = {
   ...chromeLight,
   BASE_FONT_SIZE: '13px',
   TREENODE_FONT_SIZE: '13px',
-  BASE_LINE_HEIGHT: '17px',
-  TREENODE_LINE_HEIGHT: '17px',
+  BASE_LINE_HEIGHT: '20px',
+  TREENODE_LINE_HEIGHT: '20px',
 }
 
 @pureRender
@@ -70,7 +73,7 @@ export default class extends Component {
   }
 
   renderEntry = (entry) => {
-    let row = entry.data
+    let content = entry.data
       .map((item, index) => (
         <Inspector
           key={index}
@@ -78,6 +81,7 @@ export default class extends Component {
           data={item}
         />
       ))
+      // Add spacers between each item
       .reduce((result, value, index, list) => {
         result.push(value)
 
@@ -98,7 +102,7 @@ export default class extends Component {
         key={entry.id}
         style={styles.entryRow}
       >
-        {row}
+        {content}
       </div>
     )
   }
@@ -111,9 +115,7 @@ export default class extends Component {
         style={maximize ? styles.overlayMaximized : styles.overlay}
         ref={ref => this.container = ref}
       >
-        <Overlay>
-          {logs.map(this.renderEntry)}
-        </Overlay>
+        {logs.map(this.renderEntry)}
       </div>
     )
   }
