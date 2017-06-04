@@ -11,7 +11,7 @@ import About from './About'
 import Tabs from './Tabs'
 import TabContainer from './TabContainer'
 import Fullscreen from './Fullscreen'
-import Logs from './Logs'
+import Console from './Console'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
@@ -126,19 +126,19 @@ export default class extends Component {
     playerStyleSheet: null,
     playerCSS: null,
     panes: [],
-    logOptions: {},
+    consoleOptions: {},
   }
 
   constructor(props) {
     super()
 
-    const {initialTab, panes, logOptions} = props
+    const {initialTab, panes, consoleOptions} = props
 
     this.state = {
       compilerError: null,
       runtimeError: null,
       showDetails: false,
-      showLogs: logOptions.visible,
+      showLogs: consoleOptions.visible,
       logs: [],
       activeTab: initialTab,
       transpilerCache: {},
@@ -284,10 +284,10 @@ export default class extends Component {
   }
 
   onPlayerConsole = (payload) => {
-    const {logOptions} = this.props
+    const {consoleOptions} = this.props
     const {logs} = this.state
 
-    if (!logOptions.enabled) return
+    if (!consoleOptions.enabled) return
 
     const {command} = payload
 
@@ -406,7 +406,7 @@ export default class extends Component {
   }
 
   renderPlayer = (key) => {
-    const {width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, logOptions} = this.props
+    const {width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, consoleOptions} = this.props
     const {showLogs, logs} = this.state
 
     const style = externalStyles.playerPane
@@ -433,14 +433,14 @@ export default class extends Component {
               onError={this.onPlayerError}
               onConsole={this.onPlayerConsole}
             />
-            {logOptions.enabled && showLogs && (
-              <Logs
-                maximize={logOptions.maximized}
+            {consoleOptions.enabled && showLogs && (
+              <Console
+                maximize={consoleOptions.maximized}
                 logs={logs}
               />
             )}
           </div>
-          {logOptions.enabled && (logOptions.collapsible !== false) && (
+          {consoleOptions.enabled && (consoleOptions.collapsible !== false) && (
             <Status text={'Logs' + (showLogs ? '' : ` (${logs.length})`)}>
               <Button
                 active={showLogs}

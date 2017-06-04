@@ -10,7 +10,7 @@ const styles = prefixObject({
     zIndex: 100,
     overflow: 'auto',
     boxSizing: 'border-box',
-    padding: '4px 7px',
+    padding: '4px 0',
     left: 0,
     right: 0,
     bottom: 0,
@@ -23,7 +23,7 @@ const styles = prefixObject({
     zIndex: 100,
     overflow: 'auto',
     boxSizing: 'border-box',
-    padding: '4px 7px',
+    padding: '4px 0',
     left: 0,
     right: 0,
     bottom: 0,
@@ -33,6 +33,9 @@ const styles = prefixObject({
   },
   entryRow: {
     display: 'flex',
+    boxSizing: 'border-box',
+    boxShadow: '0 -1px 0 0 rgb(240,240,240) inset',
+    padding: '0 7px',
   },
   itemSpacer: {
     width: 8,
@@ -45,6 +48,7 @@ const theme = {
   TREENODE_FONT_SIZE: '13px',
   BASE_LINE_HEIGHT: '20px',
   TREENODE_LINE_HEIGHT: '20px',
+  BASE_BACKGROUND_COLOR: 'transparent',
 }
 
 @pureRender

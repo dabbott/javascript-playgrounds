@@ -38,7 +38,7 @@ let {
   playerStyleSheet = 'reset',
   playerCSS = '',
   workspaceCSS = '',
-  logs = '{"enabled": false, "visible": false, "maximized": false, "collapsible": true}',
+  console = '{"enabled": false, "visible": false, "maximized": false, "collapsible": true}',
 } = getHashString()
 
 if (workspaceCSS) {
@@ -88,7 +88,7 @@ const root = (
       playerStyleSheet={playerStyleSheet}
       playerCSS={playerCSS}
       onChange={setHashString}
-      logOptions={JSON.parse(logs)}
+      consoleOptions={JSON.parse(console)}
     />
   </div>
 )
