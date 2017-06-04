@@ -25,7 +25,7 @@ export default class extends Component {
     playerCSS: '',
     onError: () => {},
     onRun: () => {},
-    onLog: () => {},
+    onConsole: () => {},
   }
 
   constructor(props) {
@@ -71,8 +71,8 @@ export default class extends Component {
         case 'error':
           this.props.onError(payload)
         break
-        case 'log':
-          this.props.onLog(payload)
+        case 'console':
+          this.props.onConsole(payload)
         break
       }
     })

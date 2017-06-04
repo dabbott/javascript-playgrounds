@@ -282,13 +282,19 @@ export default class extends Component {
     this.setState({runtimeError: getErrorDetails(message)})
   }
 
-  onPlayerLog = (payload) => {
+  onPlayerConsole = (payload) => {
     const {logOptions} = this.props
     const {logs} = this.state
 
     if (!logOptions.enabled) return
 
-    this.setState({logs: logs.concat(payload)})
+    const {command} = payload
+
+    switch (command) {
+      case 'log':
+        this.setState({logs: logs.concat(payload)})
+      break
+    }
   }
 
   onClickTab = (tab) => {
@@ -413,7 +419,7 @@ export default class extends Component {
               playerCSS={playerCSS}
               onRun={this.onPlayerRun}
               onError={this.onPlayerError}
-              onLog={this.onPlayerLog}
+              onConsole={this.onPlayerConsole}
             />
             {logOptions.enabled && showLogs && (
               <Logs

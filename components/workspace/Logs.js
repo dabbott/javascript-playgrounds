@@ -72,11 +72,11 @@ export default class extends Component {
         ref={ref => this.container = ref}
       >
         <Overlay>
-          {logs.map((log, index) => (
+          {logs.map(entry => (
             <Inspector
               theme={theme}
-              key={index}
-              data={log}
+              key={entry.id}
+              data={entry.data.length <= 1 ? entry.data[0] : entry.data}
             />
           ))}
         </Overlay>
