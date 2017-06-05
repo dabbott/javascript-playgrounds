@@ -5,6 +5,7 @@ const paramSchema = {
   // Plain text
   title: 'text',
   transpilerTitle: 'text',
+  playerTitle: 'text',
   code: 'text',
   entry: 'text',
   initialTab: 'text',
@@ -73,6 +74,7 @@ export default class WebPlayer extends Component {
     // Passthrough
     title: PropTypes.string,
     transpilerTitle: PropTypes.string,
+    playerTitle: PropTypes.string,
     code: PropTypes.string,
     entry: PropTypes.string,
     initialTab: PropTypes.string,
