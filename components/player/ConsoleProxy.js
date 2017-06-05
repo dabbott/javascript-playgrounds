@@ -1,12 +1,16 @@
 const consoleProxy = {id: '0'}
 
-for (let key in window.console) {
-  let f = console[key]
+// Don't think this can fail, but the console object can be strange...
+// If it fails, we won't proxy all the methods (which is likely fine)
+try {
+  for (let key in window.console) {
+    let f = console[key]
 
-  if (typeof f === 'function') {
-    consoleProxy[key] = f.bind(console)
+    if (typeof f === 'function') {
+      consoleProxy[key] = f.bind(console)
+    }
   }
-}
+} catch (e) {}
 
 let consoleMessageIndex = 0
 

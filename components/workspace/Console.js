@@ -42,7 +42,7 @@ const styles = prefixObject({
   },
 })
 
-const createTheme = (base) => ({
+const createInspectorTheme = (base) => ({
   ...base,
   BASE_FONT_SIZE: '13px',
   TREENODE_FONT_SIZE: '13px',
@@ -54,9 +54,7 @@ const createTheme = (base) => ({
 const Inspector = Loadable({
   loader: () => import('react-inspector')
     .then(({default: Inspector, chromeLight}) => {
-      const theme = createTheme(chromeLight)
-
-      console.log("Inspector", Inspector, chromeLight)
+      const theme = createInspectorTheme(chromeLight)
 
       return (props) => <Inspector {...props} theme={theme} />
     }),
