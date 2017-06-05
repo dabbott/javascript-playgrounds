@@ -69,6 +69,26 @@ export default class extends Component {
   static defaultProps = {
     maximize: false,
     logs: [],
+    style: null,
+    rowStyle: null,
+  }
+
+  getComputedStyle = () => {
+    const {style, maximize} = this.props
+    const defaultStyle = maximize ? styles.overlayMaximized : styles.overlay
+
+    return style
+      ? prefix({...defaultStyle, ...style})
+      : defaultStyle
+  }
+
+  getComputedRowStyle = () => {
+    const {rowStyle} = this.props
+    const defaultStyle = styles.entryRow
+
+    return rowStyle
+      ? prefix({...defaultStyle, ...rowStyle})
+      : defaultStyle
   }
 
   componentDidMount() {
@@ -115,7 +135,7 @@ export default class extends Component {
     return (
       <div
         key={entry.id}
-        style={styles.entryRow}
+        style={this.getComputedRowStyle()}
       >
         {content}
       </div>
@@ -123,11 +143,11 @@ export default class extends Component {
   }
 
   render() {
-    const {maximize, logs} = this.props
+    const {logs} = this.props
 
     return (
       <div
-        style={maximize ? styles.overlayMaximized : styles.overlay}
+        style={this.getComputedStyle()}
         ref={ref => this.container = ref}
       >
         {logs.map(this.renderEntry)}

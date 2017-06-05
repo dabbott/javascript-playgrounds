@@ -406,7 +406,7 @@ export default class extends Component {
   }
 
   renderPlayer = (key) => {
-    const {width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, consoleOptions} = this.props
+    const {width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, playerTitle, consoleOptions} = this.props
     const {showLogs, logs} = this.state
 
     const style = externalStyles.playerPane
@@ -418,6 +418,13 @@ export default class extends Component {
         key={key}
         style={style}
       >
+        {playerTitle && (
+          <Header
+            text={playerTitle}
+            headerStyle={externalStyles.playerHeader}
+            textStyle={externalStyles.playerHeaderText}
+          />
+        )}
         <div style={styles.column}>
           <div style={styles.row}>
             <PlayerFrame
@@ -435,6 +442,8 @@ export default class extends Component {
             />
             {consoleOptions.enabled && showLogs && (
               <Console
+                style={externalStyles.consolePane}
+                rowStyle={externalStyles.consoleRow}
                 maximize={consoleOptions.maximized}
                 logs={logs}
               />

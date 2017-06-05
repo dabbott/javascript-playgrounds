@@ -35,6 +35,7 @@ let {
   fullscreen = 'false',
   panes = '["editor", "player"]',
   transpilerTitle = '',
+  playerTitle = '',
   playerStyleSheet = 'reset',
   playerCSS = '',
   workspaceCSS = '',
@@ -85,6 +86,7 @@ const root = (
       fullscreen={fullscreen === 'true' && screenfull.enabled}
       panes={JSON.parse(panes)}
       transpilerTitle={transpilerTitle}
+      playerTitle={playerTitle}
       playerStyleSheet={playerStyleSheet}
       playerCSS={playerCSS}
       onChange={setHashString}
