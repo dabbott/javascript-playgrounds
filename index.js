@@ -35,9 +35,11 @@ let {
   fullscreen = 'false',
   panes = '["editor", "player"]',
   transpilerTitle = '',
+  playerTitle = '',
   playerStyleSheet = 'reset',
   playerCSS = '',
   workspaceCSS = '',
+  console = '{"enabled": false, "visible": false, "maximized": false, "collapsible": true}',
 } = getHashString()
 
 if (workspaceCSS) {
@@ -84,9 +86,11 @@ const root = (
       fullscreen={fullscreen === 'true' && screenfull.enabled}
       panes={JSON.parse(panes)}
       transpilerTitle={transpilerTitle}
+      playerTitle={playerTitle}
       playerStyleSheet={playerStyleSheet}
       playerCSS={playerCSS}
       onChange={setHashString}
+      consoleOptions={JSON.parse(console)}
     />
   </div>
 )

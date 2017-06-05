@@ -22,6 +22,7 @@ const paramSchema = {
   vendorComponents: 'json',
   panes: 'json',
   styles: 'json',
+  console: 'json',
 }
 
 const createUrlParams = (params) => {
@@ -87,6 +88,7 @@ export default class WebPlayer extends Component {
     vendorComponents: PropTypes.array,
     panes: PropTypes.array,
     styles: PropTypes.object,
+    console: PropTypes.object,
   }
 
   static defaultProps = {

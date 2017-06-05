@@ -11,6 +11,7 @@ import About from './About'
 import Tabs from './Tabs'
 import TabContainer from './TabContainer'
 import Fullscreen from './Fullscreen'
+import Console from './Console'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
@@ -81,6 +82,8 @@ const styles = prefixObject({
     borderTop: '1px solid #F8F8F8',
     display: 'flex',
     alignItems: 'stretch',
+    overflow: 'auto',
+    maxHeight: 300,
   },
   column: {
     flex: '1',
@@ -90,6 +93,7 @@ const styles = prefixObject({
     minWidth: 0,
     minHeight: 0,
     overflow: 'hidden',
+    position: 'relative',
   },
   row: {
     flex: '1',
@@ -99,6 +103,7 @@ const styles = prefixObject({
     minWidth: 0,
     minHeight: 0,
     overflow: 'hidden',
+    position: 'relative',
   },
 })
 
@@ -121,17 +126,20 @@ export default class extends Component {
     playerStyleSheet: null,
     playerCSS: null,
     panes: [],
+    consoleOptions: {},
   }
 
   constructor(props) {
     super()
 
-    const {initialTab, panes} = props
+    const {initialTab, panes, consoleOptions} = props
 
     this.state = {
       compilerError: null,
       runtimeError: null,
       showDetails: false,
+      showLogs: consoleOptions.visible,
+      logs: [],
       activeTab: initialTab,
       transpilerCache: {},
       transpilerVisible: containsPane(panes, 'transpiler'),
@@ -212,6 +220,7 @@ export default class extends Component {
 
         // Run the app once we've transformed each file at least once
         if (Object.keys(files).every(filename => playerCache[filename])) {
+          this.clearLogs()
           this.runApplication()
         }
       }
@@ -260,6 +269,10 @@ export default class extends Component {
     this.setState({showDetails})
   }
 
+  onToggleLogs = (showLogs) => {
+    this.setState({showLogs})
+  }
+
   onPlayerRun = () => {
     this.setState({runtimeError: null})
   }
@@ -268,6 +281,32 @@ export default class extends Component {
   // and only cause a line highlight on that file.
   onPlayerError = (message) => {
     this.setState({runtimeError: getErrorDetails(message)})
+  }
+
+  onPlayerConsole = (payload) => {
+    const {consoleOptions} = this.props
+    const {logs} = this.state
+
+    if (!consoleOptions.enabled) return
+
+    const {command} = payload
+
+    switch (command) {
+      case 'log':
+        this.setState({logs: logs.concat(payload)})
+      break
+      case 'clear':
+        this.clearLogs()
+      break
+    }
+  }
+
+  clearLogs() {
+    const {logs} = this.state
+
+    if (logs.length === 0) return
+
+    this.setState({logs: []})
   }
 
   onClickTab = (tab) => {
@@ -367,26 +406,60 @@ export default class extends Component {
   }
 
   renderPlayer = (key) => {
-    const {width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS} = this.props
+    const {width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, playerTitle, consoleOptions} = this.props
+    const {showLogs, logs} = this.state
 
     const style = externalStyles.playerPane
       ? {...styles.playerPane, ...externalStyles.playerPane}
       : styles.playerPane
 
     return (
-      <div key={key} style={style}>
-        <PlayerFrame
-          ref={ref => this.player = ref}
-          width={width}
-          scale={scale}
-          platform={platform}
-          assetRoot={assetRoot}
-          vendorComponents={vendorComponents}
-          playerStyleSheet={playerStyleSheet}
-          playerCSS={playerCSS}
-          onRun={this.onPlayerRun}
-          onError={this.onPlayerError}
-        />
+      <div
+        key={key}
+        style={style}
+      >
+        {playerTitle && (
+          <Header
+            text={playerTitle}
+            headerStyle={externalStyles.playerHeader}
+            textStyle={externalStyles.playerHeaderText}
+          />
+        )}
+        <div style={styles.column}>
+          <div style={styles.row}>
+            <PlayerFrame
+              ref={ref => this.player = ref}
+              width={width}
+              scale={scale}
+              platform={platform}
+              assetRoot={assetRoot}
+              vendorComponents={vendorComponents}
+              playerStyleSheet={playerStyleSheet}
+              playerCSS={playerCSS}
+              onRun={this.onPlayerRun}
+              onError={this.onPlayerError}
+              onConsole={this.onPlayerConsole}
+            />
+            {consoleOptions.enabled && showLogs && (
+              <Console
+                style={externalStyles.consolePane}
+                rowStyle={externalStyles.consoleRow}
+                maximize={consoleOptions.maximized}
+                logs={logs}
+              />
+            )}
+          </div>
+          {consoleOptions.enabled && (consoleOptions.collapsible !== false) && (
+            <Status text={'Logs' + (showLogs ? '' : ` (${logs.length})`)}>
+              <Button
+                active={showLogs}
+                onChange={this.onToggleLogs}
+              >
+                {'Show Logs'}
+              </Button>
+            </Status>
+          )}
+        </div>
       </div>
     )
   }

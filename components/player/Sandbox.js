@@ -4,7 +4,10 @@ import ReactNative, { AppRegistry } from 'react-native-web'
 import pureRender from 'pure-render-decorator'
 
 import VendorComponents from './VendorComponents'
+import consoleProxy, { consoleLog, consoleClear } from './ConsoleProxy'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
+
+window._consoleProxy = consoleProxy
 
 // Make regeneratorRuntime globally available for async/await
 window.regeneratorRuntime = require('regenerator-runtime')
@@ -21,6 +24,7 @@ AppRegistry.registerComponent = (name, f) => {
 const prefix = `
 var exports = {};
 var module = {exports: exports};
+var console = window._consoleProxy;
 
 (function(module, exports, require) {
 `
@@ -176,6 +180,8 @@ export default class extends Component {
       window._require = this.require.bind(this, fileMap, entry)
       window._requireCache = {}
       window._didRegisterComponent = false
+      consoleProxy.log = consoleLog.bind(consoleProxy, this.props.id)
+      consoleProxy.clear = consoleClear.bind(consoleProxy, this.props.id)
 
       this.evaluate(entry, fileMap[entry])
 
