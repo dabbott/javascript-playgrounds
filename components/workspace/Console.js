@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import Inspector, { chromeLight } from 'react-inspector'
 import pureRender from 'pure-render-decorator'
 
+import Inspector from './Inspector'
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 
 const styles = prefixObject({
@@ -42,15 +42,6 @@ const styles = prefixObject({
   },
 })
 
-const theme = {
-  ...chromeLight,
-  BASE_FONT_SIZE: '13px',
-  TREENODE_FONT_SIZE: '13px',
-  BASE_LINE_HEIGHT: '20px',
-  TREENODE_LINE_HEIGHT: '20px',
-  BASE_BACKGROUND_COLOR: 'transparent',
-}
-
 @pureRender
 export default class extends Component {
 
@@ -81,7 +72,6 @@ export default class extends Component {
       .map((item, index) => (
         <Inspector
           key={index}
-          theme={theme}
           data={item}
         />
       ))
