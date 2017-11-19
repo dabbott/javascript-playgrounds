@@ -151,7 +151,7 @@ If you prefer, you may access the gh-pages branch directly. This has the advanta
 
 ##### Notes on advanced examples:
 
-These examples are taken from [React Native Express](www.reactnativeexpress.com).
+These examples are taken from [React Native Express](http://www.reactnativeexpress.com).
 
 Advanced examples tend to have extremely long URLs which load successfully in an `iframe` but sometimes fail to load when opened by clicking a link.
 
