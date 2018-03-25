@@ -101,7 +101,7 @@ export default class extends Component {
     const {readOnly} = this.props
 
     return (
-      <div style={styles.editorContainer} className={readOnly && 'read-only'}>
+      <div style={styles.editorContainer} className={readOnly ? 'read-only' : undefined}>
         <div style={styles.editor} ref={'editor'} />
       </div>
     )
