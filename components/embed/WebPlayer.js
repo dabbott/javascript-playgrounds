@@ -48,8 +48,8 @@ const encodeParams = (params) => {
   }, {})
 }
 
-const WEB_PLAYER_VERSION = '2.0.0-alpha.2'
-const WEB_PLAYER_URL = `//cdn.rawgit.com/dabbott/react-native-web-player/gh-v${WEB_PLAYER_VERSION}/index.html`
+const WEB_PLAYER_VERSION = '2.0.0-alpha.3'
+const WEB_PLAYER_URL = `https://cdn.rawgit.com/dabbott/react-native-web-player/gh-v${WEB_PLAYER_VERSION}/index.html`
 
 const styles = {
   iframe: {
