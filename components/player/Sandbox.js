@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import ReactNative, { AppRegistry } from 'react-native-web'
+import PropTypes from 'prop-types'
 import pureRender from 'pure-render-decorator'
 
 import VendorComponents from './VendorComponents'
@@ -61,6 +62,8 @@ export default class extends Component {
 
   componentDidMount() {
     window.onmessage = (e) => {
+      if (!e.data || e.data.source !== 'rnwp') return;
+
       this.runApplication(e.data)
     }
 
@@ -122,6 +125,8 @@ export default class extends Component {
       return ReactDOM
     } else if (name === 'react') {
       return React
+    } else if (name === 'prop-types') {
+      return PropTypes
 
     // If name begins with . or ..
     } else if (name.match(/^\.{1,2}\//)) {

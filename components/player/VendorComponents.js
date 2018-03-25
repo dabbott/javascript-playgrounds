@@ -2,6 +2,7 @@ import $scriptjs from 'scriptjs'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactNative from 'react-native-web'
+import PropTypes from 'prop-types'
 
 import * as Networking from '../../utils/Networking'
 
@@ -81,6 +82,10 @@ export default class VendorComponents {
     window.React = React
     window.ReactNative = ReactNative
     window.ReactDOM = ReactDOM
+    window.PropTypes = PropTypes
+
+    // For backwards compatibility (should only be react-native-animatable example)
+    React.PropTypes = PropTypes
 
     // Format is an array of 2-element arrays [[ require-name, url ]]
     const modules = components.filter(vc => vc.length === 2)

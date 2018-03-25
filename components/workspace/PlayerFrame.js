@@ -86,7 +86,7 @@ export default class extends Component {
         this.entry = entry
       break
       case 'ready':
-        this.refs.iframe.contentWindow.postMessage({fileMap, entry}, '*')
+        this.refs.iframe.contentWindow.postMessage({fileMap, entry, source: 'rnwp'}, '*')
       break
     }
   }
