@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
-import ReactNative, { AppRegistry } from 'react-native-web'
+import * as ReactNative from 'react-native-web'
 import PropTypes from 'prop-types'
 import pureRender from 'pure-render-decorator'
 
 import VendorComponents from './VendorComponents'
 import consoleProxy, { consoleLog, consoleClear } from './ConsoleProxy'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
+
+const AppRegistry = ReactNative.AppRegistry
 
 window._consoleProxy = consoleProxy
 
@@ -44,6 +46,7 @@ const styles = prefixObject({
     alignSelf: 'stretch',
     width: '100%',
     height: '100%',
+    display: 'flex'
   },
 })
 

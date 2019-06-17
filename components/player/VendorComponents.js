@@ -1,7 +1,7 @@
 import $scriptjs from 'scriptjs'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ReactNative from 'react-native-web'
+import * as ReactNative from 'react-native-web'
 import PropTypes from 'prop-types'
 
 import * as Networking from '../../utils/Networking'
@@ -77,6 +77,8 @@ export default class VendorComponents {
 
   // Load components from urls
   static load(components, callback) {
+
+    ReactNative.default = ReactNative
 
     // Necessary for dependency mapping
     window.React = React

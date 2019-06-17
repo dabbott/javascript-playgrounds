@@ -12,6 +12,7 @@ const style = prefix({
   flexDirection: 'column',
   alignItems: 'center',
   overflow: 'hidden',
+  flex: '1 1 auto',
 })
 
 const {
