@@ -155,7 +155,6 @@ export default class extends Component {
       transpilerCache: {},
       transpilerVisible: containsPane(panes, 'transpiler'),
       playerVisible: containsPane(panes, 'player'),
-      activeStepIndex: 0,
     }
 
     this.codeCache = {}
@@ -326,12 +325,8 @@ export default class extends Component {
     this.setState({activeTab: tab})
   }
 
-  onChangeActiveStepIndex = (activeStepIndex) => {
-    this.setState({ activeStepIndex })
-  }
-
   renderEditor = (key) => {
-    const {files, title, externalStyles, fullscreen} = this.props
+    const {files, title, externalStyles, fullscreen, activeStepIndex} = this.props
     const {compilerError, runtimeError, showDetails, activeTab} = this.state
 
     const filenames = Object.keys(files)
@@ -369,7 +364,7 @@ export default class extends Component {
         <Editor
           key={activeTab}
           initialValue={files[activeTab]}
-          filename={activeTab}
+          filename={activeStepIndex + ':' + activeTab}
           onChange={this.onCodeChange}
           errorLineNumber={isError && error.lineNumber}
         />
@@ -423,8 +418,7 @@ export default class extends Component {
   }
 
   renderTutorial = (key) => {
-    const {externalStyles, tutorialTitle, tutorialSteps} = this.props
-    const {activeStepIndex} = this.state
+    const {externalStyles, tutorialTitle, tutorialSteps, activeStepIndex, onChangeActiveStepIndex} = this.props
 
     return (
       <div key={key} style={styles.tutorialPane}>
@@ -439,7 +433,7 @@ export default class extends Component {
           key={key}
           steps={tutorialSteps}
           activeStepIndex={activeStepIndex}
-          onChangeActiveStepIndex={this.onChangeActiveStepIndex}
+          onChangeActiveStepIndex={onChangeActiveStepIndex}
         />
       </div>
     )

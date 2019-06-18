@@ -33,13 +33,23 @@ let {
   vendorComponents = '[]',
   styles = '{}',
   fullscreen = 'false',
-  panes = '["editor", "player"]',
+  panes = JSON.stringify([
+    "editor",
+    "player",
+  ]),
   transpilerTitle = '',
   playerTitle = '',
+  tutorialTitle = '',
+  tutorialSteps = JSON.stringify([]),
   playerStyleSheet = 'reset',
   playerCSS = '',
   workspaceCSS = '',
-  console = '{"enabled": false, "visible": false, "maximized": false, "collapsible": true}',
+  console = JSON.stringify({
+    "enabled": false,
+    "visible": false,
+    "maximized": false,
+    "collapsible": true,
+  }),
 } = getHashString()
 
 if (workspaceCSS) {
@@ -70,34 +80,64 @@ if (!fileMap.hasOwnProperty(initialTab)) {
   initialTab = entry
 }
 
-const root = (
-  <div style={style}>
-    <Workspace
-      title={title}
-      files={fileMap}
-      entry={entry}
-      initialTab={initialTab}
-      platform={platform}
-      assetRoot={assetRoot}
-      scale={parseFloat(scale)}
-      width={parseFloat(width)}
-      vendorComponents={JSON.parse(vendorComponents)}
-      externalStyles={JSON.parse(styles)}
-      fullscreen={fullscreen === 'true' && screenfull.enabled}
-      panes={JSON.parse(panes)}
-      transpilerTitle={transpilerTitle}
-      playerTitle={playerTitle}
-      playerStyleSheet={playerStyleSheet}
-      playerCSS={playerCSS}
-      onChange={setHashString}
-      consoleOptions={JSON.parse(console)}
-    />
-  </div>
-)
+class WorkspaceContainer extends Component {
+  state = { activeStepIndex: 0 }
+
+  handleChangeActiveStepIndex = (activeStepIndex) => {
+    this.setState({ activeStepIndex })
+  }
+
+  getWorkspaceProps = () => {
+    const { activeStepIndex } = this.state
+
+    const parsedTutorialSteps = JSON.parse(tutorialSteps)
+
+    const workspaceProps = {
+      title: title,
+      files: fileMap,
+      entry: entry,
+      initialTab: initialTab,
+      platform: platform,
+      assetRoot: assetRoot,
+      scale: parseFloat(scale),
+      width: parseFloat(width),
+      vendorComponents: JSON.parse(vendorComponents),
+      externalStyles: JSON.parse(styles),
+      fullscreen: fullscreen === 'true' && screenfull.enabled,
+      panes: JSON.parse(panes),
+      transpilerTitle: transpilerTitle,
+      tutorialTitle: tutorialTitle,
+      tutorialSteps: parsedTutorialSteps,
+      playerTitle: playerTitle,
+      playerStyleSheet: playerStyleSheet,
+      playerCSS: playerCSS,
+      onChange: setHashString,
+      consoleOptions: JSON.parse(console),
+      activeStepIndex: activeStepIndex,
+      onChangeActiveStepIndex: this.handleChangeActiveStepIndex,
+    }
+
+    if (!parsedTutorialSteps || parsedTutorialSteps.length === 0) {
+      return workspaceProps
+    }
+
+    return Object.assign(workspaceProps, parsedTutorialSteps[activeStepIndex].workspace)
+  }
+
+  render() {
+    const { activeStepIndex } = this.state
+
+    return (
+      <div style={style}>
+        <Workspace key={activeStepIndex} {...this.getWorkspaceProps()} />
+      </div>
+    )
+  }
+}
 
 const mount = document.getElementById('react-root')
 
 // Set mount node to flex in a vendor-prefixed way
 prefixAndApply({ display: 'flex' }, mount)
 
-ReactDOM.render(root, mount)
+ReactDOM.render(<WorkspaceContainer />, mount)
