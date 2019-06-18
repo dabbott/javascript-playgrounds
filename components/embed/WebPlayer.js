@@ -8,6 +8,7 @@ const paramSchema = {
   title: 'text',
   transpilerTitle: 'text',
   playerTitle: 'text',
+  tutorialTitle: 'text',
   code: 'text',
   entry: 'text',
   initialTab: 'text',

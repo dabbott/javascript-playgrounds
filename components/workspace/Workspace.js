@@ -12,6 +12,7 @@ import Tabs from './Tabs'
 import TabContainer from './TabContainer'
 import Fullscreen from './Fullscreen'
 import Console from './Console'
+import Tutorial from './Tutorial'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
@@ -65,6 +66,15 @@ const styles = prefixObject({
     minHeight: 0,
     marginLeft: 10,
     marginRight: 10,
+  },
+  tutorialPane: {
+    width: 200,
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    minWidth: 0,
+    minHeight: 0,
+    overflow: 'hidden', // Clip box shadows
   },
   overlayContainer: {
     position: 'relative',
@@ -127,6 +137,7 @@ export default class extends Component {
     playerCSS: null,
     panes: [],
     consoleOptions: {},
+    tutorialSteps: [],
   }
 
   constructor(props) {
@@ -144,6 +155,7 @@ export default class extends Component {
       transpilerCache: {},
       transpilerVisible: containsPane(panes, 'transpiler'),
       playerVisible: containsPane(panes, 'player'),
+      activeStepIndex: 0,
     }
 
     this.codeCache = {}
@@ -154,6 +166,7 @@ export default class extends Component {
       editor: this.renderEditor,
       transpiler: this.renderTranspiler,
       player: this.renderPlayer,
+      tutorial: this.renderTutorial,
     }
 
     babelWorker.addEventListener("message", this.onBabelWorkerMessage)
@@ -400,6 +413,28 @@ export default class extends Component {
           readOnly={true}
           value={transpilerCache[getTranspilerId(activeTab)]}
           filename={getTranspilerId(activeTab)}
+        />
+      </div>
+    )
+  }
+
+  renderTutorial = (key) => {
+    const {externalStyles, tutorialTitle, tutorialSteps} = this.props
+    const {activeStepIndex} = this.state
+
+    return (
+      <div key={key} style={styles.tutorialPane}>
+        {tutorialTitle && (
+          <Header
+            text={tutorialTitle}
+            headerStyle={externalStyles.tutorialHeader}
+            textStyle={externalStyles.tutorialHeaderText}
+          />
+        )}
+        <Tutorial
+          key={key}
+          steps={tutorialSteps}
+          activeStepIndex={activeStepIndex}
         />
       </div>
     )
