@@ -20,6 +20,8 @@ export default class extends Component {
     width: 300,
     scale: 1,
     assetRoot: '',
+    statusBarHeight: 0,
+    statusBarColor: 'black',
     vendorComponents: [],
     playerStyleSheet: '',
     playerCSS: '',
@@ -92,7 +94,7 @@ export default class extends Component {
   }
 
   renderFrame = () => {
-    const {assetRoot, vendorComponents, playerStyleSheet, playerCSS} = this.props
+    const {assetRoot, vendorComponents, playerStyleSheet, playerCSS, statusBarColor, statusBarHeight} = this.props
     const {id} = this.state
 
     if (!id) return null
@@ -105,7 +107,7 @@ export default class extends Component {
         style={styles.iframe}
         ref={'iframe'}
         frameBorder={0}
-        src={`player.html#id=${id}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}&styleSheet=${playerStyleSheet}&css=${css}`}
+        src={`player.html#id=${id}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}&styleSheet=${playerStyleSheet}&css=${css}&statusBarColor=${statusBarColor}&statusBarHeight=${statusBarHeight}`}
       />
     )
   }

@@ -28,6 +28,8 @@ let {
   entry = 'index.js',
   initialTab = 'index.js',
   platform = 'ios',
+  statusBarHeight = '0',
+  statusBarColor = 'black',
   width = '210',
   scale = '1',
   assetRoot = '',
@@ -35,66 +37,13 @@ let {
   styles = '{}',
   fullscreen = 'false',
   panes = JSON.stringify([
-    "workspaces",
-
     "editor",
     "player",
   ]),
   transpilerTitle = '',
   playerTitle = '',
-  workspacesTitle = 'To-do List Tutorial',
-  workspaces = JSON.stringify([
-    {
-      title: "1. Project setup",
-      description: `This tutorial will walk you through creating a basic *To-do list* app.
-
-First, run \`expo-init\` to create a new project.`,
-      workspace: {
-        entry: 'store.js',
-        initialTab: 'store.js',
-        files: {
-          ['index.js']: `import React from 'react'
-import { View, Text } from 'react-native'
-
-export default () => (
-  <Text>
-    Testing
-  </Text>
-)`,
-          ['store.js']: `import { createStore } from 'redux'
-
-// Import the reducer and create a store
-import { reducer } from './todoListRedux'`
-        },
-      }
-    },
-    {
-      title: "2. First component",
-      description: 'Next, do this.',
-      workspace: {
-        entry: 'store.js',
-        initialTab: 'store.js',
-        files: {
-          ['index.js']: `import React from 'react'
-import { View, Text } from 'react-native'
-
-export default () => (
-  <Text>
-    Testing
-
-    Example
-  </Text>
-)`,
-          ['store.js']: `import { createStore } from 'redux'
-
-// Import the reducer and create a store
-import { reducer } from './todoListRedux'
-
-const store = createStore(reducer)`
-        },
-      }
-    },
-  ]),
+  workspacesTitle = '',
+  workspaces = JSON.stringify([]),
   playerStyleSheet = 'reset',
   playerCSS = '',
   workspaceCSS = '',
@@ -169,6 +118,8 @@ class WorkspaceContainer extends Component {
       entry: entry,
       initialTab: initialTab,
       platform: platform,
+      statusBarHeight: parseFloat(statusBarHeight),
+      statusBarColor: statusBarColor,
       assetRoot: assetRoot,
       scale: parseFloat(scale),
       width: parseFloat(width),

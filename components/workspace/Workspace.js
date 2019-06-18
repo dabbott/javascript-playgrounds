@@ -139,6 +139,8 @@ export default class extends Component {
     consoleOptions: {},
     workspaces: [],
     diff: {},
+    statusBarHeight: 0,
+    statusBarColor: 'black',
   }
 
   constructor(props) {
@@ -458,7 +460,7 @@ export default class extends Component {
   }
 
   renderPlayer = (key) => {
-    const {width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, playerTitle, consoleOptions} = this.props
+    const {width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, playerTitle, consoleOptions, statusBarHeight, statusBarColor} = this.props
     const {showLogs, logs} = this.state
 
     const style = externalStyles.playerPane
@@ -488,6 +490,8 @@ export default class extends Component {
               vendorComponents={vendorComponents}
               playerStyleSheet={playerStyleSheet}
               playerCSS={playerCSS}
+              statusBarHeight={statusBarHeight}
+              statusBarColor={statusBarColor}
               onRun={this.onPlayerRun}
               onError={this.onPlayerError}
               onConsole={this.onPlayerConsole}

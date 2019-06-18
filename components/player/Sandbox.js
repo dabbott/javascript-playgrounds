@@ -47,7 +47,7 @@ const styles = prefixObject({
     width: '100%',
     height: '100%',
     display: 'flex'
-  },
+  }
 })
 
 @pureRender
@@ -57,6 +57,8 @@ export default class extends Component {
     assetRoot: '',
     onRun: () => {},
     onError: () => {},
+    statusBarHeight: 0,
+    statusBarColor: 'black'
   }
 
   constructor(props) {
@@ -235,12 +237,28 @@ export default class extends Component {
   }
 
   render() {
+    const { statusBarHeight, statusBarColor } = this.props;
+
+    const showStatusBar = statusBarHeight > 0
+
+    const statusBarStyle = showStatusBar && {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: statusBarHeight,
+      backgroundColor: statusBarColor,
+    }
+
     return (
-      <div
-        ref={'root'}
-        id={'app'}
-        style={styles.root}
-      />
+      <div style={styles.root}>
+        <div
+          ref={'root'}
+          id={'app'}
+          style={styles.root}
+        />
+        {showStatusBar && <div style={statusBarStyle} />}
+      </div>
     )
   }
 }

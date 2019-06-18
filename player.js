@@ -21,6 +21,8 @@ const {
   vendorComponents = '[]',
   styleSheet = 'reset',
   css = '',
+  statusBarHeight = '0',
+  statusBarColor = 'black',
 } = getHashString()
 
 if (styleSheet === 'reset') {
@@ -38,6 +40,8 @@ const root = (
     <Sandbox
       id={id}
       assetRoot={assetRoot}
+      statusBarHeight={parseFloat(statusBarHeight)}
+      statusBarColor={statusBarColor}
     />
   </div>
 )
