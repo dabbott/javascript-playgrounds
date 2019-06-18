@@ -22,6 +22,7 @@ const rawStyles = {
     borderLeftWidth: 4,
     marginBottom: 1,
     cursor: 'pointer',
+    transition: 'border-color 0.1s',
   },
   rowTitle: {
     color: 'rgb(170, 170, 170)',
@@ -29,6 +30,7 @@ const rawStyles = {
     fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
     display: 'flex',
     alignItems: 'center',
+    transition: 'color 0.1s',
   },
   rowBody: {
 
@@ -56,6 +58,7 @@ export default class extends Component {
     rowTitleStyle: null,
     rowBodyStyle: null,
     activeRowStyle: null,
+    onChangeActiveStepIndex: () => {}
   }
 
   getComputedStyle = () => {
@@ -95,13 +98,14 @@ export default class extends Component {
   }
 
   renderStep = (step, index) => {
-    const { activeStepIndex } = this.props
+    const { activeStepIndex, onChangeActiveStepIndex } = this.props
     const { title, body } = step
 
     return (
       <div
         key={index}
         style={this.getComputedRowStyle(index === activeStepIndex)}
+        onClick={onChangeActiveStepIndex.bind(null, index)}
       >
         <div style={this.getComputedRowTitleStyle(index === activeStepIndex)}>{title}</div>
         {/* <div style={this.getComputedRowBodyStyle()}>{body}</div> */}

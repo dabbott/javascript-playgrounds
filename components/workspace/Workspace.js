@@ -68,7 +68,7 @@ const styles = prefixObject({
     marginRight: 10,
   },
   tutorialPane: {
-    width: 200,
+    width: 220,
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
@@ -326,6 +326,10 @@ export default class extends Component {
     this.setState({activeTab: tab})
   }
 
+  onChangeActiveStepIndex = (activeStepIndex) => {
+    this.setState({ activeStepIndex })
+  }
+
   renderEditor = (key) => {
     const {files, title, externalStyles, fullscreen} = this.props
     const {compilerError, runtimeError, showDetails, activeTab} = this.state
@@ -435,6 +439,7 @@ export default class extends Component {
           key={key}
           steps={tutorialSteps}
           activeStepIndex={activeStepIndex}
+          onChangeActiveStepIndex={this.onChangeActiveStepIndex}
         />
       </div>
     )
