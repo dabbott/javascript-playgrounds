@@ -46,6 +46,15 @@
   animation: cm-line-warning 0.5s;
 }
 
+.cm-s-react .cm-line-changed {
+  background-color: rgba(59, 160, 26, 0.18);
+  /* animation: cm-line-warning 0.5s; */
+}
+
+.cm-s-react .cm-line-changed .CodeMirror-linenumber {
+  color: rgba(83, 171, 57, 0.42);
+}
+
 /* read-only styles */
 
 .read-only .CodeMirror, .read-only .CodeMirror-gutters {

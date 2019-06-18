@@ -13,3 +13,27 @@ html, body, #react-root {
   width: 100%;
   height: 100%;
 }
+
+.markdown {
+  line-height: 1.4;
+}
+
+.markdown em {
+  font-style: italic;
+}
+
+.markdown bold {
+  font-weight: bold;
+}
+
+.markdown code, .markdown pre {
+  font-family: Menlo, monospace;
+  background-color: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+.markdown br {
+  line-height: 2;
+}

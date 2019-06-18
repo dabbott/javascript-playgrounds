@@ -12,7 +12,7 @@ import Tabs from './Tabs'
 import TabContainer from './TabContainer'
 import Fullscreen from './Fullscreen'
 import Console from './Console'
-import Tutorial from './Tutorial'
+import WorkspacesList from './WorkspacesList'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
@@ -67,7 +67,7 @@ const styles = prefixObject({
     marginLeft: 10,
     marginRight: 10,
   },
-  tutorialPane: {
+  workspacesPane: {
     width: 220,
     position: 'relative',
     display: 'flex',
@@ -137,7 +137,8 @@ export default class extends Component {
     playerCSS: null,
     panes: [],
     consoleOptions: {},
-    tutorialSteps: [],
+    workspaces: [],
+    diff: {},
   }
 
   constructor(props) {
@@ -165,7 +166,7 @@ export default class extends Component {
       editor: this.renderEditor,
       transpiler: this.renderTranspiler,
       player: this.renderPlayer,
-      tutorial: this.renderTutorial,
+      workspaces: this.renderWorkspaces,
     }
 
     babelWorker.addEventListener("message", this.onBabelWorkerMessage)
@@ -326,10 +327,12 @@ export default class extends Component {
   }
 
   renderEditor = (key) => {
-    const {files, title, externalStyles, fullscreen, activeStepIndex} = this.props
+    const {files, title, externalStyles, fullscreen, activeStepIndex, diff} = this.props
     const {compilerError, runtimeError, showDetails, activeTab} = this.state
 
     const filenames = Object.keys(files)
+
+    const fileDiff = (diff[activeTab] && diff[activeTab].type == 'changed') ? diff[activeTab].ranges : []
 
     const error = compilerError || runtimeError
     const isError = !! error
@@ -367,6 +370,8 @@ export default class extends Component {
           filename={activeStepIndex + ':' + activeTab}
           onChange={this.onCodeChange}
           errorLineNumber={isError && error.lineNumber}
+          showDiff={true}
+          diff={fileDiff}
         />
         {showDetails && (
           <div style={styles.overlayContainer}>
@@ -417,23 +422,36 @@ export default class extends Component {
     )
   }
 
-  renderTutorial = (key) => {
-    const {externalStyles, tutorialTitle, tutorialSteps, activeStepIndex, onChangeActiveStepIndex} = this.props
+  renderWorkspaces = (key) => {
+    const {externalStyles, workspacesTitle, workspaces, activeStepIndex, onChangeActiveStepIndex} = this.props
+
+    const style = externalStyles.workspacesPane
+      ? {...styles.workspacesPane, ...externalStyles.workspacesPane}
+      : styles.workspacesPane
 
     return (
-      <div key={key} style={styles.tutorialPane}>
-        {tutorialTitle && (
+      <div key={key} style={style}>
+        {workspacesTitle && (
           <Header
-            text={tutorialTitle}
-            headerStyle={externalStyles.tutorialHeader}
-            textStyle={externalStyles.tutorialHeaderText}
+            text={workspacesTitle}
+            headerStyle={externalStyles.workspacesHeader}
+            textStyle={externalStyles.workspacesHeaderText}
           />
         )}
-        <Tutorial
+        <WorkspacesList
           key={key}
-          steps={tutorialSteps}
+          steps={workspaces}
           activeStepIndex={activeStepIndex}
           onChangeActiveStepIndex={onChangeActiveStepIndex}
+          style={externalStyles.workspacesList}
+          rowStyle={externalStyles.workspacesRow}
+          rowTitleStyle={externalStyles.workspacesRowTitle}
+          descriptionStyle={externalStyles.workspacesDescription}
+          descriptionTextStyle={externalStyles.workspacesDescriptionText}
+          buttonTextStyle={externalStyles.workspacesButtonText}
+          buttonContainerStyle={externalStyles.workspacesButtonContainer}
+          buttonWrapperStyle={externalStyles.workspacesButtonWrapper}
+          dividerStyle={externalStyles.workspacesDivider}
         />
       </div>
     )

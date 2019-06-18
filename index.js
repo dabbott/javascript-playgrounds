@@ -10,6 +10,7 @@ import { getHashString, setHashString } from './utils/HashString'
 import DefaultCode from './constants/DefaultCode'
 import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
 import { appendCSS } from './utils/Styles'
+import diff from './utils/Diff'
 
 const style = prefix({
   flex: '1 1 auto',
@@ -34,13 +35,66 @@ let {
   styles = '{}',
   fullscreen = 'false',
   panes = JSON.stringify([
+    "workspaces",
+
     "editor",
     "player",
   ]),
   transpilerTitle = '',
   playerTitle = '',
-  tutorialTitle = '',
-  tutorialSteps = JSON.stringify([]),
+  workspacesTitle = 'To-do List Tutorial',
+  workspaces = JSON.stringify([
+    {
+      title: "1. Project setup",
+      description: `This tutorial will walk you through creating a basic *To-do list* app.
+
+First, run \`expo-init\` to create a new project.`,
+      workspace: {
+        entry: 'store.js',
+        initialTab: 'store.js',
+        files: {
+          ['index.js']: `import React from 'react'
+import { View, Text } from 'react-native'
+
+export default () => (
+  <Text>
+    Testing
+  </Text>
+)`,
+          ['store.js']: `import { createStore } from 'redux'
+
+// Import the reducer and create a store
+import { reducer } from './todoListRedux'`
+        },
+      }
+    },
+    {
+      title: "2. First component",
+      description: 'Next, do this.',
+      workspace: {
+        entry: 'store.js',
+        initialTab: 'store.js',
+        files: {
+          ['index.js']: `import React from 'react'
+import { View, Text } from 'react-native'
+
+export default () => (
+  <Text>
+    Testing
+
+    Example
+  </Text>
+)`,
+          ['store.js']: `import { createStore } from 'redux'
+
+// Import the reducer and create a store
+import { reducer } from './todoListRedux'
+
+const store = createStore(reducer)`
+        },
+      }
+    },
+  ]),
   playerStyleSheet = 'reset',
   playerCSS = '',
   workspaceCSS = '',
@@ -80,6 +134,23 @@ if (!fileMap.hasOwnProperty(initialTab)) {
   initialTab = entry
 }
 
+function workspacesStepDiff(targetStep, sourceStep) {
+  const { workspace: { files: sourceFiles } } = sourceStep
+  const { workspace: { files: targetFiles } } = targetStep
+
+  const result = {}
+
+  Object.keys(targetFiles).forEach((filename, index) => {
+    if (!(filename in sourceFiles)) {
+      result[filename] = { type: 'added' }
+    } else {
+      result[filename] = { type: 'changed', ranges: diff(sourceFiles[filename], targetFiles[filename]).added }
+    }
+  })
+
+  return result;
+}
+
 class WorkspaceContainer extends Component {
   state = { activeStepIndex: 0 }
 
@@ -90,7 +161,7 @@ class WorkspaceContainer extends Component {
   getWorkspaceProps = () => {
     const { activeStepIndex } = this.state
 
-    const parsedTutorialSteps = JSON.parse(tutorialSteps)
+    const parsedWorkspaces = JSON.parse(workspaces)
 
     const workspaceProps = {
       title: title,
@@ -106,8 +177,8 @@ class WorkspaceContainer extends Component {
       fullscreen: fullscreen === 'true' && screenfull.enabled,
       panes: JSON.parse(panes),
       transpilerTitle: transpilerTitle,
-      tutorialTitle: tutorialTitle,
-      tutorialSteps: parsedTutorialSteps,
+      workspacesTitle: workspacesTitle,
+      workspaces: parsedWorkspaces,
       playerTitle: playerTitle,
       playerStyleSheet: playerStyleSheet,
       playerCSS: playerCSS,
@@ -117,11 +188,20 @@ class WorkspaceContainer extends Component {
       onChangeActiveStepIndex: this.handleChangeActiveStepIndex,
     }
 
-    if (!parsedTutorialSteps || parsedTutorialSteps.length === 0) {
+    if (!parsedWorkspaces || parsedWorkspaces.length === 0) {
       return workspaceProps
     }
 
-    return Object.assign(workspaceProps, parsedTutorialSteps[activeStepIndex].workspace)
+    if (activeStepIndex > 0) {
+      const workspaceDiff = workspacesStepDiff(
+        parsedWorkspaces[activeStepIndex],
+        parsedWorkspaces[activeStepIndex - 1]
+      )
+
+      workspaceProps.diff = workspaceDiff
+    }
+
+    return Object.assign(workspaceProps, parsedWorkspaces[activeStepIndex].workspace)
   }
 
   render() {

@@ -6,6 +6,7 @@ import { prefixObject } from '../../utils/PrefixInlineStyles'
 const colors = {
   normal: '#D8D8D8',
   error: '#C92C2C',
+  inverse: 'white'
 }
 
 const baseStyles = {
@@ -35,12 +36,12 @@ const baseStyles = {
 }
 
 const styles = {}
-const errorStates = ['normal', 'error']
+const variants = ['normal', 'error']
 
-// Generate a style for all states: normal & error, base & active
-errorStates.forEach(errorState => {
-  const color = colors[errorState]
-  styles[errorState] = {
+// Generate a style for all variants: normal & error, base & active
+variants.forEach(variant => {
+  const color = colors[variant]
+  styles[variant] = {
     base: prefixObject({
       container: { ...baseStyles.container, borderColor: color },
       text: { ...baseStyles.text, color: color },
@@ -48,7 +49,7 @@ errorStates.forEach(errorState => {
     active: prefixObject({
       container: { ...baseStyles.container, backgroundColor: color, borderColor: color },
       text: { ...baseStyles.text, color: 'white' },
-    })
+    }),
   }
 })
 
@@ -56,9 +57,10 @@ errorStates.forEach(errorState => {
 export default class extends Component {
 
   static defaultProps = {
-    text: '',
     active: false,
+    inverse: false,
     isError: false,
+    onClick: () => {},
     onChange: () => {},
   }
 
@@ -71,19 +73,23 @@ export default class extends Component {
   }
 
   render() {
-    const {children, isError, active, onChange} = this.props
+    const {children, isError, active, inverse, onChange, onClick} = this.props
     const {hover} = this.state
     const hoverOpacity = hover ? 0.7 : 0.85
 
-    let currentStyles = styles[isError ? 'error' : 'normal'][active ? 'active' : 'base']
-    const containerStyle = { ...currentStyles.container, opacity: hoverOpacity }
+    let currentStyles = styles[isError ? 'error' : 'normal'][active ^ inverse ? 'active' : 'base']
+    const containerStyle = { ...currentStyles.container, opacity: hoverOpacity, ...this.props.containerStyle }
+    const textStyle = this.props.textStyle ? { ...currentStyles.text, ...this.props.textStyle } : currentStyles.text
 
     return (
       <div style={containerStyle}>
-        <div style={currentStyles.text}
+        <div style={textStyle}
           onMouseEnter={() => this.setState({hover: true})}
           onMouseLeave={() => this.setState({hover: false})}
-          onClick={() => onChange(! active)}
+          onClick={() => {
+            onClick()
+            onChange(! active)
+          }}
         >
           {children}
         </div>
