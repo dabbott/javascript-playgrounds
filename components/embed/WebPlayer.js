@@ -8,11 +8,13 @@ const paramSchema = {
   title: 'text',
   transpilerTitle: 'text',
   playerTitle: 'text',
-  tutorialTitle: 'text',
+  workspacesTitle: 'text',
   code: 'text',
   entry: 'text',
   initialTab: 'text',
   platform: 'text',
+  statusBarHeight: 'text',
+  statusBarColor: 'text',
   fullscreen: 'text',
   width: 'text',
   scale: 'text',
@@ -27,6 +29,7 @@ const paramSchema = {
   panes: 'json',
   styles: 'json',
   console: 'json',
+  workspaces: 'json',
 }
 
 const createUrlParams = (params) => {
