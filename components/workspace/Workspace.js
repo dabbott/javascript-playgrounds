@@ -25,6 +25,10 @@ const transpilerPrefix = '@babel-'
 const getTranspilerId = (filename) => `${transpilerPrefix}${filename}`
 const isTranspilerId = (filename) => filename.indexOf(transpilerPrefix) === 0
 
+const compareTabs = (a, b) => a.index === b.index
+const getTabTitle = (tab) => tab.title
+const getTabChanged = (tab) => tab.changed
+
 const containsPane = (panes, target) =>
   panes.some(pane => (
     typeof pane === 'string'
@@ -146,7 +150,11 @@ export default class extends Component {
   constructor(props) {
     super()
 
-    const {initialTab, panes, consoleOptions} = props
+    const {initialTab, panes, consoleOptions, files, diff} = props
+
+    const fileTabs = Object.keys(files).map((filename, index) => {
+      return { title: filename, changed: !!diff[filename], index }
+    })
 
     this.state = {
       compilerError: null,
@@ -154,10 +162,12 @@ export default class extends Component {
       showDetails: false,
       showLogs: consoleOptions.visible,
       logs: [],
-      activeTab: initialTab,
+      activeFile: initialTab,
       transpilerCache: {},
       transpilerVisible: containsPane(panes, 'transpiler'),
       playerVisible: containsPane(panes, 'player'),
+      fileTabs,
+      activeFileTab: fileTabs.find(tab => tab.title === initialTab),
     }
 
     this.codeCache = {}
@@ -259,11 +269,11 @@ export default class extends Component {
   }
 
   onCodeChange = (code) => {
-    const {activeTab, transpilerVisible, playerVisible} = this.state
+    const {activeFile, transpilerVisible, playerVisible} = this.state
 
     if (playerVisible) {
       babelWorker.postMessage({
-        filename: activeTab,
+        filename: activeFile,
         code,
         options: {retainLines: true},
       })
@@ -271,12 +281,12 @@ export default class extends Component {
 
     if (transpilerVisible) {
       babelWorker.postMessage({
-        filename: getTranspilerId(activeTab),
+        filename: getTranspilerId(activeFile),
         code,
       })
     }
 
-    this.codeCache[activeTab] = code
+    this.codeCache[activeFile] = code
     this.props.onChange(this.codeCache)
   }
 
@@ -325,16 +335,17 @@ export default class extends Component {
   }
 
   onClickTab = (tab) => {
-    this.setState({activeTab: tab})
+    this.setState({
+      activeFile: tab.title,
+      activeFileTab: tab,
+    })
   }
 
   renderEditor = (key) => {
     const {files, title, externalStyles, fullscreen, activeStepIndex, diff} = this.props
-    const {compilerError, runtimeError, showDetails, activeTab} = this.state
+    const {compilerError, runtimeError, showDetails, activeFile, activeFileTab, fileTabs} = this.state
 
-    const filenames = Object.keys(files)
-
-    const fileDiff = (diff[activeTab] && diff[activeTab].type == 'changed') ? diff[activeTab].ranges : []
+    const fileDiff = diff[activeFile] ? diff[activeFile].ranges : []
 
     const error = compilerError || runtimeError
     const isError = !! error
@@ -352,14 +363,18 @@ export default class extends Component {
             )}
           </Header>
         )}
-        {filenames.length > 1 && (
+        {fileTabs.length > 1 && (
           <Tabs
-            tabs={filenames}
-            activeTab={activeTab}
+            tabs={fileTabs}
+            getTitle={getTabTitle}
+            getChanged={getTabChanged}
+            activeTab={activeFileTab}
+            compareTabs={compareTabs}
             onClickTab={this.onClickTab}
             tabStyle={externalStyles.tab}
             textStyle={externalStyles.tabText}
             activeTextStyle={externalStyles.tabTextActive}
+            changedTextStyle={externalStyles.tabTextChanged}
           >
             {fullscreen && !title && (
               <Fullscreen textStyle={externalStyles.tabText} />
@@ -367,9 +382,9 @@ export default class extends Component {
           </Tabs>
         )}
         <Editor
-          key={activeTab}
-          initialValue={files[activeTab]}
-          filename={activeStepIndex + ':' + activeTab}
+          key={activeFile}
+          initialValue={files[activeFile]}
+          filename={activeStepIndex + ':' + activeFile}
           onChange={this.onCodeChange}
           errorLineNumber={isError && error.lineNumber}
           showDiff={true}
@@ -403,7 +418,7 @@ export default class extends Component {
 
   renderTranspiler = (key) => {
     const {externalStyles, transpilerTitle} = this.props
-    const {activeTab, transpilerCache} = this.state
+    const {activeFile, transpilerCache} = this.state
 
     return (
       <div key={key} style={styles.transpilerPane}>
@@ -415,10 +430,10 @@ export default class extends Component {
           />
         )}
         <Editor
-          key={getTranspilerId(activeTab)}
+          key={getTranspilerId(activeFile)}
           readOnly={true}
-          value={transpilerCache[getTranspilerId(activeTab)]}
-          filename={getTranspilerId(activeTab)}
+          value={transpilerCache[getTranspilerId(activeFile)]}
+          filename={getTranspilerId(activeFile)}
         />
       </div>
     )
@@ -539,13 +554,13 @@ export default class extends Component {
       return (
         <TabContainer
           tabs={tabs}
-          titles={tabs.map(x => x.title)}
+          getTitle={getTabTitle}
           initialTab={tabs[0]}
           tabStyle={externalStyles.tab}
           textStyle={externalStyles.tabText}
           activeTextStyle={externalStyles.tabTextActive}
           renderHiddenContent={true}
-          compareTabs={(a, b) => a.index === b.index}
+          compareTabs={compareTabs}
           renderContent={tab => this.renderPane(tab.pane, tab.index)}
         />
       )

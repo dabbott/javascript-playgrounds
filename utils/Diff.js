@@ -13,13 +13,15 @@ export default function changedRanges(originalText, newText) {
 
     const result = lineDiff.reduce(
       (result, change, index) => {
+        if (change.removed) { return result }
+
         let { ranges, value } = result
 
-        const beforeLines = value == '' ? [] : value.split(newlineRegex)
+        const beforeLines = value.split(newlineRegex)
 
         value += change.value
 
-        const afterLines = value == '' ? [] : value.split(newlineRegex)
+        const afterLines = value.split(newlineRegex)
 
         let beforeLineCount = beforeLines.length - 1
         let afterLineCount = afterLines.length - 1

@@ -28,6 +28,9 @@ const styles = prefixObject({
     borderBottomWidth: 0,
     transition: 'border-width 0.1s, color 0.1s',
   },
+  changedText: {
+    color: '#7ABE66',
+  },
   spacer: {
     flex: '1 1 auto',
   },
@@ -44,9 +47,10 @@ export default class extends Component {
 
   static defaultProps = {
     tabs: [],
-    titles: [],
     activeTab: null,
     onClickTab: () => {},
+    getTitle: a => a,
+    getChanged: a => false,
     compareTabs: (a, b) => a === b,
     textStyle: null,
     activeTextStyle: null,
@@ -77,19 +81,31 @@ export default class extends Component {
     }
   }
 
+  getChangedTextStyle = (tab) => {
+    const {getChanged, changedTextStyle} = this.props
+
+    const base = this.getTextStyle(tab)
+
+    if (getChanged(tab)) {
+      return prefix({...base, ...styles.changedText, changedTextStyle})
+    } else {
+      return base
+    }
+  }
+
   render() {
-    const {children, tabs, titles} = this.props
+    const {children, tabs, titles, getTitle, getChanged} = this.props
     const computedStyles = this.getComputedStyles()
 
     return (
       <div style={computedStyles.container}>
         {tabs.map((tab, i) => {
-          const title = titles.length > 0 ? titles[i] : tab
+          const title = getTitle(tab)
 
           return (
             <div
               key={title}
-              style={this.getTextStyle(tab)}
+              style={this.getChangedTextStyle(tab)}
               onClick={this.onClickTab.bind(this, tab)}
             >
               {title}

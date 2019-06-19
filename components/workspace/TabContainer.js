@@ -20,11 +20,11 @@ export default class extends Component {
 
   static defaultProps = {
     tabs: [],
-    titles: [],
     initialTab: null,
     onClickTab: () => {},
     renderContent: () => null,
     renderRight: () => null,
+    getTitle: a => a,
     compareTabs: (a, b) => a === b,
     renderHiddenContent: false,
     tabStyle: null,
@@ -73,14 +73,14 @@ export default class extends Component {
   }
 
   render() {
-    const {renderRight, tabs, titles, compareTabs, tabStyle, textStyle, textActiveStyle} = this.props
+    const {renderRight, tabs, getTitle, compareTabs, tabStyle, textStyle, textActiveStyle} = this.props
     const {activeTab} = this.state
 
     return (
       <div style={styles.container}>
         <Tabs
           tabs={tabs}
-          titles={titles}
+          getTitle={getTitle}
           compareTabs={compareTabs}
           activeTab={activeTab}
           onClickTab={this.onClickTab}

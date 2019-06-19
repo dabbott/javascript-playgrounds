@@ -91,7 +91,7 @@ function workspacesStepDiff(targetStep, sourceStep) {
 
   Object.keys(targetFiles).forEach((filename, index) => {
     if (!(filename in sourceFiles)) {
-      result[filename] = { type: 'added' }
+      result[filename] = { type: 'added', ranges: diff('', targetFiles[filename]).added }
     } else {
       result[filename] = { type: 'changed', ranges: diff(sourceFiles[filename], targetFiles[filename]).added }
     }
