@@ -153,7 +153,11 @@ export default class extends Component {
     const {initialTab, panes, consoleOptions, files, diff} = props
 
     const fileTabs = Object.keys(files).map((filename, index) => {
-      return { title: filename, changed: !!diff[filename], index }
+      return {
+        title: filename,
+        changed: diff[filename] && diff[filename].ranges.length > 0,
+        index
+      }
     })
 
     this.state = {
