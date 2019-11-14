@@ -59,7 +59,7 @@ The `iframe` accepts the following parameters *after the hash* in the url. You m
 - **`title`** - An optional title for the player. By default, there is no title.
 - **`width`** - The width of the device. Defaults to `210`.
 - **`scale`** - Zoom the device screen. Defaults to `1`.
-- **`platform`** - One of `ios` or `android`. Defaults to `ios`. Currently this changes the phone image, but may also have an effect on how the code is executed in the future.
+- **`platform`** - One of `ios`, `android` or `web`. Defaults to `ios`. Currently, this changes the phone the image. The `web` option removes image. But may also have an effect on how the code is executed in the future. `width` and `scale` are not working with the `platform: web`.
 - **`entry`** - The filename of the entry file. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`.
 - **`initialTab`** - The filename of the tab to show by default. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`.
 - **`fullscreen`** - Show a button to enable fullscreen editing. Defaults to `false`. Note that the iframe must have the `allowfullscreen` attribute for this to work.
@@ -81,7 +81,7 @@ When using the iframe directly, the following parameters must be JSON encoded *a
   Use the `entry` and `initialTab` parameters to control which file is executed first and which tab is shown by default.
 
 - **`panes`** - Array of panes to show. Each element is one of:
-`editor`, `player`, `transpiler`.
+`editor`, `player`, `transpiler`. To render panes in column you can set an array with object with `children` and `type` keys. Example: `[{children: ['editor', 'player'], type: 'column'}]`.
 
   The default value is: `['editor', 'player']`
 
