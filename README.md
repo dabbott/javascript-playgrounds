@@ -60,6 +60,8 @@ The `iframe` accepts the following parameters *after the hash* in the url. You m
 - **`width`** - The width of the device. Defaults to `210`.
 - **`scale`** - Zoom the device screen. Defaults to `1`.
 - **`platform`** - One of `ios` or `android`. Defaults to `ios`. Currently this changes the phone image, but may also have an effect on how the code is executed in the future.
+- **`deviceType`** One of `phone` or `tablet`. Defaults to `phone`. This changes the frame image.
+- **`orientation`** One of `portrait` or `landscape`. Defaults to `portrait`. This allows to rotate the frame image.
 - **`entry`** - The filename of the entry file. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`.
 - **`initialTab`** - The filename of the tab to show by default. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`.
 - **`fullscreen`** - Show a button to enable fullscreen editing. Defaults to `false`. Note that the iframe must have the `allowfullscreen` attribute for this to work.

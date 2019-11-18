@@ -17,7 +17,7 @@ export default class extends Component {
 
   render() {
     const {children, width, platform, deviceType, orientation, scale} = this.props
-    console.log(deviceType, platform, orientation)
+
     const {deviceImageUrl, deviceImageWidth, deviceImageHeight, screenWidth, screenHeight} = DEVICES[deviceType][platform]
     const isLandscape = orientation === 'landscape';
     const imageScale = width / deviceImageWidth
