@@ -117,6 +117,8 @@ export default class extends Component {
     initialTab: 'index.js',
     onChange: () => {},
     platform: null,
+    deviceType: null,
+    orientation: null,
     scale: null,
     width: null,
     assetRoot: null,
@@ -406,7 +408,7 @@ export default class extends Component {
   }
 
   renderPlayer = (key) => {
-    const {width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, playerTitle, consoleOptions} = this.props
+    const {width, scale, platform, deviceType, orientation, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, playerTitle, consoleOptions} = this.props
     const {showLogs, logs} = this.state
 
     const style = externalStyles.playerPane
@@ -432,6 +434,8 @@ export default class extends Component {
               width={width}
               scale={scale}
               platform={platform}
+              deviceType={deviceType}
+              orientation={orientation}
               assetRoot={assetRoot}
               vendorComponents={vendorComponents}
               playerStyleSheet={playerStyleSheet}

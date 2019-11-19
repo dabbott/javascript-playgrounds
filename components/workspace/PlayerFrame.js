@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import pureRender from 'pure-render-decorator'
 
-import Phone from './Phone'
+import Device from './Device'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
 const styles = prefixObject({
@@ -17,6 +17,8 @@ export default class extends Component {
 
   static defaultProps = {
     platform: 'ios',
+    deviceType: 'phone',
+    orientation: 'portrait',
     width: 300,
     scale: 1,
     assetRoot: '',
@@ -111,20 +113,22 @@ export default class extends Component {
   }
 
   render() {
-    const {width, scale, platform} = this.props
+    const {width, scale, platform, deviceType, orientation} = this.props
 
     if (platform === 'web') {
       return this.renderFrame()
     }
 
     return (
-      <Phone
+      <Device
         width={width}
-        device={platform}
+        platform={platform}
+        deviceType={deviceType}
+        orientation={orientation}
         scale={scale}
       >
         {this.renderFrame()}
-      </Phone>
+      </Device>
     )
   }
 }

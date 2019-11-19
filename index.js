@@ -27,6 +27,8 @@ let {
   entry = 'index.js',
   initialTab = 'index.js',
   platform = 'ios',
+  deviceType = 'phone',
+  orientation = 'portrait',
   width = '210',
   scale = '1',
   assetRoot = '',
@@ -78,6 +80,8 @@ const root = (
       entry={entry}
       initialTab={initialTab}
       platform={platform}
+      deviceType={deviceType}
+      orientation={orientation}
       assetRoot={assetRoot}
       scale={parseFloat(scale)}
       width={parseFloat(width)}
