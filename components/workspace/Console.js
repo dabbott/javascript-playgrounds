@@ -157,8 +157,8 @@ export default class extends Component {
       }, [])
 
     const lineNumber = this.props.showLineNumber && entry.location 
-    ? this.renderLineNumber(entry.location) 
-    : null
+      ? this.renderLineNumber(entry.location) 
+      : null
 
     return (
       <div
