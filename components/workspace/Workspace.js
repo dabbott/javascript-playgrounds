@@ -479,7 +479,7 @@ export default class extends Component {
   }
 
   renderPlayer = (key) => {
-    const {width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, playerTitle, consoleOptions, statusBarHeight, statusBarColor} = this.props
+    const {files, width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, playerTitle, consoleOptions, statusBarHeight, statusBarColor} = this.props
     const {showLogs, logs} = this.state
 
     const style = externalStyles.playerPane
@@ -520,6 +520,8 @@ export default class extends Component {
                 style={externalStyles.consolePane}
                 rowStyle={externalStyles.consoleRow}
                 maximize={consoleOptions.maximized}
+                showFileName={Object.keys(files).length > 1 && consoleOptions.showFileName}
+                showLineNumber={consoleOptions.showLineNumber}
                 logs={logs}
               />
             )}

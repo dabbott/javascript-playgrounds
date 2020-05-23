@@ -37,6 +37,17 @@ const styles = prefixObject({
     boxShadow: '0 -1px 0 0 rgb(240,240,240) inset',
     padding: '0 7px',
   },
+  lineNumberSpacer: {
+    flex: '1 1 auto',
+  },
+  lineNumber: {
+    fontFamily: 'Menlo, monospace',
+    fontSize: '13px',
+    lineHeight: '20px',
+    color: 'rgb(200,200,200)',
+    // color: 'rgb(74, 74, 74)',
+    textDecoration: 'underline',
+  },
   itemSpacer: {
     width: 8,
   },
@@ -66,6 +77,8 @@ export default class extends Component {
 
   static defaultProps = {
     maximize: false,
+    showFileName: false,
+    showLineNumber: true,
     logs: [],
     style: null,
     rowStyle: null,
@@ -106,6 +119,19 @@ export default class extends Component {
     }
   }
 
+  renderLineNumber = (location) => {
+    const string = this.props.showFileName 
+      ? `${location.file}:${location.line}`
+      : `:${location.line}`
+
+    return (
+      <React.Fragment>
+        <span style={styles.lineNumberSpacer}></span>
+        <span style={styles.lineNumber}>{string}</span> 
+      </React.Fragment>
+    ) 
+  }
+
   renderEntry = (entry) => {
     let content = entry.data
       .map((item, index) => (
@@ -130,12 +156,16 @@ export default class extends Component {
         return result
       }, [])
 
+    const lineNumber = this.props.showLineNumber && entry.location 
+    ? this.renderLineNumber(entry.location) 
+    : null
+
     return (
       <div
         key={entry.id}
         style={this.getComputedRowStyle()}
       >
-        {content}
+        {content}{lineNumber}
       </div>
     )
   }

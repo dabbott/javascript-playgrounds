@@ -36,10 +36,7 @@ let {
   vendorComponents = '[]',
   styles = '{}',
   fullscreen = 'false',
-  panes = JSON.stringify([
-    "editor",
-    "player",
-  ]),
+  panes = JSON.stringify(['editor', 'player']),
   transpilerTitle = '',
   playerTitle = '',
   workspacesTitle = '',
@@ -48,10 +45,12 @@ let {
   playerCSS = '',
   workspaceCSS = '',
   console = JSON.stringify({
-    "enabled": false,
-    "visible": false,
-    "maximized": false,
-    "collapsible": true,
+    enabled: false,
+    visible: false,
+    maximized: false,
+    collapsible: true,
+    showFileName: true,
+    showLineNumber: true,
   }),
 } = getHashString()
 
@@ -63,7 +62,6 @@ const parsedFiles = JSON.parse(files)
 let fileMap
 
 if (parsedFiles.length > 0) {
-
   // Build a map of {filename => code}
   fileMap = parsedFiles.reduce((fileMap, [filename, code]) => {
     fileMap[filename] = code
@@ -76,7 +74,7 @@ if (parsedFiles.length > 0) {
   }
 } else {
   // If no files are given, use the code param
-  fileMap = {[entry]: code}
+  fileMap = { [entry]: code }
 }
 
 if (!fileMap.hasOwnProperty(initialTab)) {
@@ -84,20 +82,30 @@ if (!fileMap.hasOwnProperty(initialTab)) {
 }
 
 function workspacesStepDiff(targetStep, sourceStep) {
-  const { workspace: { files: sourceFiles } } = sourceStep
-  const { workspace: { files: targetFiles } } = targetStep
+  const {
+    workspace: { files: sourceFiles },
+  } = sourceStep
+  const {
+    workspace: { files: targetFiles },
+  } = targetStep
 
   const result = {}
 
   Object.keys(targetFiles).forEach((filename, index) => {
     if (!(filename in sourceFiles)) {
-      result[filename] = { type: 'added', ranges: diff('', targetFiles[filename]).added }
+      result[filename] = {
+        type: 'added',
+        ranges: diff('', targetFiles[filename]).added,
+      }
     } else {
-      result[filename] = { type: 'changed', ranges: diff(sourceFiles[filename], targetFiles[filename]).added }
+      result[filename] = {
+        type: 'changed',
+        ranges: diff(sourceFiles[filename], targetFiles[filename]).added,
+      }
     }
   })
 
-  return result;
+  return result
 }
 
 class WorkspaceContainer extends Component {
@@ -152,7 +160,10 @@ class WorkspaceContainer extends Component {
       workspaceProps.diff = workspaceDiff
     }
 
-    return Object.assign(workspaceProps, parsedWorkspaces[activeStepIndex].workspace)
+    return Object.assign(
+      workspaceProps,
+      parsedWorkspaces[activeStepIndex].workspace
+    )
   }
 
   render() {

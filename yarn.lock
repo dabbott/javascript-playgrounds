@@ -504,6 +504,11 @@ babel-plugin-check-es2015-constants@^6.3.13, babel-plugin-check-es2015-constants
   dependencies:
     babel-runtime "^6.0.0"
 
+babel-plugin-console-source@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/babel-plugin-console-source/-/babel-plugin-console-source-2.0.5.tgz#850f2753e2246b4f051ea05049160436c39c8351"
+  integrity sha512-yzQpv5ur9IeSH8EuFdDogGYR19u69Ez7cYolOde3jiyZlpy04Vn5HzCyOshylXACjLzWZIFi4RZa7ZYQxADJIg==
+
 babel-plugin-constant-folding@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/babel-plugin-constant-folding/-/babel-plugin-constant-folding-1.0.1.tgz#8361d364c98e449c3692bdba51eff0844290aa8e"
