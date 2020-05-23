@@ -34,8 +34,9 @@ function extractLocationInfo(logString) {
 export const consoleLog = (id, ...args) => {
   const hasLogMarker =
     typeof args[0] === 'string' && args[0].indexOf(LogMarker.symbol) === 0
-
   const logs = hasLogMarker ? args.slice(1) : args
+
+  console.log(logs)
 
   const payload = {
     id: nextMessageId(),
