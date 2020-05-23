@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 
 import PropTypes from 'prop-types'
 
-const WEB_PLAYER_VERSION = '2.0.0-alpha.9'
-const WEB_PLAYER_URL = `https://cdn.rawgit.com/dabbott/react-native-web-player/gh-v${WEB_PLAYER_VERSION}/index.html`
+const WEB_PLAYER_VERSION = '2.0.0-alpha.10'
+const WEB_PLAYER_URL = `https://unpkg.com/react-native-web-player@${WEB_PLAYER_VERSION}/index.html`
 
 const paramSchema = {
   // Plain text
