@@ -13,6 +13,7 @@ let styles = {
     whiteSpace: 'pre-wrap',
   },
   text: {
+    flex: '1',
     color: 'rgba(0,0,0,0.5)',
     fontSize: 13,
     fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -30,20 +31,17 @@ styles = prefixObject(styles)
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     children: '',
     isError: false,
   }
 
   render() {
-    const {children, isError} = this.props
+    const { children, isError } = this.props
 
     return (
       <div style={styles.container}>
-        <div style={isError ? styles.error : styles.text}>
-          {children}
-        </div>
+        <div style={isError ? styles.error : styles.text}>{children}</div>
       </div>
     )
   }

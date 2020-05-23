@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import pureRender from 'pure-render-decorator'
 
 import VendorComponents from './VendorComponents'
-import consoleProxy, { consoleLog, consoleClear } from './ConsoleProxy'
+import consoleProxy, { consoleLog, consoleLogRNWP, consoleClear } from './ConsoleProxy'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
 const AppRegistry = ReactNative.AppRegistry
@@ -190,6 +190,8 @@ export default class extends Component {
       window._require = this.require.bind(this, fileMap, entry)
       window._requireCache = {}
       window._didRegisterComponent = false
+      
+      consoleProxy._rnwp_log = consoleLogRNWP.bind(consoleProxy, this.props.id)
       consoleProxy.log = consoleLog.bind(consoleProxy, this.props.id)
       consoleProxy.clear = consoleClear.bind(consoleProxy, this.props.id)
 

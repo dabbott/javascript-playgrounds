@@ -1,4 +1,4 @@
-import * as LogMarker from '../../utils/LogMarker'
+import * as ExtendedJSON from '../../utils/ExtendedJSON'
 
 const consoleProxy = { id: '0' }
 
@@ -18,41 +18,33 @@ let consoleMessageIndex = 0
 
 const nextMessageId = () => `${+new Date()}-${++consoleMessageIndex}`
 
-function extractLocationInfo(logString) {
-  const remainder = logString.slice(LogMarker.symbol.length)
-  const match = remainder.match(LogMarker.regExp)
-
-  if (!match) return undefined
-
-  return {
-    file: match[1],
-    line: match[2],
-    column: match[3],
-  }
-}
-
-export const consoleLog = (id, ...args) => {
-  const hasLogMarker =
-    typeof args[0] === 'string' && args[0].indexOf(LogMarker.symbol) === 0
-  const logs = hasLogMarker ? args.slice(1) : args
-
-  console.log(logs)
+const consoleLogCommon = (id, location, ...logs) => {
+  console.log(...logs)
 
   const payload = {
     id: nextMessageId(),
     command: 'log',
     data: logs,
-    location: hasLogMarker ? extractLocationInfo(args[0]) : undefined,
+    location,
   }
 
   parent.postMessage(
-    JSON.stringify({
+    ExtendedJSON.stringify({
       id: id,
       type: 'console',
       payload,
     }),
     '*'
   )
+}
+
+export const consoleLogRNWP = (id, file, line, column, ...logs) => {
+  const location = { file, line, column }
+  return consoleLogCommon(id, location, ...logs)
+}
+
+export const consoleLog = (id, ...args) => {
+  return consoleLogCommon(id, undefined, ...logs)
 }
 
 export const consoleClear = (id) => {

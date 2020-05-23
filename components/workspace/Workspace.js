@@ -119,6 +119,17 @@ const styles = prefixObject({
     overflow: 'hidden',
     position: 'relative',
   },
+  boldMessage: {
+    fontWeight: 'bold'
+  },
+  codeMessage: {
+    display: 'block',
+    fontFamily: `'source-code-pro', Menlo, 'Courier New', Consolas, monospace`,
+    borderRadius: 4,
+    padding: '4px 8px',
+    backgroundColor: 'rgba(0,0,0,0.02)',
+    border: '1px solid rgba(0,0,0,0.05)',
+  }
 })
 
 @pureRender
@@ -141,6 +152,7 @@ export default class extends Component {
     playerCSS: null,
     panes: [],
     consoleOptions: {},
+    playgroundOptions: {},
     workspaces: [],
     diff: {},
     statusBarHeight: 0,
@@ -313,20 +325,20 @@ export default class extends Component {
   }
 
   onPlayerConsole = (payload) => {
-    const {consoleOptions} = this.props
+    const {consoleOptions, playgroundOptions} = this.props
     const {logs} = this.state
 
-    if (!consoleOptions.enabled) return
+    if (consoleOptions.enabled || playgroundOptions.enabled) {
+      const {command} = payload
 
-    const {command} = payload
-
-    switch (command) {
-      case 'log':
-        this.setState({logs: logs.concat(payload)})
-      break
-      case 'clear':
-        this.clearLogs()
-      break
+      switch (command) {
+        case 'log':
+          this.setState({logs: logs.concat(payload)})
+        break
+        case 'clear':
+          this.clearLogs()
+        break
+      }
     }
   }
 
@@ -346,8 +358,8 @@ export default class extends Component {
   }
 
   renderEditor = (key) => {
-    const {files, title, externalStyles, fullscreen, activeStepIndex, diff} = this.props
-    const {compilerError, runtimeError, showDetails, activeFile, activeFileTab, fileTabs} = this.state
+    const {files, title, externalStyles, fullscreen, activeStepIndex, diff, playgroundOptions} = this.props
+    const {compilerError, runtimeError, showDetails, activeFile, activeFileTab, fileTabs, logs} = this.state
 
     const fileDiff = diff[activeFile] ? diff[activeFile].ranges : []
 
@@ -393,12 +405,24 @@ export default class extends Component {
           errorLineNumber={isError && error.lineNumber}
           showDiff={true}
           diff={fileDiff}
+          logs={playgroundOptions.enabled ? logs : undefined}
+          playgroundDebounceDuration={playgroundOptions.debounceDuration}
         />
         {showDetails && (
           <div style={styles.overlayContainer}>
             <div style={styles.overlay}>
               <Overlay isError={isError}>
-                {isError ? error.description + '\n\n' : ''}
+                {isError ? (
+                  <React.Fragment>
+                    <b style={styles.boldMessage}>{error.description}</b>
+                    <br />
+                    <br />
+                    <code style={styles.codeMessage}>{error.errorMessage}</code>
+                    <br />
+                  </React.Fragment>
+                ) : (
+                  ''
+                )}
                 <About />
               </Overlay>
             </div>

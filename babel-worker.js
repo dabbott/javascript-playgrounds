@@ -1,13 +1,11 @@
 const Babel = require('babel-core')
 
-import babelPluginConsoleSource from 'babel-loader!babel-plugin-console-source'
-
 // Ensure consistency with react-native's babel plugins by directly using
 // the babel-preset-react-native. It's intended for usage in node, so we
 // have to require it slightly differently to get it to work in the browser.
 import plugins from './utils/BabelPlugins'
 
-import * as LogMarker from './utils/LogMarker'
+import consolePlugin from './utils/BabelConsolePlugin'
 
 onmessage = function (event) {
   const { code: value, filename, options } = event.data
@@ -15,13 +13,7 @@ onmessage = function (event) {
 
   try {
     const code = Babel.transform(value, {
-      plugins: [
-        ...plugins,
-        [
-          babelPluginConsoleSource,
-          { resolveFile: () => `${LogMarker.symbol}${filename}` },
-        ],
-      ],
+      plugins: [...plugins, [consolePlugin, { filename }]],
       ...options,
     }).code
 

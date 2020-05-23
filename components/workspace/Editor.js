@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import pureRender from 'pure-render-decorator'
+import ReactDOM from 'react-dom'
 
 import { options, requireAddons } from '../../utils/CodeMirror'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import { highlightAddedLines } from '../../utils/Diff'
+import PlaygroundPreview from './PlaygroundPreview'
 
-require("../../node_modules/codemirror/lib/codemirror.css")
-require("../../styles/codemirror-theme.css")
+require('../../node_modules/codemirror/lib/codemirror.css')
+require('../../styles/codemirror-theme.css')
 
 // Work around a codemirror + flexbox + chrome issue by creating an absolute
 // positioned parent and flex grandparent of the codemirror element.
@@ -30,7 +32,6 @@ const docCache = {}
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     initialValue: null,
     value: null,
@@ -38,35 +39,44 @@ export default class extends Component {
     readOnly: false,
     showDiff: false,
     diff: [],
+    logs: undefined, // Undefined instead of array to simplify re-rendering,
+    playgroundDebounceDuration: 200,
   }
 
   currentDiff = []
 
   componentDidMount() {
     if (typeof navigator !== 'undefined') {
-      const {filename, initialValue, value, readOnly, onChange, diff} = this.props
+      const {
+        filename,
+        initialValue,
+        value,
+        readOnly,
+        onChange,
+        diff,
+      } = this.props
 
       requireAddons()
       const CodeMirror = require('codemirror')
 
       if (!docCache[filename]) {
-        docCache[filename] = new CodeMirror.Doc(initialValue || value || '', options.mode)
+        docCache[filename] = new CodeMirror.Doc(
+          initialValue || value || '',
+          options.mode
+        )
       }
 
-      this.cm = CodeMirror(
-        this.refs.editor,
-        {
-          ...options,
-          readOnly,
-          value: docCache[filename].linkedDoc({sharedHist: true}),
-        }
-      )
+      this.cm = CodeMirror(this.refs.editor, {
+        ...options,
+        readOnly,
+        value: docCache[filename].linkedDoc({ sharedHist: true }),
+      })
 
       this.cm.on('beforeChange', (cm) => {
-        this.currentDiff.forEach(range => {
+        this.currentDiff.forEach((range) => {
           for (let i = range[0]; i <= range[1]; i++) {
-            this.cm.removeLineClass(i, "background", "cm-line-changed")
-            this.cm.removeLineClass(i, "gutter", "cm-line-changed")
+            this.cm.removeLineClass(i, 'background', 'cm-line-changed')
+            this.cm.removeLineClass(i, 'gutter', 'cm-line-changed')
           }
         })
       })
@@ -85,8 +95,10 @@ export default class extends Component {
   }
 
   componentWillUnmount() {
+    clearTimeout(this.updateTimerId)
+
     if (typeof navigator !== 'undefined') {
-      const {filename} = this.props
+      const { filename } = this.props
       const CodeMirror = require('codemirror')
 
       // Store a reference to the current linked doc
@@ -99,55 +111,169 @@ export default class extends Component {
     }
   }
 
+  updateTimerId = undefined
+
+  componentDidUpdate() {
+    const { playgroundDebounceDuration } = this.props
+
+    if (this.updateTimerId) {
+      clearTimeout(this.updateTimerId)
+    }
+
+    this.updateTimerId = setTimeout(() => {
+      this.addPlaygroundWidgets()
+    }, playgroundDebounceDuration)
+  }
+
+  widgets = []
+
+  addPlaygroundWidgets() {
+    if (!this.cm) return
+
+    const { filename, logs } = this.props
+
+    // Skip configuring playgrounds altogether if there are no logs
+    if (logs === undefined) return
+
+    // Line numbers start at 1 in the logs and UI, but 0 in CodeMirror
+    const editorLine = (location) => location.line - 1
+
+    // Take the latest log for each line
+    const createLogMap = (logs) => {
+      return logs
+        .filter(
+          (log) =>
+            log.command === 'log' &&
+            log.data.length > 0 &&
+            log.location &&
+            filename.endsWith(log.location.file)
+        )
+        .reduce((result, log) => {
+          result[editorLine(log.location)] = log
+          return result
+        }, {})
+    }
+
+    const logMap = createLogMap(logs)
+
+    // Remove widgets that aren't needed from CodeMirror
+    this.widgets.forEach((widget) => {
+      const lineNumber = this.cm.getLineNumber(widget.line)
+
+      if (logMap[lineNumber]) return
+
+      ReactDOM.unmountComponentAtNode(widget.node)
+
+      this.cm.removeLineWidget(widget)
+    })
+
+    // Delete widgets from our array of widgets
+    this.widgets = this.widgets.filter((widget) => {
+      const lineNumber = this.cm.getLineNumber(widget.line)
+
+      return !!logMap[lineNumber]
+    })
+
+    // Create or update all widgets
+    Object.values(logMap).forEach((entry) => {
+      const { data, location } = entry
+
+      const handle = this.cm.getLineHandle(editorLine(location))
+
+      if (handle) {
+        const ensureWidget = () => {
+          const found = this.widgets.find(
+            (widget) =>
+              this.cm.getLineNumber(widget.line) === editorLine(location)
+          )
+
+          if (found) return found
+
+          const reactHost = document.createElement('div')
+
+          const widget = this.cm.addLineWidget(handle, reactHost, {
+            noHScroll: true,
+            coverGutter: false,
+          })
+
+          this.widgets.push(widget)
+
+          return widget
+        }
+
+        const widget = ensureWidget()
+
+        ReactDOM.render(
+          <PlaygroundPreview
+            indent={4 + location.column * this.cm.defaultCharWidth()}
+            data={data}
+            didResize={() => {
+              if (this.widgets.includes(widget)) {
+                widget.changed()
+              }
+            }}
+          />,
+          widget.node
+        )
+      }
+    })
+  }
+
   highlightDiff() {
     const CodeMirror = require('codemirror')
 
-    if (!this.cm) return;
+    if (!this.cm) return
 
     const { showDiff, diff } = this.props
 
     if (showDiff) {
-      diff.forEach(range => {
+      diff.forEach((range) => {
         for (let i = range[0]; i <= range[1]; i++) {
-          this.cm.addLineClass(i, "gutter", "cm-line-changed")
-          this.cm.addLineClass(i, "background", "cm-line-changed")
+          this.cm.addLineClass(i, 'gutter', 'cm-line-changed')
+          this.cm.addLineClass(i, 'background', 'cm-line-changed')
         }
       })
 
       if (diff.length > 0) {
-        const scrollInfo = this.cm.getScrollInfo();
+        const scrollInfo = this.cm.getScrollInfo()
 
         const fromLine = diff[0][0]
         const toLine = diff[diff.length - 1][1]
 
-        const fromHeight = this.cm.heightAtLine(fromLine);
-        const toHeight = this.cm.heightAtLine(toLine);
+        const fromHeight = this.cm.heightAtLine(fromLine)
+        const toHeight = this.cm.heightAtLine(toLine)
 
-        const visibleHeight = toHeight - fromHeight;
+        const visibleHeight = toHeight - fromHeight
 
         if (visibleHeight < scrollInfo.clientHeight) {
-          const middleLine = fromLine + Math.floor((toLine - fromLine) / 2);
-          this.cm.scrollIntoView(CodeMirror.Pos(middleLine, 0), scrollInfo.clientHeight / 2)
+          const middleLine = fromLine + Math.floor((toLine - fromLine) / 2)
+          this.cm.scrollIntoView(
+            CodeMirror.Pos(middleLine, 0),
+            scrollInfo.clientHeight / 2
+          )
         } else {
-          this.cm.scrollIntoView(CodeMirror.Pos(fromLine, 0), scrollInfo.clientHeight / 2)
+          this.cm.scrollIntoView(
+            CodeMirror.Pos(fromLine, 0),
+            scrollInfo.clientHeight / 2
+          )
         }
       }
 
-      this.currentDiff = diff;
+      this.currentDiff = diff
     }
   }
 
   componentWillUpdate(nextProps) {
-    const {errorLineNumber: nextLineNumber, value} = nextProps
-    const {errorLineNumber: prevLineNumber} = this.props
+    const { errorLineNumber: nextLineNumber, value } = nextProps
+    const { errorLineNumber: prevLineNumber } = this.props
 
     if (this.cm) {
       if (typeof prevLineNumber === 'number') {
-        this.cm.removeLineClass(prevLineNumber, "background", "cm-line-error")
+        this.cm.removeLineClass(prevLineNumber, 'background', 'cm-line-error')
       }
 
       if (typeof nextLineNumber === 'number') {
-        this.cm.addLineClass(nextLineNumber, "background", "cm-line-error")
+        this.cm.addLineClass(nextLineNumber, 'background', 'cm-line-error')
       }
 
       const oldValue = this.cm.getValue()
@@ -159,10 +285,13 @@ export default class extends Component {
   }
 
   render() {
-    const {readOnly} = this.props
+    const { readOnly } = this.props
 
     return (
-      <div style={styles.editorContainer} className={readOnly ? 'read-only' : undefined}>
+      <div
+        style={styles.editorContainer}
+        className={readOnly ? 'read-only' : undefined}
+      >
         <div style={styles.editor} ref={'editor'} />
       </div>
     )

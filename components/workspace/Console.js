@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import pureRender from 'pure-render-decorator'
-import Loadable from 'react-loadable'
 
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
+import { MultiInspector } from './Inspector'
 
 const styles = prefixObject({
   overlay: {
@@ -45,31 +45,8 @@ const styles = prefixObject({
     fontSize: '13px',
     lineHeight: '20px',
     color: 'rgb(200,200,200)',
-    // color: 'rgb(74, 74, 74)',
     textDecoration: 'underline',
   },
-  itemSpacer: {
-    width: 8,
-  },
-})
-
-const createInspectorTheme = (base) => ({
-  ...base,
-  BASE_FONT_SIZE: '13px',
-  TREENODE_FONT_SIZE: '13px',
-  BASE_LINE_HEIGHT: '20px',
-  TREENODE_LINE_HEIGHT: '20px',
-  BASE_BACKGROUND_COLOR: 'transparent',
-})
-
-const Inspector = Loadable({
-  loader: () => import('react-inspector')
-    .then(({default: Inspector, chromeLight}) => {
-      const theme = createInspectorTheme(chromeLight)
-
-      return (props) => <Inspector {...props} theme={theme} />
-    }),
-  LoadingComponent: () => null,
 })
 
 @pureRender
@@ -133,29 +110,6 @@ export default class extends Component {
   }
 
   renderEntry = (entry) => {
-    let content = entry.data
-      .map((item, index) => (
-        <Inspector
-          key={index}
-          data={item}
-        />
-      ))
-      // Add spacers between each item
-      .reduce((result, value, index, list) => {
-        result.push(value)
-
-        if (index !== list.length - 1) {
-          result.push(
-            <div
-              key={`s-${index}`}
-              style={styles.itemSpacer}
-            />
-          )
-        }
-
-        return result
-      }, [])
-
     const lineNumber = this.props.showLineNumber && entry.location 
       ? this.renderLineNumber(entry.location) 
       : null
@@ -165,7 +119,7 @@ export default class extends Component {
         key={entry.id}
         style={this.getComputedRowStyle()}
       >
-        {content}{lineNumber}
+        <MultiInspector data={entry.data} />{lineNumber}
       </div>
     )
   }

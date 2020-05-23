@@ -3,6 +3,7 @@ import pureRender from 'pure-render-decorator'
 
 import Phone from './Phone'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
+import * as ExtendedJSON from '../../utils/ExtendedJSON'
 
 const styles = prefixObject({
   iframe: {
@@ -14,7 +15,6 @@ const styles = prefixObject({
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     platform: 'ios',
     width: 300,
@@ -44,18 +44,18 @@ export default class extends Component {
 
   componentDidMount() {
     this.setState({
-      id: Math.random().toString().slice(2)
+      id: Math.random().toString().slice(2),
     })
 
     window.addEventListener('message', (e) => {
       let data
       try {
-        data = JSON.parse(e.data)
+        data = ExtendedJSON.parse(e.data)
       } catch (err) {
         return
       }
 
-      const {id, type, payload} = data
+      const { id, type, payload } = data
 
       if (id !== this.state.id) {
         return
@@ -69,13 +69,13 @@ export default class extends Component {
             this.fileMap = null
             this.entry = null
           }
-        break
+          break
         case 'error':
           this.props.onError(payload)
-        break
+          break
         case 'console':
           this.props.onConsole(payload)
-        break
+          break
       }
     })
   }
@@ -86,20 +86,32 @@ export default class extends Component {
       case 'loading':
         this.fileMap = fileMap
         this.entry = entry
-      break
+        break
       case 'ready':
-        this.refs.iframe.contentWindow.postMessage({fileMap, entry, source: 'rnwp'}, '*')
-      break
+        this.refs.iframe.contentWindow.postMessage(
+          { fileMap, entry, source: 'rnwp' },
+          '*'
+        )
+        break
     }
   }
 
   renderFrame = () => {
-    const {assetRoot, vendorComponents, playerStyleSheet, playerCSS, statusBarColor, statusBarHeight} = this.props
-    const {id} = this.state
+    const {
+      assetRoot,
+      vendorComponents,
+      playerStyleSheet,
+      playerCSS,
+      statusBarColor,
+      statusBarHeight,
+    } = this.props
+    const { id } = this.state
 
     if (!id) return null
 
-    const vendorComponentsEncoded = encodeURIComponent(JSON.stringify(vendorComponents))
+    const vendorComponentsEncoded = encodeURIComponent(
+      JSON.stringify(vendorComponents)
+    )
     const css = encodeURIComponent(playerCSS)
 
     return (
@@ -113,18 +125,14 @@ export default class extends Component {
   }
 
   render() {
-    const {width, scale, platform} = this.props
+    const { width, scale, platform } = this.props
 
     if (platform === 'web') {
       return this.renderFrame()
     }
 
     return (
-      <Phone
-        width={width}
-        device={platform}
-        scale={scale}
-      >
+      <Phone width={width} device={platform} scale={scale}>
         {this.renderFrame()}
       </Phone>
     )

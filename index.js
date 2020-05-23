@@ -52,6 +52,10 @@ let {
     showFileName: true,
     showLineNumber: true,
   }),
+  playground = JSON.stringify({
+    enabled: false,
+    debounceDuration: 200,
+  }),
 } = getHashString()
 
 if (workspaceCSS) {
@@ -143,6 +147,7 @@ class WorkspaceContainer extends Component {
       playerCSS: playerCSS,
       onChange: setHashString,
       consoleOptions: JSON.parse(console),
+      playgroundOptions: JSON.parse(playground),
       activeStepIndex: activeStepIndex,
       onChangeActiveStepIndex: this.handleChangeActiveStepIndex,
     }

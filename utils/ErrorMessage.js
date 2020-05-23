@@ -32,6 +32,7 @@ export const getErrorDetails = (originalMessage) => {
     lineNumber: errorLineNumber && parseInt(errorLineNumber[1]) - 1,
     summary: firstLine,
     description: defaultDescription,
+    errorMessage: originalMessage,
   }
 
   for (let i = 0; i < messages.length; i++) {
