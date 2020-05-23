@@ -6,7 +6,6 @@ const WEB_PLAYER_VERSION = '2.0.0-alpha.8'
 const WEB_PLAYER_URL = `https://cdn.rawgit.com/dabbott/react-native-web-player/gh-v${WEB_PLAYER_VERSION}/index.html`
 
 const paramSchema = {
-
   // Plain text
   title: 'text',
   transpilerTitle: 'text',
@@ -32,13 +31,16 @@ const paramSchema = {
   panes: 'json',
   styles: 'json',
   console: 'json',
+  playground: 'json',
   workspaces: 'json',
 }
 
 const createUrlParams = (params) => {
-  return Object.keys(params).map(key => {
-    return `${key}=${encodeURIComponent(params[key])}`
-  }).join('&')
+  return Object.keys(params)
+    .map((key) => {
+      return `${key}=${encodeURIComponent(params[key])}`
+    })
+    .join('&')
 }
 
 const encodeParams = (params) => {
@@ -47,9 +49,7 @@ const encodeParams = (params) => {
 
     if (typeof value === 'undefined') return acc
 
-    acc[key] = paramSchema[key] === 'json'
-      ? JSON.stringify(value)
-      : value
+    acc[key] = paramSchema[key] === 'json' ? JSON.stringify(value) : value
 
     return acc
   }, {})
@@ -71,7 +71,6 @@ const styles = {
  * normally.
  */
 export default class WebPlayer extends Component {
-
   static propTypes = {
     style: PropTypes.any,
     className: PropTypes.string,
@@ -97,6 +96,7 @@ export default class WebPlayer extends Component {
     panes: PropTypes.array,
     styles: PropTypes.object,
     console: PropTypes.object,
+    playground: PropTypes.object,
   }
 
   static defaultProps = {
@@ -106,7 +106,7 @@ export default class WebPlayer extends Component {
   constructor(props) {
     super()
 
-    const params = {...props}
+    const params = { ...props }
     delete params.style
     delete params.className
     delete params.baseURL
@@ -125,14 +125,11 @@ export default class WebPlayer extends Component {
   }
 
   render() {
-    const {hash} = this
-    const {style, className, baseURL} = this.props
+    const { hash } = this
+    const { style, className, baseURL } = this.props
 
     return (
-      <div
-        style={style}
-        className={className}
-      >
+      <div style={style} className={className}>
         <iframe
           style={styles.iframe}
           frameBorder={0}
