@@ -7,7 +7,7 @@ import { prefixObject } from '../../utils/PrefixInlineStyles'
 import { highlightAddedLines } from '../../utils/Diff'
 import PlaygroundPreview from './PlaygroundPreview'
 
-require('../../node_modules/codemirror/lib/codemirror.css')
+require('codemirror/lib/codemirror.css')
 require('../../styles/codemirror-theme.css')
 
 // Work around a codemirror + flexbox + chrome issue by creating an absolute

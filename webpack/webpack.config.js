@@ -6,13 +6,16 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const paths = {
   root: path.join(__dirname, '..'),
   get index() {
-    return path.join(this.root, 'index.js')
+    return path.join(this.root, 'src/index.js')
   },
   get player() {
-    return path.join(this.root, 'player.js')
+    return path.join(this.root, 'src/player.js')
   },
   get public() {
     return path.join(this.root, 'public')
+  },
+  get htmlTemplate() {
+    return path.join(this.root, 'webpack/index.ejs')
   },
 }
 
@@ -65,14 +68,14 @@ const common = merge({
     new HtmlWebpackPlugin({
       title: 'React Native Web Player',
       filename: 'index.html',
-      template: 'index.ejs',
+      template: paths.htmlTemplate,
       minify: false,
       chunks: ['index'],
     }),
     new HtmlWebpackPlugin({
       title: 'Player',
       filename: 'player.html',
-      template: 'index.ejs',
+      template: paths.htmlTemplate,
       minify: false,
       chunks: ['player'],
     }),

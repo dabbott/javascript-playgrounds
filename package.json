@@ -12,7 +12,7 @@
     "prepublish": "npm run clean && npm run build && npm run dist",
     "build": "webpack --env.production --config webpack/webpack.config.js --sort-assets-by --progress",
     "start": "webpack-dev-server --config webpack/webpack.config.js --inline --hot --colors --quiet",
-    "clean": "rm -rf ./dist",
+    "clean": "rm -rf ./dist ./public",
     "analyze": "webpack --env.production --config webpack/webpack.config.js --sort-assets-by --progress --profile --json > stats.json",
     "gh-pages": "make",
     "dist": "webpack --config webpack/webpack-embed.config.js --sort-assets-by --progress"

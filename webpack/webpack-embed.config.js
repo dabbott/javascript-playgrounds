@@ -5,7 +5,7 @@ const DIRECTORY = path.dirname(__dirname)
 
 module.exports = {
   mode: 'production',
-  entry: path.join(DIRECTORY, 'components', 'embed', 'WebPlayer.js'),
+  entry: path.join(DIRECTORY, 'src', 'components', 'embed', 'WebPlayer.js'),
   output: {
     path: path.join(DIRECTORY, 'dist'),
     filename: 'react-native-web-player.js',
