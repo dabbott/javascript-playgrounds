@@ -1,6 +1,6 @@
 {
   "name": "react-native-web-player",
-  "version": "2.0.0-alpha.10",
+  "version": "2.0.0-alpha.11",
   "description": "Run React Native apps in your browser!",
   "main": "dist/react-native-web-player.js",
   "include": [
