@@ -34,7 +34,7 @@ This component is a simple wrapper around the `iframe` that handles encoding par
 
 - **`style`** - The style of the `div` which wraps the `iframe` (the iframe has `100%` width and height).
 - **`className`** - The className of the `div` which wraps the `iframe`.
-- **`baseURL`** - Optionally, specify a custom url to load the player from. This url should not include a hash. Defaults to the `//cdn.rawgit.com` url as described below.
+- **`baseURL`** - Optionally, specify a custom url to load the player from. This url should not include a hash. Defaults to the `unpkg.com` url as described below.
 
 A `umd` build of this React component is available in the `dist` directory.
 
