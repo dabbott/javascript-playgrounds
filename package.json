@@ -50,6 +50,7 @@
     "gh-pages": "^2.2.0",
     "html-webpack-plugin": "^4.3.0",
     "inline-style-prefixer": "^2.0.4",
+    "prettier": "^2.0.5",
     "prop-types": "^15.5.10",
     "pure-render-decorator": "^1.1.1",
     "react": "16.8.0",

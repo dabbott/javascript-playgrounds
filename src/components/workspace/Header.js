@@ -28,7 +28,6 @@ const styles = prefixObject({
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     text: '',
     textStyle: null,
@@ -36,27 +35,23 @@ export default class extends Component {
   }
 
   getComputedStyles = () => {
-    const {textStyle, headerStyle} = this.props
+    const { textStyle, headerStyle } = this.props
 
     return {
       container: headerStyle
-        ? prefix({...styles.container, ...headerStyle})
+        ? prefix({ ...styles.container, ...headerStyle })
         : styles.container,
-      text: textStyle
-        ? prefix({...styles.text, ...textStyle})
-        : styles.text,
+      text: textStyle ? prefix({ ...styles.text, ...textStyle }) : styles.text,
     }
   }
 
   render() {
-    const {children, text} = this.props
+    const { children, text } = this.props
     const computedStyles = this.getComputedStyles()
 
     return (
       <div style={computedStyles.container}>
-        <div style={computedStyles.text}>
-          {text}
-        </div>
+        <div style={computedStyles.text}>{text}</div>
         <div style={styles.spacer} />
         {children}
       </div>

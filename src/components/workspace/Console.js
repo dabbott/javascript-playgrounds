@@ -51,7 +51,6 @@ const styles = prefixObject({
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     maximize: false,
     showFileName: false,
@@ -62,32 +61,28 @@ export default class extends Component {
   }
 
   getComputedStyle = () => {
-    const {style, maximize} = this.props
+    const { style, maximize } = this.props
     const defaultStyle = maximize ? styles.overlayMaximized : styles.overlay
 
-    return style
-      ? prefix({...defaultStyle, ...style})
-      : defaultStyle
+    return style ? prefix({ ...defaultStyle, ...style }) : defaultStyle
   }
 
   getComputedRowStyle = () => {
-    const {rowStyle} = this.props
+    const { rowStyle } = this.props
     const defaultStyle = styles.entryRow
 
-    return rowStyle
-      ? prefix({...defaultStyle, ...rowStyle})
-      : defaultStyle
+    return rowStyle ? prefix({ ...defaultStyle, ...rowStyle }) : defaultStyle
   }
 
   componentDidMount() {
-    const {clientHeight, scrollHeight} = this.container
+    const { clientHeight, scrollHeight } = this.container
     const maxScrollTop = scrollHeight - clientHeight
 
     this.container.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
   }
 
   componentDidUpdate() {
-    const {clientHeight, scrollHeight, scrollTop} = this.container
+    const { clientHeight, scrollHeight, scrollTop } = this.container
     const maxScrollTop = scrollHeight - clientHeight
 
     // If we're within one clientHeight of the bottom, scroll to bottom
@@ -97,40 +92,39 @@ export default class extends Component {
   }
 
   renderLineNumber = (location) => {
-    const string = this.props.showFileName 
+    const string = this.props.showFileName
       ? `${location.file}:${location.line}`
       : `:${location.line}`
 
     return (
       <React.Fragment>
         <span style={styles.lineNumberSpacer}></span>
-        <span style={styles.lineNumber}>{string}</span> 
+        <span style={styles.lineNumber}>{string}</span>
       </React.Fragment>
-    ) 
+    )
   }
 
   renderEntry = (entry) => {
-    const lineNumber = this.props.showLineNumber && entry.location 
-      ? this.renderLineNumber(entry.location) 
-      : null
+    const lineNumber =
+      this.props.showLineNumber && entry.location
+        ? this.renderLineNumber(entry.location)
+        : null
 
     return (
-      <div
-        key={entry.id}
-        style={this.getComputedRowStyle()}
-      >
-        <MultiInspector data={entry.data} />{lineNumber}
+      <div key={entry.id} style={this.getComputedRowStyle()}>
+        <MultiInspector data={entry.data} />
+        {lineNumber}
       </div>
     )
   }
 
   render() {
-    const {logs} = this.props
+    const { logs } = this.props
 
     return (
       <div
         style={this.getComputedStyle()}
-        ref={ref => this.container = ref}
+        ref={(ref) => (this.container = ref)}
       >
         {logs.map(this.renderEntry)}
       </div>

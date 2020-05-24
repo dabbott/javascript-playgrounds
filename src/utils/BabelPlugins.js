@@ -12,7 +12,7 @@ import pluginMap from 'babel-preset-react-native/plugins'
 
 // Manually resolve all default Babel plugins.
 function resolvePlugins(plugins) {
-  return plugins.map(function(plugin) {
+  return plugins.map(function (plugin) {
     // Normalise plugin to an array.
     if (!Array.isArray(plugin)) {
       plugin = [plugin]
@@ -38,7 +38,10 @@ export default resolvePlugins([
   'transform-es2015-computed-properties',
   'check-es2015-constants',
   'transform-es2015-destructuring',
-  ['transform-es2015-modules-commonjs', { strict: false, allowTopLevelThis: true }],
+  [
+    'transform-es2015-modules-commonjs',
+    { strict: false, allowTopLevelThis: true },
+  ],
   'transform-es2015-parameters',
   'transform-es2015-shorthand-properties',
   'transform-es2015-spread',

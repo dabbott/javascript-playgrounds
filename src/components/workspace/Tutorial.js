@@ -32,9 +32,7 @@ const rawStyles = {
     alignItems: 'center',
     transition: 'color 0.1s',
   },
-  rowBody: {
-
-  }
+  rowBody: {},
 }
 
 rawStyles.activeRow = {
@@ -51,49 +49,44 @@ const styles = prefixObject(rawStyles)
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     style: null,
     rowStyle: null,
     rowTitleStyle: null,
     rowBodyStyle: null,
     activeRowStyle: null,
-    onChangeActiveStepIndex: () => {}
+    onChangeActiveStepIndex: () => {},
   }
 
   getComputedStyle = () => {
-    const {style} = this.props
+    const { style } = this.props
     const defaultStyle = styles.container
 
-    return style
-      ? prefix({...defaultStyle, ...style})
-      : defaultStyle
+    return style ? prefix({ ...defaultStyle, ...style }) : defaultStyle
   }
 
   getComputedRowStyle = (isActive) => {
-    const {rowStyle} = this.props
+    const { rowStyle } = this.props
     const defaultStyle = isActive ? styles.activeRow : styles.row
 
-    return rowStyle
-      ? prefix({...defaultStyle, ...rowStyle})
-      : defaultStyle
+    return rowStyle ? prefix({ ...defaultStyle, ...rowStyle }) : defaultStyle
   }
 
   getComputedRowTitleStyle = (isActive) => {
-    const {rowTitleStyle} = this.props
+    const { rowTitleStyle } = this.props
     const defaultStyle = isActive ? styles.activeRowTitle : styles.rowTitle
 
     return rowTitleStyle
-      ? prefix({...defaultStyle, ...rowTitleStyle})
+      ? prefix({ ...defaultStyle, ...rowTitleStyle })
       : defaultStyle
   }
 
   getComputedRowBodyStyle = () => {
-    const {rowBodyStyle} = this.props
+    const { rowBodyStyle } = this.props
     const defaultStyle = styles.rowBody
 
     return rowBodyStyle
-      ? prefix({...defaultStyle, ...rowBodyStyle})
+      ? prefix({ ...defaultStyle, ...rowBodyStyle })
       : defaultStyle
   }
 
@@ -107,19 +100,19 @@ export default class extends Component {
         style={this.getComputedRowStyle(index === activeStepIndex)}
         onClick={onChangeActiveStepIndex.bind(null, index)}
       >
-        <div style={this.getComputedRowTitleStyle(index === activeStepIndex)}>{title}</div>
+        <div style={this.getComputedRowTitleStyle(index === activeStepIndex)}>
+          {title}
+        </div>
         {/* <div style={this.getComputedRowBodyStyle()}>{body}</div> */}
       </div>
     )
   }
 
   render() {
-    const {steps} = this.props
+    const { steps } = this.props
 
     return (
-      <div style={this.getComputedStyle()}>
-        {steps.map(this.renderStep)}
-      </div>
+      <div style={this.getComputedStyle()}>{steps.map(this.renderStep)}</div>
     )
   }
 }

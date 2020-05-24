@@ -38,20 +38,17 @@ styles = prefixObject(styles)
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     text: '',
     isError: false,
   }
 
   render() {
-    const {text, isError, children} = this.props
+    const { text, isError, children } = this.props
 
     return (
       <div style={styles.container}>
-        <div style={isError ? styles.error : styles.text}>
-          {text}
-        </div>
+        <div style={isError ? styles.error : styles.text}>{text}</div>
         {children}
       </div>
     )

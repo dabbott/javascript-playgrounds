@@ -17,14 +17,13 @@ const styles = prefixObject({
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     tabs: [],
     initialTab: null,
     onClickTab: () => {},
     renderContent: () => null,
     renderRight: () => null,
-    getTitle: a => a,
+    getTitle: (a) => a,
     compareTabs: (a, b) => a === b,
     renderHiddenContent: false,
     tabStyle: null,
@@ -35,7 +34,7 @@ export default class extends Component {
   constructor(props) {
     super()
 
-    const {initialTab} = props
+    const { initialTab } = props
 
     this.state = {
       activeTab: initialTab,
@@ -43,27 +42,23 @@ export default class extends Component {
   }
 
   onClickTab = (tab) => {
-    const {onClickTab} = this.props
+    const { onClickTab } = this.props
 
-    this.setState({activeTab: tab})
+    this.setState({ activeTab: tab })
     onClickTab(tab)
   }
 
   renderTab = (tab, i) => {
-    const {compareTabs, renderContent, renderHiddenContent} = this.props
-    const {activeTab} = this.state
+    const { compareTabs, renderContent, renderHiddenContent } = this.props
+    const { activeTab } = this.state
 
     if (compareTabs(tab, activeTab)) {
-      return (
-        <div style={styles.container}>
-          {renderContent(tab, i)}
-        </div>
-      )
+      return <div style={styles.container}>{renderContent(tab, i)}</div>
     }
 
     if (renderHiddenContent) {
       return (
-        <div style={{...styles.container, flex: '0'}}>
+        <div style={{ ...styles.container, flex: '0' }}>
           {renderContent(tab, i)}
         </div>
       )
@@ -73,8 +68,16 @@ export default class extends Component {
   }
 
   render() {
-    const {renderRight, tabs, getTitle, compareTabs, tabStyle, textStyle, textActiveStyle} = this.props
-    const {activeTab} = this.state
+    const {
+      renderRight,
+      tabs,
+      getTitle,
+      compareTabs,
+      tabStyle,
+      textStyle,
+      textActiveStyle,
+    } = this.props
+    const { activeTab } = this.state
 
     return (
       <div style={styles.container}>

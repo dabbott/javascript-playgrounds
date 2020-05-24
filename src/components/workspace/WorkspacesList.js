@@ -68,11 +68,11 @@ const rawStyles = {
   },
   buttonText: {
     color: 'rgba(0,0,0,0.6)',
-    fontWeight: 'normal'
+    fontWeight: 'normal',
   },
   divider: {
     height: 1,
-  }
+  },
 }
 
 rawStyles.activeRow = {
@@ -91,94 +91,89 @@ const styles = prefixObject(rawStyles)
 
 @pureRender
 export default class WorkspacesList extends Component {
-
   static defaultProps = {
     style: null,
     rowStyle: null,
     rowTitleStyle: null,
     descriptionStyle: null,
     activeRowStyle: null,
-    onChangeActiveStepIndex: () => {}
+    onChangeActiveStepIndex: () => {},
   }
 
   getComputedStyle = () => {
-    const {style} = this.props
+    const { style } = this.props
     const defaultStyle = styles.container
 
-    return style
-      ? prefix({...defaultStyle, ...style})
-      : defaultStyle
+    return style ? prefix({ ...defaultStyle, ...style }) : defaultStyle
   }
 
   getComputedRowStyle = (isActive) => {
-    const {rowStyle} = this.props
+    const { rowStyle } = this.props
     const defaultStyle = isActive ? styles.activeRow : styles.row
 
-    return rowStyle
-      ? prefix({...defaultStyle, ...rowStyle})
-      : defaultStyle
+    return rowStyle ? prefix({ ...defaultStyle, ...rowStyle }) : defaultStyle
   }
 
   getComputedRowTitleStyle = (isActive) => {
-    const {rowTitleStyle} = this.props
+    const { rowTitleStyle } = this.props
     const defaultStyle = isActive ? styles.activeRowTitle : styles.rowTitle
 
     return rowTitleStyle
-      ? prefix({...defaultStyle, ...rowTitleStyle})
+      ? prefix({ ...defaultStyle, ...rowTitleStyle })
       : defaultStyle
   }
 
   getComputedDescriptionStyle = () => {
-    const {descriptionStyle} = this.props
+    const { descriptionStyle } = this.props
     const defaultStyle = styles.description
 
     return descriptionStyle
-      ? prefix({...defaultStyle, ...descriptionStyle})
+      ? prefix({ ...defaultStyle, ...descriptionStyle })
       : defaultStyle
   }
 
   getComputedDescriptionTextStyle = () => {
-    const {descriptionTextStyle} = this.props
+    const { descriptionTextStyle } = this.props
     const defaultStyle = styles.descriptionText
 
     return descriptionTextStyle
-      ? prefix({...defaultStyle, ...descriptionTextStyle})
+      ? prefix({ ...defaultStyle, ...descriptionTextStyle })
       : defaultStyle
   }
 
   getComputedButtonTextStyle = () => {
-    const {buttonTextStyle} = this.props
+    const { buttonTextStyle } = this.props
     const defaultStyle = styles.buttonText
 
     return buttonTextStyle
-      ? prefix({...defaultStyle, ...buttonTextStyle})
+      ? prefix({ ...defaultStyle, ...buttonTextStyle })
       : defaultStyle
   }
 
   getComputedButtonContainerStyle = () => {
-    const {buttonContainerStyle} = this.props
+    const { buttonContainerStyle } = this.props
     const defaultStyle = styles.buttonContainer
 
     return buttonContainerStyle
-      ? prefix({...defaultStyle, ...buttonContainerStyle})
+      ? prefix({ ...defaultStyle, ...buttonContainerStyle })
       : defaultStyle
   }
 
   getComputedButtonWrapperStyle = () => {
-    const {buttonWrapperStyle} = this.props
+    const { buttonWrapperStyle } = this.props
     const defaultStyle = styles.buttonWrapper
 
     return buttonWrapperStyle
-      ? prefix({...defaultStyle, ...buttonWrapperStyle})
+      ? prefix({ ...defaultStyle, ...buttonWrapperStyle })
       : defaultStyle
   }
 
   getComputedDividerStyle = () => {
-    const {dividerStyle} = this.props
+    const { dividerStyle } = this.props
     const defaultStyle = styles.divider
 
     return dividerStyle
-      ? prefix({...defaultStyle, ...dividerStyle})
+      ? prefix({ ...defaultStyle, ...dividerStyle })
       : defaultStyle
   }
 
@@ -201,7 +196,7 @@ export default class WorkspacesList extends Component {
             <div
               className={'markdown'}
               style={this.getComputedDescriptionTextStyle()}
-              dangerouslySetInnerHTML={{__html: snarkdown(description)}}
+              dangerouslySetInnerHTML={{ __html: snarkdown(description) }}
             />
           </div>
         )}
@@ -223,12 +218,10 @@ export default class WorkspacesList extends Component {
   }
 
   render() {
-    const {steps} = this.props
+    const { steps } = this.props
 
     return (
-      <div style={this.getComputedStyle()}>
-        {steps.map(this.renderStep)}
-      </div>
+      <div style={this.getComputedStyle()}>{steps.map(this.renderStep)}</div>
     )
   }
 }

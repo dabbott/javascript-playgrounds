@@ -16,7 +16,7 @@ import WorkspacesList from './WorkspacesList'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
-const BabelWorker = require("../../babel-worker.js")
+const BabelWorker = require('../../babel-worker.js')
 const babelWorker = new BabelWorker()
 
 // Utilities for determining which babel worker responses are for the player vs
@@ -30,11 +30,11 @@ const getTabTitle = (tab) => tab.title
 const getTabChanged = (tab) => tab.changed
 
 const containsPane = (panes, target) =>
-  panes.some(pane => (
+  panes.some((pane) =>
     typeof pane === 'string'
       ? pane === target
       : containsPane(pane.children, target)
-  ))
+  )
 
 const styles = prefixObject({
   container: {
@@ -120,7 +120,7 @@ const styles = prefixObject({
     position: 'relative',
   },
   boldMessage: {
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   codeMessage: {
     display: 'block',
@@ -129,15 +129,14 @@ const styles = prefixObject({
     padding: '4px 8px',
     backgroundColor: 'rgba(0,0,0,0.02)',
     border: '1px solid rgba(0,0,0,0.05)',
-  }
+  },
 })
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     title: 'Live Editor',
-    files: {['index.js']: ''},
+    files: { ['index.js']: '' },
     entry: 'index.js',
     initialTab: 'index.js',
     onChange: () => {},
@@ -162,13 +161,13 @@ export default class extends Component {
   constructor(props) {
     super()
 
-    const {initialTab, panes, consoleOptions, files, diff} = props
+    const { initialTab, panes, consoleOptions, files, diff } = props
 
     const fileTabs = Object.keys(files).map((filename, index) => {
       return {
         title: filename,
         changed: diff[filename] && diff[filename].ranges.length > 0,
-        index
+        index,
       }
     })
 
@@ -183,7 +182,7 @@ export default class extends Component {
       transpilerVisible: containsPane(panes, 'transpiler'),
       playerVisible: containsPane(panes, 'player'),
       fileTabs,
-      activeFileTab: fileTabs.find(tab => tab.title === initialTab),
+      activeFileTab: fileTabs.find((tab) => tab.title === initialTab),
     }
 
     this.codeCache = {}
@@ -197,20 +196,20 @@ export default class extends Component {
       workspaces: this.renderWorkspaces,
     }
 
-    babelWorker.addEventListener("message", this.onBabelWorkerMessage)
+    babelWorker.addEventListener('message', this.onBabelWorkerMessage)
   }
 
   componentWillUnmount() {
-    babelWorker.removeEventListener("message", this.onBabelWorkerMessage)
+    babelWorker.removeEventListener('message', this.onBabelWorkerMessage)
   }
 
   componentDidMount() {
     if (typeof navigator !== 'undefined') {
-      const {files} = this.props
-      const {playerVisible, transpilerVisible} = this.state
+      const { files } = this.props
+      const { playerVisible, transpilerVisible } = this.state
 
       // Cache and compile each file
-      Object.keys(files).forEach(filename => {
+      Object.keys(files).forEach((filename) => {
         const code = files[filename]
 
         this.codeCache[filename] = code
@@ -219,7 +218,7 @@ export default class extends Component {
           babelWorker.postMessage({
             filename,
             code,
-            options: {retainLines: true},
+            options: { retainLines: true },
           })
         }
 
@@ -234,17 +233,17 @@ export default class extends Component {
   }
 
   runApplication = () => {
-    const {playerCache, player} = this
-    const {entry} = this.props
+    const { playerCache, player } = this
+    const { entry } = this.props
 
     player.runApplication(playerCache, entry)
   }
 
-  onBabelWorkerMessage = ({data}) => {
-    const {playerCache} = this
-    const {files} = this.props
-    const {transpilerCache} = this.state
-    const {filename, type, code, error} = JSON.parse(data)
+  onBabelWorkerMessage = ({ data }) => {
+    const { playerCache } = this
+    const { files } = this.props
+    const { transpilerCache } = this.state
+    const { filename, type, code, error } = JSON.parse(data)
 
     this.updateStatus(type, error)
 
@@ -260,7 +259,7 @@ export default class extends Component {
         playerCache[filename] = code
 
         // Run the app once we've transformed each file at least once
-        if (Object.keys(files).every(filename => playerCache[filename])) {
+        if (Object.keys(files).every((filename) => playerCache[filename])) {
           this.clearLogs()
           this.runApplication()
         }
@@ -275,23 +274,23 @@ export default class extends Component {
           compilerError: null,
           showDetails: false,
         })
-      break
+        break
       case 'error':
         this.setState({
-          compilerError: getErrorDetails(error.message)
+          compilerError: getErrorDetails(error.message),
         })
-      break
+        break
     }
   }
 
   onCodeChange = (code) => {
-    const {activeFile, transpilerVisible, playerVisible} = this.state
+    const { activeFile, transpilerVisible, playerVisible } = this.state
 
     if (playerVisible) {
       babelWorker.postMessage({
         filename: activeFile,
         code,
-        options: {retainLines: true},
+        options: { retainLines: true },
       })
     }
 
@@ -307,47 +306,47 @@ export default class extends Component {
   }
 
   onToggleDetails = (showDetails) => {
-    this.setState({showDetails})
+    this.setState({ showDetails })
   }
 
   onToggleLogs = (showLogs) => {
-    this.setState({showLogs})
+    this.setState({ showLogs })
   }
 
   onPlayerRun = () => {
-    this.setState({runtimeError: null})
+    this.setState({ runtimeError: null })
   }
 
   // TODO: Runtime errors should indicate which file they're coming from,
   // and only cause a line highlight on that file.
   onPlayerError = (message) => {
-    this.setState({runtimeError: getErrorDetails(message)})
+    this.setState({ runtimeError: getErrorDetails(message) })
   }
 
   onPlayerConsole = (payload) => {
-    const {consoleOptions, playgroundOptions} = this.props
-    const {logs} = this.state
+    const { consoleOptions, playgroundOptions } = this.props
+    const { logs } = this.state
 
     if (consoleOptions.enabled || playgroundOptions.enabled) {
-      const {command} = payload
+      const { command } = payload
 
       switch (command) {
         case 'log':
-          this.setState({logs: logs.concat(payload)})
-        break
+          this.setState({ logs: logs.concat(payload) })
+          break
         case 'clear':
           this.clearLogs()
-        break
+          break
       }
     }
   }
 
   clearLogs() {
-    const {logs} = this.state
+    const { logs } = this.state
 
     if (logs.length === 0) return
 
-    this.setState({logs: []})
+    this.setState({ logs: [] })
   }
 
   onClickTab = (tab) => {
@@ -358,13 +357,29 @@ export default class extends Component {
   }
 
   renderEditor = (key) => {
-    const {files, title, externalStyles, fullscreen, activeStepIndex, diff, playgroundOptions} = this.props
-    const {compilerError, runtimeError, showDetails, activeFile, activeFileTab, fileTabs, logs} = this.state
+    const {
+      files,
+      title,
+      externalStyles,
+      fullscreen,
+      activeStepIndex,
+      diff,
+      playgroundOptions,
+    } = this.props
+    const {
+      compilerError,
+      runtimeError,
+      showDetails,
+      activeFile,
+      activeFileTab,
+      fileTabs,
+      logs,
+    } = this.state
 
     const fileDiff = diff[activeFile] ? diff[activeFile].ranges : []
 
     const error = compilerError || runtimeError
-    const isError = !! error
+    const isError = !!error
 
     return (
       <div key={key} style={styles.editorPane}>
@@ -374,9 +389,7 @@ export default class extends Component {
             headerStyle={externalStyles.header}
             textStyle={externalStyles.headerText}
           >
-            {fullscreen && (
-              <Fullscreen textStyle={externalStyles.headerText} />
-            )}
+            {fullscreen && <Fullscreen textStyle={externalStyles.headerText} />}
           </Header>
         )}
         {fileTabs.length > 1 && (
@@ -428,10 +441,7 @@ export default class extends Component {
             </div>
           </div>
         )}
-        <Status
-          text={isError ? error.summary : 'No Errors'}
-          isError={isError}
-        >
+        <Status text={isError ? error.summary : 'No Errors'} isError={isError}>
           <Button
             active={showDetails}
             isError={isError}
@@ -445,8 +455,8 @@ export default class extends Component {
   }
 
   renderTranspiler = (key) => {
-    const {externalStyles, transpilerTitle} = this.props
-    const {activeFile, transpilerCache} = this.state
+    const { externalStyles, transpilerTitle } = this.props
+    const { activeFile, transpilerCache } = this.state
 
     return (
       <div key={key} style={styles.transpilerPane}>
@@ -468,10 +478,16 @@ export default class extends Component {
   }
 
   renderWorkspaces = (key) => {
-    const {externalStyles, workspacesTitle, workspaces, activeStepIndex, onChangeActiveStepIndex} = this.props
+    const {
+      externalStyles,
+      workspacesTitle,
+      workspaces,
+      activeStepIndex,
+      onChangeActiveStepIndex,
+    } = this.props
 
     const style = externalStyles.workspacesPane
-      ? {...styles.workspacesPane, ...externalStyles.workspacesPane}
+      ? { ...styles.workspacesPane, ...externalStyles.workspacesPane }
       : styles.workspacesPane
 
     return (
@@ -503,18 +519,29 @@ export default class extends Component {
   }
 
   renderPlayer = (key) => {
-    const {files, width, scale, platform, assetRoot, vendorComponents, externalStyles, playerStyleSheet, playerCSS, playerTitle, consoleOptions, statusBarHeight, statusBarColor} = this.props
-    const {showLogs, logs} = this.state
+    const {
+      files,
+      width,
+      scale,
+      platform,
+      assetRoot,
+      vendorComponents,
+      externalStyles,
+      playerStyleSheet,
+      playerCSS,
+      playerTitle,
+      consoleOptions,
+      statusBarHeight,
+      statusBarColor,
+    } = this.props
+    const { showLogs, logs } = this.state
 
     const style = externalStyles.playerPane
-      ? {...styles.playerPane, ...externalStyles.playerPane}
+      ? { ...styles.playerPane, ...externalStyles.playerPane }
       : styles.playerPane
 
     return (
-      <div
-        key={key}
-        style={style}
-      >
+      <div key={key} style={style}>
         {playerTitle && (
           <Header
             text={playerTitle}
@@ -525,7 +552,7 @@ export default class extends Component {
         <div style={styles.column}>
           <div style={styles.row}>
             <PlayerFrame
-              ref={ref => this.player = ref}
+              ref={(ref) => (this.player = ref)}
               width={width}
               scale={scale}
               platform={platform}
@@ -544,18 +571,17 @@ export default class extends Component {
                 style={externalStyles.consolePane}
                 rowStyle={externalStyles.consoleRow}
                 maximize={consoleOptions.maximized}
-                showFileName={Object.keys(files).length > 1 && consoleOptions.showFileName}
+                showFileName={
+                  Object.keys(files).length > 1 && consoleOptions.showFileName
+                }
                 showLineNumber={consoleOptions.showLineNumber}
                 logs={logs}
               />
             )}
           </div>
-          {consoleOptions.enabled && (consoleOptions.collapsible !== false) && (
+          {consoleOptions.enabled && consoleOptions.collapsible !== false && (
             <Status text={'Logs' + (showLogs ? '' : ` (${logs.length})`)}>
-              <Button
-                active={showLogs}
-                onChange={this.onToggleLogs}
-              >
+              <Button active={showLogs} onChange={this.onToggleLogs}>
                 {'Show Logs'}
               </Button>
             </Status>
@@ -566,13 +592,13 @@ export default class extends Component {
   }
 
   renderPane = (pane, i) => {
-    const {externalStyles} = this.props
+    const { externalStyles } = this.props
 
     if (typeof pane === 'string') {
       return this.paneMap[pane](i)
     }
 
-    const {children, type} = pane
+    const { children, type } = pane
 
     if (type === 'stack') {
       const tabs = children.map((child, i) => ({
@@ -591,7 +617,7 @@ export default class extends Component {
           activeTextStyle={externalStyles.tabTextActive}
           renderHiddenContent={true}
           compareTabs={compareTabs}
-          renderContent={tab => this.renderPane(tab.pane, tab.index)}
+          renderContent={(tab) => this.renderPane(tab.pane, tab.index)}
         />
       )
     }
@@ -604,12 +630,8 @@ export default class extends Component {
   }
 
   render() {
-    const {panes} = this.props
+    const { panes } = this.props
 
-    return (
-      <div style={styles.container}>
-        {panes.map(this.renderPane)}
-      </div>
-    )
+    return <div style={styles.container}>{panes.map(this.renderPane)}</div>
   }
 }

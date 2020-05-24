@@ -17,18 +17,15 @@ const styles = prefixObject({
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     textStyle: null,
   }
 
   getComputedStyles = () => {
-    const {textStyle} = this.props
+    const { textStyle } = this.props
 
     return {
-      text: textStyle
-        ? prefix({...styles.text, ...textStyle})
-        : styles.text,
+      text: textStyle ? prefix({ ...styles.text, ...textStyle }) : styles.text,
     }
   }
 
@@ -38,10 +35,7 @@ export default class extends Component {
     const computedStyles = this.getComputedStyles()
 
     return (
-      <div
-        style={computedStyles.text}
-        onClick={this.toggleFullscreen}
-      >
+      <div style={computedStyles.text} onClick={this.toggleFullscreen}>
         Fullscreen
       </div>
     )

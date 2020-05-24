@@ -5,7 +5,11 @@ import PropTypes from 'prop-types'
 import pureRender from 'pure-render-decorator'
 
 import VendorComponents from './VendorComponents'
-import consoleProxy, { consoleLog, consoleLogRNWP, consoleClear } from './ConsoleProxy'
+import consoleProxy, {
+  consoleLog,
+  consoleLogRNWP,
+  consoleClear,
+} from './ConsoleProxy'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
 const AppRegistry = ReactNative.AppRegistry
@@ -46,19 +50,18 @@ const styles = prefixObject({
     alignSelf: 'stretch',
     width: '100%',
     height: '100%',
-    display: 'flex'
-  }
+    display: 'flex',
+  },
 })
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     assetRoot: '',
     onRun: () => {},
     onError: () => {},
     statusBarHeight: 0,
-    statusBarColor: 'black'
+    statusBarColor: 'black',
   }
 
   constructor(props) {
@@ -67,7 +70,7 @@ export default class extends Component {
 
   componentDidMount() {
     window.onmessage = (e) => {
-      if (!e.data || e.data.source !== 'rnwp') return;
+      if (!e.data || e.data.source !== 'rnwp') return
 
       this.runApplication(e.data)
     }
@@ -78,10 +81,13 @@ export default class extends Component {
       return true
     }
 
-    parent.postMessage(JSON.stringify({
-      id: this.props.id,
-      type: 'ready',
-    }), '*')
+    parent.postMessage(
+      JSON.stringify({
+        id: this.props.id,
+        type: 'ready',
+      }),
+      '*'
+    )
   }
 
   buildErrorMessage(e) {
@@ -96,7 +102,7 @@ export default class extends Component {
     } else if (e.lineNumber != null) {
       line = e.lineNumber
 
-    // Chrome
+      // Chrome
     } else if (e.stack) {
       const matched = e.stack.match(/<anonymous>:(\d+)/)
       if (matched) {
@@ -113,16 +119,19 @@ export default class extends Component {
   }
 
   throwError(message) {
-    parent.postMessage(JSON.stringify({
-      id: this.props.id,
-      type: 'error',
-      payload: message,
-    }), '*')
+    parent.postMessage(
+      JSON.stringify({
+        id: this.props.id,
+        type: 'error',
+        payload: message,
+      }),
+      '*'
+    )
   }
 
   require = (fileMap, entry, name) => {
-    const {_requireCache} = window
-    let {assetRoot} = this.props
+    const { _requireCache } = window
+    let { assetRoot } = this.props
 
     if (name === 'react-native') {
       return ReactNative
@@ -133,15 +142,18 @@ export default class extends Component {
     } else if (name === 'prop-types') {
       return PropTypes
 
-    // If name begins with . or ..
+      // If name begins with . or ..
     } else if (name.match(/^\.{1,2}\//)) {
-
       // Check if we're referencing another tab
-      const filename = Object.keys(fileMap).find(x => `${name}.js` === `./${x}`)
+      const filename = Object.keys(fileMap).find(
+        (x) => `${name}.js` === `./${x}`
+      )
 
       if (filename) {
         if (filename === entry) {
-          throw new Error(`Requiring entry file ${entry} would cause an infinite loop`)
+          throw new Error(
+            `Requiring entry file ${entry} would cause an infinite loop`
+          )
         }
 
         if (!_requireCache[filename]) {
@@ -152,17 +164,16 @@ export default class extends Component {
       }
 
       // Resolve local asset paths
-      if (! assetRoot.match(/\/$/)) {
+      if (!assetRoot.match(/\/$/)) {
         assetRoot += '/'
       }
 
-      return {uri: assetRoot + name}
+      return { uri: assetRoot + name }
 
-    // If we have vendor components registered and loaded,
-    // allow for them to be resolved here
+      // If we have vendor components registered and loaded,
+      // allow for them to be resolved here
     } else if (VendorComponents.get(name)) {
       return VendorComponents.get(name)
-
     } else if (VendorComponents.require(name)) {
       const code = VendorComponents.require(name)
 
@@ -177,7 +188,7 @@ export default class extends Component {
     }
   }
 
-  runApplication({fileMap, entry}) {
+  runApplication({ fileMap, entry }) {
     const screenElement = this.refs.root
 
     if (window._didRegisterComponent) {
@@ -190,7 +201,7 @@ export default class extends Component {
       window._require = this.require.bind(this, fileMap, entry)
       window._requireCache = {}
       window._didRegisterComponent = false
-      
+
       consoleProxy._rnwp_log = consoleLogRNWP.bind(consoleProxy, this.props.id)
       consoleProxy.log = consoleLog.bind(consoleProxy, this.props.id)
       consoleProxy.clear = consoleClear.bind(consoleProxy, this.props.id)
@@ -239,7 +250,7 @@ export default class extends Component {
   }
 
   render() {
-    const { statusBarHeight, statusBarColor } = this.props;
+    const { statusBarHeight, statusBarColor } = this.props
 
     const showStatusBar = statusBarHeight > 0
 
@@ -254,11 +265,7 @@ export default class extends Component {
 
     return (
       <div style={styles.root}>
-        <div
-          ref={'root'}
-          id={'app'}
-          style={styles.root}
-        />
+        <div ref={'root'} id={'app'} style={styles.root} />
         {showStatusBar && <div style={statusBarStyle} />}
       </div>
     )

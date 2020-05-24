@@ -24,14 +24,16 @@
 // Devices have pixel density of 2, but we also zoom in for visibility at small sizes.
 export default {
   ios: {
-    deviceImageUrl: 'https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/iphone-6-silver.png',
+    deviceImageUrl:
+      'https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/iphone-6-silver.png',
     deviceImageWidth: 870,
     deviceImageHeight: 1738,
     screenWidth: 750,
     screenHeight: 1334,
   },
   android: {
-    deviceImageUrl: 'https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/google-nexus-5x.png',
+    deviceImageUrl:
+      'https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/google-nexus-5x.png',
     deviceImageWidth: 1204,
     deviceImageHeight: 2432,
     screenWidth: 1080,

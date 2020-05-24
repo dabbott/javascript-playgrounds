@@ -6,7 +6,6 @@ import PHONES from '../../constants/Phones'
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     width: 500,
     device: 'ios',
@@ -14,8 +13,14 @@ export default class extends Component {
   }
 
   render() {
-    const {children, width, device, scale} = this.props
-    const {deviceImageUrl, deviceImageWidth, deviceImageHeight, screenWidth, screenHeight} = PHONES[device]
+    const { children, width, device, scale } = this.props
+    const {
+      deviceImageUrl,
+      deviceImageWidth,
+      deviceImageHeight,
+      screenWidth,
+      screenHeight,
+    } = PHONES[device]
 
     const imageScale = width / deviceImageWidth
     const height = imageScale * deviceImageHeight
@@ -31,18 +36,18 @@ export default class extends Component {
       },
       screen: {
         position: 'absolute',
-        top: (deviceImageHeight - screenHeight) / 2 * imageScale,
-        left: (deviceImageWidth - screenWidth) / 2 * imageScale,
+        top: ((deviceImageHeight - screenHeight) / 2) * imageScale,
+        left: ((deviceImageWidth - screenWidth) / 2) * imageScale,
         width: screenWidth * imageScale,
         height: screenHeight * imageScale,
         backgroundColor: 'white',
       },
       overlay: {
         position: 'absolute',
-        top: (deviceImageHeight - screenHeight) / 2 * imageScale,
-        left: (deviceImageWidth - screenWidth) / 2 * imageScale,
-        width: screenWidth * imageScale / scale,
-        height: screenHeight * imageScale / scale,
+        top: ((deviceImageHeight - screenHeight) / 2) * imageScale,
+        left: ((deviceImageWidth - screenWidth) / 2) * imageScale,
+        width: (screenWidth * imageScale) / scale,
+        height: (screenHeight * imageScale) / scale,
         transform: `scale(${scale}, ${scale})`,
         transformOrigin: '0 0 0px',
         display: 'flex',
@@ -52,9 +57,7 @@ export default class extends Component {
     return (
       <div style={styles.container}>
         <div style={styles.screen} />
-        <div style={styles.overlay}>
-          {children}
-        </div>
+        <div style={styles.overlay}>{children}</div>
       </div>
     )
   }

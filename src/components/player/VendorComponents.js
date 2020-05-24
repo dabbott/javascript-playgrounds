@@ -21,7 +21,6 @@ const getObjectFromKeyPath = (data, keyPath) => {
 //   be executed in the module wrapper before use.
 // TODO figure out how to merge these
 export default class VendorComponents {
-
   // Register an external
   // name: name used in import/require
   // value: external to resolve
@@ -57,18 +56,21 @@ export default class VendorComponents {
   }
 
   static loadExternals(externals) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (externals.length === 0) {
         resolve()
         return
       }
 
-      const urls = externals.map(vc => vc[2])
+      const urls = externals.map((vc) => vc[2])
 
       $scriptjs(urls, () => {
         externals.forEach(([requireName, windowName]) => {
           // Inject into vendor components
-          VendorComponents.register(requireName, getObjectFromKeyPath(window, windowName))
+          VendorComponents.register(
+            requireName,
+            getObjectFromKeyPath(window, windowName)
+          )
         })
         resolve()
       })
@@ -77,7 +79,6 @@ export default class VendorComponents {
 
   // Load components from urls
   static load(components, callback) {
-
     ReactNative.default = ReactNative
 
     // Necessary for dependency mapping
@@ -90,10 +91,10 @@ export default class VendorComponents {
     React.PropTypes = PropTypes
 
     // Format is an array of 2-element arrays [[ require-name, url ]]
-    const modules = components.filter(vc => vc.length === 2)
+    const modules = components.filter((vc) => vc.length === 2)
 
     // Format is an array of 3-element arrays [[ require-name, window-name, url ]]
-    const externals = components.filter(vc => vc.length === 3)
+    const externals = components.filter((vc) => vc.length === 3)
 
     Promise.all([
       this.loadModules(modules),

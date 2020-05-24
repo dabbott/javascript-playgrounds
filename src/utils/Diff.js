@@ -8,12 +8,14 @@ export default function changedRanges(originalText, newText) {
 
   function diffLines(originalText, newText) {
     const lineDiff = diff.diffLines(originalText, newText, {
-      newlineIsToken: true
+      newlineIsToken: true,
     })
 
     const result = lineDiff.reduce(
       (result, change, index) => {
-        if (change.removed) { return result }
+        if (change.removed) {
+          return result
+        }
 
         let { ranges, value } = result
 

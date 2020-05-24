@@ -44,13 +44,12 @@ styles.activeText = {
 
 @pureRender
 export default class extends Component {
-
   static defaultProps = {
     tabs: [],
     activeTab: null,
     onClickTab: () => {},
-    getTitle: a => a,
-    getChanged: a => false,
+    getTitle: (a) => a,
+    getChanged: (a) => false,
     compareTabs: (a, b) => a === b,
     textStyle: null,
     activeTextStyle: null,
@@ -60,41 +59,43 @@ export default class extends Component {
   onClickTab = (tab) => this.props.onClickTab(tab)
 
   getComputedStyles = () => {
-    const {tabStyle} = this.props
+    const { tabStyle } = this.props
 
     return {
       container: tabStyle
-        ? prefix({...styles.container, ...tabStyle})
+        ? prefix({ ...styles.container, ...tabStyle })
         : styles.container,
     }
   }
 
   getTextStyle = (tab) => {
-    const {activeTab, textStyle, activeTextStyle, compareTabs} = this.props
+    const { activeTab, textStyle, activeTextStyle, compareTabs } = this.props
 
     if (compareTabs(tab, activeTab)) {
-      const base = textStyle ? prefix({...styles.activeText, ...textStyle}) : styles.activeText
+      const base = textStyle
+        ? prefix({ ...styles.activeText, ...textStyle })
+        : styles.activeText
 
-      return activeTextStyle ? prefix({...base, ...activeTextStyle}) : base
+      return activeTextStyle ? prefix({ ...base, ...activeTextStyle }) : base
     } else {
-      return textStyle ? prefix({...styles.text, ...textStyle}) : styles.text
+      return textStyle ? prefix({ ...styles.text, ...textStyle }) : styles.text
     }
   }
 
   getChangedTextStyle = (tab) => {
-    const {getChanged, changedTextStyle} = this.props
+    const { getChanged, changedTextStyle } = this.props
 
     const base = this.getTextStyle(tab)
 
     if (getChanged(tab)) {
-      return prefix({...base, ...styles.changedText, changedTextStyle})
+      return prefix({ ...base, ...styles.changedText, changedTextStyle })
     } else {
       return base
     }
   }
 
   render() {
-    const {children, tabs, titles, getTitle, getChanged} = this.props
+    const { children, tabs, titles, getTitle, getChanged } = this.props
     const computedStyles = this.getComputedStyles()
 
     return (
