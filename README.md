@@ -189,14 +189,8 @@ npm run build
 Follow this process to release a new version on `npm`:
 
 - Find-and-replace the version, `2.0.0-alpha.11`, throughout the project with the desired version using your IDE or terminal (this is somewhat manual, but is easy enough that I haven't scripted it yet)
-- `npm run prepublish`
-- `git add .`
-- `git commit -m ...`
-- `git tag v2.0.0-alpha.11`
-- `make TAG=v2.0.0-alpha.11`
-- `npm publish`
-
-> It would probably be easier to switch to the `gh-pages` package, at some point, instead of the current Makefile.
+- `npm run publish`
+- `npm run gh-pages`
 
 ### License
 

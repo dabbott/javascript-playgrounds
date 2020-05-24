@@ -9,13 +9,14 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "npm run clean && npm run build && npm run dist",
-    "build": "webpack --env.production --config webpack/webpack.config.js --sort-assets-by --progress",
     "start": "webpack-dev-server --config webpack/webpack.config.js --inline --hot --colors --quiet",
+    "build": "npm run build:core && npm run build:embed",
+    "build:core": "webpack --env.production --config webpack/webpack.config.js --sort-assets-by --progress",
+    "build:embed": "webpack --config webpack/webpack-embed.config.js --sort-assets-by --progress",
     "clean": "rm -rf ./dist ./public",
-    "analyze": "webpack --env.production --config webpack/webpack.config.js --sort-assets-by --progress --profile --json > stats.json",
-    "gh-pages": "gh-pages -d public",
-    "dist": "webpack --config webpack/webpack-embed.config.js --sort-assets-by --progress"
+    "prepublish": "npm run clean && npm run build",
+    "gh-pages": "npm run prepublish && gh-pages -d public",
+    "analyze": "webpack --env.production --config webpack/webpack.config.js --sort-assets-by --progress --profile --json > stats.json"
   },
   "repository": {
     "type": "git",
