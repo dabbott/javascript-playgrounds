@@ -26,7 +26,7 @@ export const Inspector = Loadable({
 
       return (props) => <Inspector {...props} theme={theme} />
     }),
-  LoadingComponent: () => null,
+  loading: () => null,
 })
 
 @pureRender

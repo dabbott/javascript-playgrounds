@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import pureRender from 'pure-render-decorator'
-import Loadable from 'react-loadable'
 import snarkdown from 'snarkdown'
 
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
