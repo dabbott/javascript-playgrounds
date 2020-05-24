@@ -4,6 +4,7 @@ const webpack = require('webpack')
 const DIRECTORY = path.dirname(__dirname)
 
 module.exports = {
+  mode: 'production',
   entry: path.join(DIRECTORY, 'components', 'embed', 'WebPlayer.js'),
   output: {
     path: path.join(DIRECTORY, 'dist'),
@@ -23,7 +24,7 @@ module.exports = {
               cacheDirectory: true,
             },
           },
-        ]
+        ],
       },
     ],
   },
@@ -43,18 +44,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('production')
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      output: {
-        comments: false,
-      },
-      compress: {
-        dead_code: true,
-        drop_console: true,
-        screw_ie8: true,
-        warnings: true,
-      }
+      'process.env.NODE_ENV': JSON.stringify('production'),
     }),
   ],
 }

@@ -1,16 +1,28 @@
-const path = require('path')
 const webpack = require('webpack')
+const merge = require('webpack-merge')
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
-const DIRECTORY = path.dirname(__dirname)
+const paths = {
+  root: path.join(__dirname, '..'),
+  get index() {
+    return path.join(this.root, 'index.js')
+  },
+  get player() {
+    return path.join(this.root, 'player.js')
+  },
+  get public() {
+    return path.join(this.root, 'public')
+  },
+}
 
-module.exports = {
+const common = merge({
   devServer: {
-    contentBase: DIRECTORY
+    contentBase: paths.public,
   },
   entry: {
-    index: path.join(DIRECTORY, 'index.js'),
-    player: path.join(DIRECTORY, 'player.js'),
-    vendor: ['react', 'react-dom'],
+    index: paths.index,
+    player: paths.player,
   },
   module: {
     rules: [
@@ -24,11 +36,16 @@ module.exports = {
               cacheDirectory: true,
             },
           },
-        ]
+        ],
       },
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /-worker\.js/,
+        loader: 'worker-loader',
+        options: { name: '[name]-bundle.js' },
       },
     ],
   },
@@ -38,21 +55,53 @@ module.exports = {
     // particularly care about.
     fs: 'empty',
     module: 'empty',
-    net: 'empty'
+    net: 'empty',
   },
   output: {
-    filename: '[name]-bundle.js'
+    path: paths.public,
+    filename: '[name]-bundle.js',
   },
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin('vendor'),
-    new webpack.LoaderOptionsPlugin({
-      options: {
-        worker: {
-          output: {
-            filename: "babel-worker-bundle.js",
-          }
-        },
-      },
+    new HtmlWebpackPlugin({
+      title: 'React Native Web Player',
+      filename: 'index.html',
+      template: 'index.ejs',
+      minify: false,
+      chunks: ['index'],
+    }),
+    new HtmlWebpackPlugin({
+      title: 'Player',
+      filename: 'player.html',
+      template: 'index.ejs',
+      minify: false,
+      chunks: ['player'],
     }),
   ],
+})
+
+module.exports = ({ production } = {}) => {
+  const defines = new webpack.DefinePlugin({
+    'process.env.NODE_ENV': JSON.stringify(
+      production ? 'production' : 'development'
+    ),
+  })
+
+  if (production) {
+    return merge(common, {
+      mode: 'production',
+      plugins: [defines],
+      optimization: {
+        splitChunks: {
+          name: false,
+          chunks: 'all',
+        },
+      },
+    })
+  } else {
+    return merge(common, {
+      mode: 'development',
+      devtool: 'source-map',
+      plugins: [defines],
+    })
+  }
 }

@@ -16,7 +16,7 @@ import WorkspacesList from './WorkspacesList'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
-const BabelWorker = require("worker-loader!../../babel-worker.js")
+const BabelWorker = require("../../babel-worker.js")
 const babelWorker = new BabelWorker()
 
 // Utilities for determining which babel worker responses are for the player vs

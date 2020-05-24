@@ -1,3 +1,6 @@
-node_modules
-*-bundle.js
 .vscode
+
+node_modules
+
+dist
+public
