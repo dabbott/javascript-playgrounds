@@ -1,19 +1,31 @@
-const Babel = require('babel-core')
-
-// Ensure consistency with react-native's babel plugins by directly using
-// the babel-preset-react-native. It's intended for usage in node, so we
-// have to require it slightly differently to get it to work in the browser.
-import plugins from './utils/BabelPlugins'
-
-import consolePlugin from './utils/BabelConsolePlugin'
+const Babel = require('@babel/core')
 
 onmessage = function (event) {
   const { code: value, filename, options } = event.data
   let output
 
   try {
+    const presets = [
+      require('metro-react-native-babel-preset').getPreset(value, {
+        enableBabelRuntime: false,
+      }),
+    ]
+
+    const plugins = [
+      require('./utils/BabelConsolePlugin'),
+      [
+        require('@babel/plugin-transform-typescript'),
+        {
+          isTSX: true,
+          allowNamespaces: true,
+        },
+      ],
+    ]
+
     const code = Babel.transform(value, {
-      plugins: [...plugins, [consolePlugin, { filename }]],
+      presets,
+      plugins,
+      filename,
       ...options,
     }).code
 

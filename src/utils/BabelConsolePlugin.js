@@ -13,7 +13,7 @@ export default () => {
           path.node.callee.property.name = '_rnwp_log'
 
           const locationArguments = [
-            state.opts.filename,
+            state.filename.slice(1),
             path.node.loc.end.line.toString(),
             path.node.loc.start.column.toString(),
           ]
