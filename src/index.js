@@ -45,7 +45,7 @@ let {
   playerCSS = '',
   workspaceCSS = '',
   console = JSON.stringify({
-    enabled: true,
+    enabled: false,
     visible: false,
     maximized: false,
     collapsible: true,
