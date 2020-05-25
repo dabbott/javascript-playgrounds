@@ -68,6 +68,11 @@ const common = merge({
     path: paths.public,
     filename: '[name]-bundle.js',
   },
+  resolve: {
+    alias: {
+      '@babel/plugin-transform-unicode-regex': path.join(__dirname, 'empty.js'),
+    },
+  },
   plugins: [
     new HtmlWebpackPlugin({
       title: 'React Native Web Player',
