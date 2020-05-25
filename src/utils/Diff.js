@@ -3,7 +3,6 @@ const newlineRegex = /\r\n|\n|\r/g
 export default function changedRanges(originalText, newText) {
   if (typeof navigator === 'undefined') return { added: [] }
 
-  const CodeMirror = require('codemirror')
   const diff = require('diff')
 
   function diffLines(originalText, newText) {
