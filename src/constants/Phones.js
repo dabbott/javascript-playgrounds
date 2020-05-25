@@ -20,18 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Devices, taken from the framerjs codebase
+import iphone6silver from '../assets/iphone-6-silver.svg'
+
 // Devices have pixel density of 2, but we also zoom in for visibility at small sizes.
 export default {
   ios: {
-    deviceImageUrl:
-      'https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/iphone-6-silver.png',
+    deviceImageUrl: iphone6silver,
     deviceImageWidth: 870,
     deviceImageHeight: 1738,
     screenWidth: 750,
     screenHeight: 1334,
   },
   android: {
+    // Device image taken from the framerjs codebase
     deviceImageUrl:
       'https://cdn.rawgit.com/koenbok/Framer/master/extras/DeviceResources/google-nexus-5x.png',
     deviceImageWidth: 1204,

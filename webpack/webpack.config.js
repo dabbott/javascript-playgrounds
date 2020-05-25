@@ -50,6 +50,10 @@ const common = merge({
         loader: 'worker-loader',
         options: { name: '[name]-bundle.js' },
       },
+      {
+        test: /\.svg$/i,
+        loader: 'file-loader',
+      },
     ],
   },
   node: {
