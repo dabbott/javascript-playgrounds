@@ -1,16 +1,14 @@
-import React, { Component } from 'react'
+import PropTypes from 'prop-types'
+import React, { PureComponent } from 'react'
 import ReactDOM from 'react-dom'
 import * as ReactNative from 'react-native-web'
-import PropTypes from 'prop-types'
-import pureRender from 'pure-render-decorator'
-
-import VendorComponents from './VendorComponents'
+import { prefixObject } from '../../utils/PrefixInlineStyles'
 import consoleProxy, {
+  consoleClear,
   consoleLog,
   consoleLogRNWP,
-  consoleClear,
 } from './ConsoleProxy'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import VendorComponents from './VendorComponents'
 
 const AppRegistry = ReactNative.AppRegistry
 
@@ -54,8 +52,7 @@ const styles = prefixObject({
   },
 })
 
-@pureRender
-export default class extends Component {
+export default class extends PureComponent {
   static defaultProps = {
     assetRoot: '',
     onRun: () => {},

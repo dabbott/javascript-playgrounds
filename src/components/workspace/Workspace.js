@@ -1,20 +1,18 @@
-import React, { Component } from 'react'
-import pureRender from 'pure-render-decorator'
-
-import Header from './Header'
-import Editor from './Editor'
-import PlayerFrame from './PlayerFrame'
-import Status from './Status'
-import Overlay from './Overlay'
-import Button from './Button'
-import About from './About'
-import Tabs from './Tabs'
-import TabContainer from './TabContainer'
-import Fullscreen from './Fullscreen'
-import Console from './Console'
-import WorkspacesList from './WorkspacesList'
+import React, { PureComponent } from 'react'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
+import About from './About'
+import Button from './Button'
+import Console from './Console'
+import Editor from './Editor'
+import Fullscreen from './Fullscreen'
+import Header from './Header'
+import Overlay from './Overlay'
+import PlayerFrame from './PlayerFrame'
+import Status from './Status'
+import TabContainer from './TabContainer'
+import Tabs from './Tabs'
+import WorkspacesList from './WorkspacesList'
 
 const BabelWorker = require('../../babel-worker.js')
 const babelWorker = new BabelWorker()
@@ -132,8 +130,7 @@ const styles = prefixObject({
   },
 })
 
-@pureRender
-export default class extends Component {
+export default class extends PureComponent {
   static defaultProps = {
     title: 'Live Editor',
     files: { ['index.js']: '' },

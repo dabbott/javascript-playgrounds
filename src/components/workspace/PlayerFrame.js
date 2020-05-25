@@ -1,9 +1,7 @@
-import React, { Component } from 'react'
-import pureRender from 'pure-render-decorator'
-
-import Phone from './Phone'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import React, { PureComponent } from 'react'
 import * as ExtendedJSON from '../../utils/ExtendedJSON'
+import { prefixObject } from '../../utils/PrefixInlineStyles'
+import Phone from './Phone'
 
 const styles = prefixObject({
   iframe: {
@@ -13,8 +11,7 @@ const styles = prefixObject({
   },
 })
 
-@pureRender
-export default class extends Component {
+export default class extends PureComponent {
   static defaultProps = {
     platform: 'ios',
     width: 300,

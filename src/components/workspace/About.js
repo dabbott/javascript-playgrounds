@@ -1,10 +1,8 @@
-import React, { Component } from 'react'
-import pureRender from 'pure-render-decorator'
+import React, { PureComponent } from 'react'
 
 const nbsp = '\u00a0'
 
-@pureRender
-export default class extends Component {
+export default class extends PureComponent {
   static defaultProps = {}
 
   render() {

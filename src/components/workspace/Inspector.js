@@ -1,7 +1,5 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import Loadable from 'react-loadable'
-import pureRender from 'pure-render-decorator'
-
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
 const styles = prefixObject({
@@ -29,8 +27,7 @@ export const Inspector = Loadable({
   loading: () => null,
 })
 
-@pureRender
-export class MultiInspector extends Component {
+export class MultiInspector extends PureComponent {
   render() {
     const { data } = this.props
 

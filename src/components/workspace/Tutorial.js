@@ -1,6 +1,4 @@
-import React, { Component } from 'react'
-import pureRender from 'pure-render-decorator'
-
+import React, { PureComponent } from 'react'
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 
 const rawStyles = {
@@ -46,8 +44,7 @@ rawStyles.activeRowTitle = {
 
 const styles = prefixObject(rawStyles)
 
-@pureRender
-export default class extends Component {
+export default class extends PureComponent {
   static defaultProps = {
     style: null,
     rowStyle: null,

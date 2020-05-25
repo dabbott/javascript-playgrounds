@@ -1,10 +1,7 @@
-import React, { Component } from 'react'
-import pureRender from 'pure-render-decorator'
+import React, { PureComponent } from 'react'
 import ReactDOM from 'react-dom'
-
 import { options, requireAddons } from '../../utils/CodeMirror'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
-import { highlightAddedLines } from '../../utils/Diff'
 import PlaygroundPreview from './PlaygroundPreview'
 
 require('codemirror/lib/codemirror.css')
@@ -30,8 +27,7 @@ const styles = prefixObject({
 
 const docCache = {}
 
-@pureRender
-export default class extends Component {
+export default class extends PureComponent {
   static defaultProps = {
     initialValue: null,
     value: null,

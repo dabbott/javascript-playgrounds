@@ -1,5 +1,5 @@
 import React, { Component, useLayoutEffect, useRef, useEffect } from 'react'
-import pureRender from 'pure-render-decorator'
+import { PureComponent } from 'react'
 
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import { MultiInspector } from './Inspector'

@@ -1,7 +1,5 @@
-import React, { Component } from 'react'
-import pureRender from 'pure-render-decorator'
-
-import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
+import React, { PureComponent } from 'react'
+import { prefixObject } from '../../utils/PrefixInlineStyles'
 import Tabs from './Tabs'
 
 const styles = prefixObject({
@@ -15,8 +13,7 @@ const styles = prefixObject({
   },
 })
 
-@pureRender
-export default class extends Component {
+export default class extends PureComponent {
   static defaultProps = {
     tabs: [],
     initialTab: null,
