@@ -310,7 +310,7 @@ export default class extends PureComponent {
 
   runTypeScriptRequest = (payload) => {
     if (!this.props.typescriptOptions.enabled) {
-      return Promise.resolve('')
+      return Promise.resolve()
     }
 
     if (!this.typeScriptWorker) {
@@ -333,7 +333,7 @@ export default class extends PureComponent {
       position: index,
     })
       .then((info) => {
-        if (info !== '') {
+        if (info && info.displayParts.length > 0) {
           done(info)
         }
       })

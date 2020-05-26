@@ -129,7 +129,7 @@ onmessage = function ({ data }) {
     }
     case 'quickInfo': {
       if (!ready) {
-        postMessage({ id, payload: '' })
+        postMessage({ id, payload: undefined })
 
         return
       }
@@ -141,6 +141,8 @@ onmessage = function ({ data }) {
       if (!languageServiceHost.fileExists(filename)) {
         console.warn(`Can't get quickInfo, ${filename} doesn't exist yet`)
 
+        postMessage({ id, payload: undefined })
+
         return
       }
 
@@ -149,11 +151,7 @@ onmessage = function ({ data }) {
         position
       )
 
-      const result = quickInfo
-        ? ts.displayPartsToString(quickInfo.displayParts)
-        : ''
-
-      postMessage({ id, payload: result })
+      postMessage({ id, payload: quickInfo })
 
       return
     }

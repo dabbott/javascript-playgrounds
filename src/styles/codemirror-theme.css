@@ -105,14 +105,11 @@
 /* tooltip */
 
 .CodeMirror-tooltip {
-  font-family: 'source-code-pro', Menlo, 'Courier New', Consolas, monospace;
   font-size: 13px;
   line-height: 20px;
-  color: #1990b8;
   white-space: pre-wrap;
   background-color: white;
   border: 1px solid #ccc;
-  padding: 4px 8px;
   box-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
 
   pointer-events: none;

@@ -18,12 +18,13 @@ export function tooltipAddon() {
     }
 
     // Set up new state
-    if (value && value.getInfo) {
+    if (value && value.getNode) {
       const state = {
         mousemove: mousemove.bind(null, cm),
         mouseout: mouseout.bind(null, cm),
         windowScroll: reset.bind(null, cm),
-        getInfo: value.getInfo,
+        getNode: value.getNode,
+        removeNode: value.removeNode || (() => {}),
         style: value.style || {},
       }
       CodeMirror.on(cm.getWrapperElement(), 'mousemove', state.mousemove)
@@ -146,7 +147,7 @@ export function tooltipAddon() {
    * @param {CodeMirror} cm
    */
   function update(cm) {
-    const { coords, getInfo } = cm.state.tooltip
+    const { coords, getNode } = cm.state.tooltip
 
     if (!coords) return
 
@@ -154,22 +155,24 @@ export function tooltipAddon() {
 
     if (!token) return
 
-    if (typeof getInfo !== 'function') return
+    if (typeof getNode !== 'function') return
 
     const pos = token.pos
 
     const startPos = new CodeMirror.Pos(pos.line, token.start)
 
-    getInfo(
+    getNode(
       cm,
       {
         index: cm.indexFromPos(pos) + 1,
       },
-      (text) => {
+      (node) => {
+        if (!node) return
+
         cm.state.tooltip.removeTooltip = makeTooltip(
           cm,
           cm.charCoords(startPos),
-          text
+          node
         )
       }
     )
@@ -177,8 +180,16 @@ export function tooltipAddon() {
 
   // Tooltips
 
-  function makeTooltip(cm, coords, content) {
-    const tooltip = makeTooltipNode(coords, content, cm.state.tooltip.style)
+  /**
+   *
+   * @param {CodeMirror} cm
+   * @param {*} coords
+   * @param {HTMLElement} child
+   */
+  function makeTooltip(cm, coords, child) {
+    const tooltip = makeTooltipNode(coords, cm.state.tooltip.style)
+    tooltip.appendChild(child)
+
     const container = getTooltipContainer(cm)
     container.appendChild(tooltip)
 
@@ -187,7 +198,7 @@ export function tooltipAddon() {
 
       // There are still some scenarios where tooltips aren't cleaned up properly with removeFromParent.
       // For now, remove every tooltip from the DOM.
-      removeAllTooltipNodes()
+      removeAllTooltipNodes(cm.state.tooltip.removeNode)
     }
   }
 
@@ -201,22 +212,9 @@ export function tooltipAddon() {
   /**
    * @returns {HTMLElement}
    */
-  function elt(tagname, cls /*, ... elts*/) {
-    var e = document.createElement(tagname)
-    if (cls) e.className = cls
-    for (var i = 2; i < arguments.length; ++i) {
-      var elt = arguments[i]
-      if (typeof elt == 'string') elt = document.createTextNode(elt)
-      e.appendChild(elt)
-    }
-    return e
-  }
-
-  /**
-   * @returns {HTMLElement}
-   */
-  function makeTooltipNode(coords, content, style) {
-    var node = elt('div', tooltipClassName, content)
+  function makeTooltipNode(coords, style) {
+    const node = document.createElement('div')
+    node.className = tooltipClassName
     prefixAndApply(style, node)
     node.style.left = `${coords.left}px`
     node.style.top = `${Math.max(1, coords.top - 30)}px`
@@ -234,12 +232,16 @@ export function tooltipAddon() {
     }
   }
 
-  function removeAllTooltipNodes() {
+  function removeAllTooltipNodes(callback) {
     document.querySelectorAll(`.${tooltipClassName}`).forEach((element) => {
       const parent = element.parentNode
 
       if (parent) {
         parent.removeChild(element)
+
+        if (callback && element.firstChild) {
+          callback(element.firstChild)
+        }
       }
     })
   }

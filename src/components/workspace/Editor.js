@@ -4,6 +4,7 @@ import { options, requireAddons } from '../../utils/CodeMirror'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import PlaygroundPreview from './PlaygroundPreview'
 import { tooltipAddon } from '../../utils/CodeMirrorTooltipAddon'
+import Tooltip from './Tooltip'
 
 require('codemirror/lib/codemirror.css')
 require('../../styles/codemirror-theme.css')
@@ -74,8 +75,28 @@ export default class extends PureComponent {
         ...options,
         ...(getTypeInfo && {
           tooltip: {
-            getInfo: (cm, { index }, callback) => {
-              return getTypeInfo(filename, index - 1, callback)
+            getNode: (cm, { index }, callback) => {
+              getTypeInfo(
+                filename,
+                index - 1,
+                ({ displayParts, documentation }) => {
+                  const reactHost = document.createElement('div')
+                  reactHost.className = 'cm-s-react'
+
+                  ReactDOM.render(
+                    <Tooltip
+                      type={displayParts}
+                      documentation={documentation}
+                    />,
+                    reactHost
+                  )
+
+                  callback(reactHost)
+                }
+              )
+            },
+            removeNode: (node) => {
+              ReactDOM.unmountComponentAtNode(node)
             },
             style: tooltipStyle,
           },
