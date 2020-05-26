@@ -1,3 +1,5 @@
+import { prefixAndApply } from './PrefixInlineStyles'
+
 export function tooltipAddon() {
   const CodeMirror = require('codemirror')
 
@@ -22,6 +24,7 @@ export function tooltipAddon() {
         mouseout: mouseout.bind(null, cm),
         windowScroll: reset.bind(null, cm),
         getInfo: value.getInfo,
+        style: value.style || {},
       }
       CodeMirror.on(cm.getWrapperElement(), 'mousemove', state.mousemove)
       CodeMirror.on(cm.getWrapperElement(), 'mouseout', state.mouseout)
@@ -175,7 +178,7 @@ export function tooltipAddon() {
   // Tooltips
 
   function makeTooltip(cm, coords, content) {
-    const tooltip = makeTooltipNode(coords, content)
+    const tooltip = makeTooltipNode(coords, content, cm.state.tooltip.style)
     const container = getTooltipContainer(cm)
     container.appendChild(tooltip)
 
@@ -208,8 +211,9 @@ export function tooltipAddon() {
   /**
    * @returns {HTMLElement}
    */
-  function makeTooltipNode(coords, content) {
+  function makeTooltipNode(coords, content, style) {
     var node = elt('div', tooltipClassName, content)
+    prefixAndApply(style, node)
     node.style.left = `${coords.left}px`
     node.style.top = `${Math.max(1, coords.top - 30)}px`
     return node

@@ -489,6 +489,7 @@ export default class extends PureComponent {
           getTypeInfo={
             typescriptOptions.enabled ? this.getTypeScriptInfo : undefined
           }
+          tooltipStyle={externalStyles.tooltip}
         />
         {showDetails && (
           <div style={styles.overlayContainer}>

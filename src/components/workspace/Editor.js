@@ -39,15 +39,22 @@ export default class extends PureComponent {
     logs: undefined, // Undefined instead of array to simplify re-rendering,
     playgroundDebounceDuration: 200,
     getTypeInfo: undefined,
+    tooltipStyle: undefined,
   }
 
   currentDiff = []
 
   componentDidMount() {
-    const { getTypeInfo } = this.props
-
     if (typeof navigator !== 'undefined') {
-      const { filename, initialValue, value, readOnly, onChange } = this.props
+      const {
+        filename,
+        initialValue,
+        value,
+        readOnly,
+        onChange,
+        getTypeInfo,
+        tooltipStyle,
+      } = this.props
 
       if (getTypeInfo) {
         tooltipAddon()
@@ -70,6 +77,7 @@ export default class extends PureComponent {
             getInfo: (cm, { index }, callback) => {
               return getTypeInfo(filename, index - 1, callback)
             },
+            style: tooltipStyle,
           },
         }),
         readOnly,
