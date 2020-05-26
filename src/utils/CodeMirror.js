@@ -1,6 +1,6 @@
 export const options = {
   value: '',
-  mode: 'jsx',
+  mode: 'text/typescript-jsx',
   theme: 'react',
   keyMap: 'sublime',
   indentUnit: 2,
