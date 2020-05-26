@@ -24,20 +24,35 @@ const styles = prefixObject({
   },
 })
 
+function useResizeObserver(ref, f) {
+  useEffect(() => {
+    let resizeObserver
+    let mounted = true
+
+    import('@juggle/resize-observer').then(({ ResizeObserver }) => {
+      if (!mounted) return
+
+      resizeObserver = new ResizeObserver(() => {
+        f()
+      })
+
+      resizeObserver.observe(ref.current)
+    })
+
+    return () => {
+      mounted = false
+
+      if (resizeObserver) {
+        resizeObserver.unobserve(ref.current)
+      }
+    }
+  }, [])
+}
+
 export default function PlaygroundPreview({ indent, data, didResize }) {
   const ref = useRef(null)
 
-  useEffect(() => {
-    if (typeof ResizeObserver === 'undefined') return
-
-    const resizeObserver = new ResizeObserver(() => {
-      didResize()
-    })
-
-    resizeObserver.observe(ref.current)
-
-    return () => resizeObserver.unobserve(ref.current)
-  }, [])
+  useResizeObserver(ref, didResize)
 
   return (
     <div ref={ref} style={{ ...styles.container, marginLeft: indent }}>
