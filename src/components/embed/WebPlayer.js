@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 
 import PropTypes from 'prop-types'
 
-const WEB_PLAYER_URL = `https://unpkg.com/react-native-web-player@2.0.0-alpha.14/public/index.html`
+const WEB_PLAYER_URL = `https://unpkg.com/react-native-web-player@2.0.0-alpha.15/public/index.html`
 
 const paramSchema = {
   // Plain text
@@ -31,6 +31,7 @@ const paramSchema = {
   styles: 'json',
   console: 'json',
   playground: 'json',
+  typescript: 'json',
   workspaces: 'json',
 }
 
@@ -96,6 +97,7 @@ export default class WebPlayer extends Component {
     styles: PropTypes.object,
     console: PropTypes.object,
     playground: PropTypes.object,
+    typescript: PropTypes.object,
   }
 
   static defaultProps = {
