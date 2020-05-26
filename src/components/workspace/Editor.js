@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import { options, requireAddons } from '../../utils/CodeMirror'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import PlaygroundPreview from './PlaygroundPreview'
+import { tooltipAddon } from '../../utils/CodeMirrorTooltipAddon'
 
 require('codemirror/lib/codemirror.css')
 require('../../styles/codemirror-theme.css')
@@ -37,20 +38,20 @@ export default class extends PureComponent {
     diff: [],
     logs: undefined, // Undefined instead of array to simplify re-rendering,
     playgroundDebounceDuration: 200,
+    getTypeInfo: undefined,
   }
 
   currentDiff = []
 
   componentDidMount() {
+    const { getTypeInfo } = this.props
+
     if (typeof navigator !== 'undefined') {
-      const {
-        filename,
-        initialValue,
-        value,
-        readOnly,
-        onChange,
-        diff,
-      } = this.props
+      const { filename, initialValue, value, readOnly, onChange } = this.props
+
+      if (getTypeInfo) {
+        tooltipAddon()
+      }
 
       requireAddons()
       const CodeMirror = require('codemirror')
@@ -64,6 +65,13 @@ export default class extends PureComponent {
 
       this.cm = CodeMirror(this.refs.editor, {
         ...options,
+        ...(getTypeInfo && {
+          tooltip: {
+            getInfo: (cm, { index }, callback) => {
+              return getTypeInfo(filename, index - 1, callback)
+            },
+          },
+        }),
         readOnly,
         value: docCache[filename].linkedDoc({ sharedHist: true }),
       })

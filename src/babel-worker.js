@@ -1,4 +1,4 @@
-const Babel = require('@babel/core')
+import * as Babel from '@babel/core'
 
 onmessage = function (event) {
   const { code: value, filename, options } = event.data

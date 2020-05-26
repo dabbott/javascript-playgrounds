@@ -67,6 +67,7 @@ const common = merge({
   output: {
     path: paths.public,
     filename: '[name]-bundle.js',
+    globalObject: 'this',
   },
   resolve: {
     alias: {

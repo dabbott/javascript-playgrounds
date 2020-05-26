@@ -37,8 +37,9 @@ const buildHashString = (pairs = {}) => {
 }
 
 export const setHashString = (fileMap) => {
-  const multiFile = Object.keys(fileMap).length > 1
-  const code = fileMap['index.js']
+  const filenames = Object.keys(fileMap)
+  const multiFile = filenames.length > 1
+  const code = fileMap[filenames[0]]
 
   const options = {
     ...getHashString(),

@@ -11,6 +11,7 @@ import DefaultCode from './constants/DefaultCode'
 import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
 import { appendCSS } from './utils/Styles'
 import diff from './utils/Diff'
+import defaultLibs from './utils/TypeScriptDefaultLibs'
 
 const style = prefix({
   flex: '1 1 auto',
@@ -25,8 +26,8 @@ let {
   title = '',
   code = DefaultCode,
   files = '[]',
-  entry = 'index.js',
-  initialTab = 'index.js',
+  entry,
+  initialTab,
   platform = 'ios',
   statusBarHeight = '0',
   statusBarColor = 'black',
@@ -56,10 +57,31 @@ let {
     enabled: false,
     debounceDuration: 200,
   }),
+  typescript = JSON.stringify({
+    enabled: false,
+    /* libs */
+    /* types */
+  }),
 } = getHashString()
+
+const typescriptOptions = Object.assign(
+  { libs: defaultLibs, types: [] },
+  JSON.parse(typescript)
+)
+
+const consoleOptions = JSON.parse(console)
+const playgroundOptions = JSON.parse(playground)
 
 if (workspaceCSS) {
   appendCSS(workspaceCSS)
+}
+
+if (typescriptOptions.enabled && !(entry || initialTab)) {
+  entry = 'index.tsx'
+  initialTab = 'index.tsx'
+} else {
+  entry = 'index.js'
+  initialTab = 'index.js'
 }
 
 const parsedFiles = JSON.parse(files)
@@ -125,29 +147,30 @@ class WorkspaceContainer extends Component {
     const parsedWorkspaces = JSON.parse(workspaces)
 
     const workspaceProps = {
-      title: title,
+      title,
       files: fileMap,
-      entry: entry,
-      initialTab: initialTab,
-      platform: platform,
+      entry,
+      initialTab,
+      platform,
       statusBarHeight: parseFloat(statusBarHeight),
-      statusBarColor: statusBarColor,
-      assetRoot: assetRoot,
+      statusBarColor,
+      assetRoot,
       scale: parseFloat(scale),
       width: parseFloat(width),
       vendorComponents: JSON.parse(vendorComponents),
       externalStyles: JSON.parse(styles),
       fullscreen: fullscreen === 'true' && screenfull.enabled,
       panes: JSON.parse(panes),
-      transpilerTitle: transpilerTitle,
-      workspacesTitle: workspacesTitle,
+      transpilerTitle,
+      workspacesTitle,
       workspaces: parsedWorkspaces,
-      playerTitle: playerTitle,
-      playerStyleSheet: playerStyleSheet,
-      playerCSS: playerCSS,
+      playerTitle,
+      playerStyleSheet,
+      playerCSS,
       onChange: setHashString,
-      consoleOptions: JSON.parse(console),
-      playgroundOptions: JSON.parse(playground),
+      consoleOptions,
+      playgroundOptions,
+      typescriptOptions,
       activeStepIndex: activeStepIndex,
       onChangeActiveStepIndex: this.handleChangeActiveStepIndex,
     }

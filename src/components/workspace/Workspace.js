@@ -13,6 +13,7 @@ import Status from './Status'
 import TabContainer from './TabContainer'
 import Tabs from './Tabs'
 import WorkspacesList from './WorkspacesList'
+import { workerRequest } from '../../utils/WorkerRequest'
 
 const BabelWorker = require('../../babel-worker.js')
 const babelWorker = new BabelWorker()
@@ -149,6 +150,7 @@ export default class extends PureComponent {
     panes: [],
     consoleOptions: {},
     playgroundOptions: {},
+    typescriptOptions: {},
     workspaces: [],
     diff: {},
     statusBarHeight: 0,
@@ -158,7 +160,14 @@ export default class extends PureComponent {
   constructor(props) {
     super()
 
-    const { initialTab, panes, consoleOptions, files, diff } = props
+    const {
+      initialTab,
+      panes,
+      consoleOptions,
+      files,
+      diff,
+      typescriptOptions,
+    } = props
 
     const fileTabs = Object.keys(files).map((filename, index) => {
       return {
@@ -167,6 +176,13 @@ export default class extends PureComponent {
         index,
       }
     })
+
+    if (
+      typescriptOptions.enabled &&
+      Object.keys(files).filter((file) => file.match(/\.tsx?/)).length === 0
+    ) {
+      console.warn('TypeScript is enabled but there are no .ts or .tsx files.')
+    }
 
     this.state = {
       compilerError: null,
@@ -202,7 +218,7 @@ export default class extends PureComponent {
 
   componentDidMount() {
     if (typeof navigator !== 'undefined') {
-      const { files } = this.props
+      const { files, typescriptOptions } = this.props
       const { playerVisible, transpilerVisible } = this.state
 
       // Cache and compile each file
@@ -210,6 +226,18 @@ export default class extends PureComponent {
         const code = files[filename]
 
         this.codeCache[filename] = code
+
+        this.runTypeScriptRequest({
+          type: 'libs',
+          libs: typescriptOptions.libs || [],
+          types: typescriptOptions.types || [],
+        })
+
+        this.runTypeScriptRequest({
+          type: 'file',
+          filename,
+          code,
+        })
 
         if (playerVisible) {
           babelWorker.postMessage({
@@ -280,8 +308,48 @@ export default class extends PureComponent {
     }
   }
 
+  runTypeScriptRequest = (payload) => {
+    if (!this.props.typescriptOptions.enabled) {
+      return Promise.resolve('')
+    }
+
+    if (!this.typeScriptWorker) {
+      this.typeScriptWorker = import(
+        '../../typescript-worker.js'
+      ).then((worker) => worker.default())
+    }
+
+    return this.typeScriptWorker.then((worker) =>
+      workerRequest(worker, payload)
+    )
+  }
+
+  getTypeScriptInfo = (prefixedFilename, index, done) => {
+    const [, filename] = prefixedFilename.split(':')
+
+    this.runTypeScriptRequest({
+      type: 'quickInfo',
+      filename,
+      position: index,
+    })
+      .then((info) => {
+        if (info !== '') {
+          done(info)
+        }
+      })
+      .catch((error) => {
+        console.log('Error finding type info', error)
+      })
+  }
+
   onCodeChange = (code) => {
     const { activeFile, transpilerVisible, playerVisible } = this.state
+
+    this.runTypeScriptRequest({
+      type: 'file',
+      filename: activeFile,
+      code,
+    })
 
     if (playerVisible) {
       babelWorker.postMessage({
@@ -362,6 +430,7 @@ export default class extends PureComponent {
       activeStepIndex,
       diff,
       playgroundOptions,
+      typescriptOptions,
     } = this.props
     const {
       compilerError,
@@ -417,6 +486,9 @@ export default class extends PureComponent {
           diff={fileDiff}
           logs={playgroundOptions.enabled ? logs : undefined}
           playgroundDebounceDuration={playgroundOptions.debounceDuration}
+          getTypeInfo={
+            typescriptOptions.enabled ? this.getTypeScriptInfo : undefined
+          }
         />
         {showDetails && (
           <div style={styles.overlayContainer}>
