@@ -24,6 +24,7 @@ export function tooltipAddon() {
         mouseout: mouseout.bind(null, cm),
         windowScroll: reset.bind(null, cm),
         getNode: value.getNode,
+        getContainerNode: value.getContainerNode || (() => document.body),
         removeNode: value.removeNode || (() => {}),
         style: value.style || {},
       }
@@ -187,11 +188,17 @@ export function tooltipAddon() {
    * @param {HTMLElement} child
    */
   function makeTooltip(cm, coords, child) {
-    const tooltip = makeTooltipNode(coords, cm.state.tooltip.style)
+    const tooltip = document.createElement('div')
+    tooltip.className = tooltipClassName
+    prefixAndApply(cm.state.tooltip.style, tooltip)
+
     tooltip.appendChild(child)
 
-    const container = getTooltipContainer(cm)
+    const container = cm.state.tooltip.getContainerNode(cm)
     container.appendChild(tooltip)
+
+    tooltip.style.left = `${coords.left}px`
+    tooltip.style.top = `${Math.max(1, coords.top - tooltip.clientHeight)}px`
 
     return () => {
       // removeFromParent(tooltip)
@@ -200,25 +207,6 @@ export function tooltipAddon() {
       // For now, remove every tooltip from the DOM.
       removeAllTooltipNodes(cm.state.tooltip.removeNode)
     }
-  }
-
-  /**
-   * @returns {HTMLElement}
-   */
-  function getTooltipContainer(cm) {
-    return ((cm.options || {}).hintOptions || {}).container || document.body
-  }
-
-  /**
-   * @returns {HTMLElement}
-   */
-  function makeTooltipNode(coords, style) {
-    const node = document.createElement('div')
-    node.className = tooltipClassName
-    prefixAndApply(style, node)
-    node.style.left = `${coords.left}px`
-    node.style.top = `${Math.max(1, coords.top - 30)}px`
-    return node
   }
 
   /**
