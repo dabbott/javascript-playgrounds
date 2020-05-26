@@ -29,10 +29,22 @@ export class LanguageServiceHost {
 
   // Implementation of ts.LanguageServiceHost
 
+  /**
+   * @returns {ts.CompilerOptions}
+   */
   getCompilationSettings() {
     return {
       target: ts.ScriptTarget.ES5,
       module: ts.ModuleKind.CommonJS,
+      strictNullChecks: true,
+      strictFunctionTypes: true,
+      strictPropertyInitialization: true,
+      strictBindCallApply: true,
+      noImplicitThis: true,
+      alwaysStrict: true,
+      esModuleInterop: true,
+      experimentalDecorators: true,
+      emitDecoratorMetadata: true,
     }
   }
 
