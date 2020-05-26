@@ -183,7 +183,11 @@ export function tooltipAddon() {
     container.appendChild(tooltip)
 
     return () => {
-      removeFromParent(tooltip)
+      // removeFromParent(tooltip)
+
+      // There are still some scenarios where tooltips aren't cleaned up properly with removeFromParent.
+      // For now, remove every tooltip from the DOM.
+      removeAllTooltipNodes()
     }
   }
 
@@ -228,5 +232,15 @@ export function tooltipAddon() {
     if (parent) {
       parent.removeChild(node)
     }
+  }
+
+  function removeAllTooltipNodes() {
+    document.querySelectorAll(`.${tooltipClassName}`).forEach((element) => {
+      const parent = element.parentNode
+
+      if (parent) {
+        parent.removeChild(element)
+      }
+    })
   }
 }
