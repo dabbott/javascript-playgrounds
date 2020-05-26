@@ -11,6 +11,7 @@ module.exports = {
     filename: 'react-native-web-player.js',
     library: 'react-native-web-player',
     libraryTarget: 'umd',
+    globalObject: 'this',
   },
   module: {
     rules: [
