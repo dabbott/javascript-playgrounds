@@ -1,6 +1,7 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, useRef, useEffect } from 'react'
 import Loadable from 'react-loadable'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
+import * as DOMCoding from '../../utils/DOMCoding'
 
 const styles = prefixObject({
   itemSpacer: {
@@ -27,6 +28,31 @@ export const Inspector = Loadable({
   loading: () => null,
 })
 
+const InlineElement = ({ onMount, onUnmount }) => {
+  const ref = useRef(null)
+
+  useEffect(() => {
+    onMount(ref.current)
+
+    return () => {
+      onUnmount(ref.current)
+    }
+  }, [])
+
+  return <span ref={ref} />
+}
+
+// https://stackoverflow.com/a/20476546
+function isNodeInDOM(o) {
+  return (
+    o !== null &&
+    !!(
+      o.ownerDocument &&
+      (o.ownerDocument.defaultView || o.ownerDocument.parentWindow).alert
+    )
+  )
+}
+
 export class MultiInspector extends PureComponent {
   render() {
     const { data } = this.props
@@ -36,7 +62,40 @@ export class MultiInspector extends PureComponent {
     for (let i = 0; i < data.length; i++) {
       const item = data[i]
 
-      inspectors.push(<Inspector key={i} data={item} />)
+      if (isNodeInDOM(item) || item instanceof HTMLElement) {
+        inspectors.push(
+          <InlineElement
+            key={JSON.stringify(DOMCoding.toJSON(item))}
+            onMount={(node) => {
+              node.appendChild(item)
+            }}
+            onUnmount={(node) => {
+              node.removeChild(item)
+            }}
+          />
+        )
+      } else if (
+        typeof item === 'object' &&
+        item !== null &&
+        '__is_react_element' in item
+      ) {
+        // Render using the iframe's copy of React
+        const { element, ReactDOM } = item
+
+        inspectors.push(
+          <InlineElement
+            key={Math.random().toString()}
+            onMount={(node) => {
+              ReactDOM.render(element, node)
+            }}
+            onUnmount={(node) => {
+              ReactDOM.unmountComponentAtNode(node)
+            }}
+          />
+        )
+      } else {
+        inspectors.push(<Inspector key={i} data={item} />)
+      }
     }
 
     let content = inspectors

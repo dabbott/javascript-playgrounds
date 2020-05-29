@@ -19,6 +19,7 @@ export default class extends PureComponent {
     assetRoot: '',
     statusBarHeight: 0,
     statusBarColor: 'black',
+    sharedEnvironment: true,
     vendorComponents: [],
     playerStyleSheet: '',
     playerCSS: '',
@@ -40,23 +41,16 @@ export default class extends PureComponent {
   }
 
   componentDidMount() {
+    const { sharedEnvironment } = this.props
+
     this.setState({
       id: Math.random().toString().slice(2),
     })
 
-    window.addEventListener('message', (e) => {
-      let data
-      try {
-        data = ExtendedJSON.parse(e.data)
-      } catch (err) {
-        return
-      }
-
+    const handleMessageData = (data) => {
       const { id, type, payload } = data
 
-      if (id !== this.state.id) {
-        return
-      }
+      if (id !== this.state.id) return
 
       switch (type) {
         case 'ready':
@@ -74,6 +68,21 @@ export default class extends PureComponent {
           this.props.onConsole(payload)
           break
       }
+    }
+
+    if (sharedEnvironment) {
+      window.__message = handleMessageData
+    }
+
+    window.addEventListener('message', (e) => {
+      let data
+      try {
+        data = ExtendedJSON.parse(e.data)
+      } catch (err) {
+        return
+      }
+
+      handleMessageData(data)
     })
   }
 
@@ -101,6 +110,7 @@ export default class extends PureComponent {
       playerCSS,
       statusBarColor,
       statusBarHeight,
+      sharedEnvironment,
     } = this.props
     const { id } = this.state
 
@@ -116,7 +126,7 @@ export default class extends PureComponent {
         style={styles.iframe}
         ref={'iframe'}
         frameBorder={0}
-        src={`player.html#id=${id}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}&styleSheet=${playerStyleSheet}&css=${css}&statusBarColor=${statusBarColor}&statusBarHeight=${statusBarHeight}`}
+        src={`player.html#id=${id}&sharedEnvironment=${sharedEnvironment}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}&styleSheet=${playerStyleSheet}&css=${css}&statusBarColor=${statusBarColor}&statusBarHeight=${statusBarHeight}`}
       />
     )
   }

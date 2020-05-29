@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { PureComponent } from 'react'
+import React, { PureComponent, isValidElement } from 'react'
 import ReactDOM from 'react-dom'
 import * as ReactNative from 'react-native-web'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
@@ -9,6 +9,7 @@ import consoleProxy, {
   consoleLogRNWP,
 } from './ConsoleProxy'
 import VendorComponents from './VendorComponents'
+import * as ExtendedJSON from '../../utils/ExtendedJSON'
 
 const AppRegistry = ReactNative.AppRegistry
 
@@ -59,6 +60,7 @@ export default class extends PureComponent {
     onError: () => {},
     statusBarHeight: 0,
     statusBarColor: 'black',
+    sharedEnvironment: true,
   }
 
   constructor(props) {
@@ -185,6 +187,30 @@ export default class extends PureComponent {
     }
   }
 
+  sendMessage = (message) => {
+    const { sharedEnvironment } = this.props
+
+    if (sharedEnvironment) {
+      if (message.type === 'console' && message.payload.command === 'log') {
+        message.payload.data = message.payload.data.map((log) => {
+          if (isValidElement(log)) {
+            return {
+              __is_react_element: true,
+              element: log,
+              ReactDOM,
+            }
+          } else {
+            return log
+          }
+        })
+      }
+
+      parent.__message(message)
+    } else {
+      parent.postMessage(ExtendedJSON.stringify(message), '*')
+    }
+  }
+
   runApplication({ fileMap, entry }) {
     const screenElement = this.refs.root
 
@@ -199,9 +225,21 @@ export default class extends PureComponent {
       window._requireCache = {}
       window._didRegisterComponent = false
 
-      consoleProxy._rnwp_log = consoleLogRNWP.bind(consoleProxy, this.props.id)
-      consoleProxy.log = consoleLog.bind(consoleProxy, this.props.id)
-      consoleProxy.clear = consoleClear.bind(consoleProxy, this.props.id)
+      consoleProxy._rnwp_log = consoleLogRNWP.bind(
+        consoleProxy,
+        this.sendMessage,
+        this.props.id
+      )
+      consoleProxy.log = consoleLog.bind(
+        consoleProxy,
+        this.sendMessage,
+        this.props.id
+      )
+      consoleProxy.clear = consoleClear.bind(
+        consoleProxy,
+        this.sendMessage,
+        this.props.id
+      )
 
       this.evaluate(entry, fileMap[entry])
 

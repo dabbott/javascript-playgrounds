@@ -145,6 +145,7 @@ export default class extends PureComponent {
     vendorComponents: [],
     externalStyles: {},
     fullscreen: false,
+    sharedEnvironment: true,
     playerStyleSheet: null,
     playerCSS: null,
     panes: [],
@@ -603,6 +604,7 @@ export default class extends PureComponent {
       consoleOptions,
       statusBarHeight,
       statusBarColor,
+      sharedEnvironment,
     } = this.props
     const { showLogs, logs } = this.state
 
@@ -632,6 +634,7 @@ export default class extends PureComponent {
               playerCSS={playerCSS}
               statusBarHeight={statusBarHeight}
               statusBarColor={statusBarColor}
+              sharedEnvironment={sharedEnvironment}
               onRun={this.onPlayerRun}
               onError={this.onPlayerError}
               onConsole={this.onPlayerConsole}

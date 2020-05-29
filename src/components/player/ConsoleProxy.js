@@ -1,8 +1,6 @@
-import * as ExtendedJSON from '../../utils/ExtendedJSON'
-
 const consoleProxy = { id: '0' }
 
-// Don't think this can fail, but the console object can be strange...
+// I don't think this can fail, but the console object can be strange...
 // If it fails, we won't proxy all the methods (which is likely fine)
 try {
   for (let key in window.console) {
@@ -18,7 +16,7 @@ let consoleMessageIndex = 0
 
 const nextMessageId = () => `${+new Date()}-${++consoleMessageIndex}`
 
-const consoleLogCommon = (id, location, ...logs) => {
+const consoleLogCommon = (callback, id, location, ...logs) => {
   console.log(...logs)
 
   const payload = {
@@ -28,26 +26,25 @@ const consoleLogCommon = (id, location, ...logs) => {
     location,
   }
 
-  parent.postMessage(
-    ExtendedJSON.stringify({
-      id: id,
-      type: 'console',
-      payload,
-    }),
-    '*'
-  )
+  const message = {
+    id: id,
+    type: 'console',
+    payload,
+  }
+
+  callback(message)
 }
 
-export const consoleLogRNWP = (id, file, line, column, ...logs) => {
+export const consoleLogRNWP = (callback, id, file, line, column, ...logs) => {
   const location = { file, line, column }
-  return consoleLogCommon(id, location, ...logs)
+  return consoleLogCommon(callback, id, location, ...logs)
 }
 
-export const consoleLog = (id, ...args) => {
-  return consoleLogCommon(id, undefined, ...logs)
+export const consoleLog = (callback, id, ...args) => {
+  return consoleLogCommon(callback, id, undefined, ...logs)
 }
 
-export const consoleClear = (id) => {
+export const consoleClear = (callback, id) => {
   console.clear()
 
   const payload = {
@@ -55,14 +52,13 @@ export const consoleClear = (id) => {
     command: 'clear',
   }
 
-  parent.postMessage(
-    JSON.stringify({
-      id: id,
-      type: 'console',
-      payload,
-    }),
-    '*'
-  )
+  const message = {
+    id: id,
+    type: 'console',
+    payload,
+  }
+
+  callback(message)
 }
 
 export default consoleProxy

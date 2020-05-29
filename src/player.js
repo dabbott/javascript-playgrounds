@@ -23,6 +23,7 @@ const {
   css = '',
   statusBarHeight = '0',
   statusBarColor = 'black',
+  sharedEnvironment = 'true',
 } = getHashString()
 
 if (styleSheet === 'reset') {
@@ -42,6 +43,7 @@ const root = (
       assetRoot={assetRoot}
       statusBarHeight={parseFloat(statusBarHeight)}
       statusBarColor={statusBarColor}
+      sharedEnvironment={sharedEnvironment === 'true'}
     />
   </div>
 )
