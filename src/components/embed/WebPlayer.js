@@ -23,6 +23,7 @@ const paramSchema = {
   workspaceCSS: 'text',
   playerCSS: 'text',
   playerStyleSheet: 'text',
+  sharedEnvironment: 'text',
 
   // JSON-encoded
   files: 'json',
@@ -98,6 +99,7 @@ export default class WebPlayer extends Component {
     console: PropTypes.object,
     playground: PropTypes.object,
     typescript: PropTypes.object,
+    sharedEnvironment: PropTypes.bool,
   }
 
   static defaultProps = {
