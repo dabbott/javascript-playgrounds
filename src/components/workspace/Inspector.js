@@ -45,6 +45,7 @@ const InlineElement = ({ onMount, onUnmount }) => {
 // https://stackoverflow.com/a/20476546
 function isNodeInDOM(o) {
   return (
+    typeof o === 'object' &&
     o !== null &&
     !!(
       o.ownerDocument &&
