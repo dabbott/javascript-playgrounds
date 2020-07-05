@@ -49,7 +49,12 @@ function useResizeObserver(ref, f) {
   }, [])
 }
 
-export default function PlaygroundPreview({ indent, data, didResize }) {
+export default function PlaygroundPreview({
+  indent,
+  data,
+  didResize,
+  renderReactElements,
+}) {
   const ref = useRef(null)
 
   useResizeObserver(ref, didResize)
@@ -57,7 +62,7 @@ export default function PlaygroundPreview({ indent, data, didResize }) {
   return (
     <div ref={ref} style={{ ...styles.container, marginLeft: indent }}>
       <div style={styles.content}>
-        <MultiInspector data={data} />
+        <MultiInspector data={data} renderReactElements={renderReactElements} />
       </div>
     </div>
   )

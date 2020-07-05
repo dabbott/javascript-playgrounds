@@ -53,9 +53,11 @@ let {
     collapsible: true,
     showFileName: true,
     showLineNumber: true,
+    renderReactElements: true,
   }),
   playground = JSON.stringify({
     enabled: false,
+    renderReactElements: true,
     debounceDuration: 200,
   }),
   typescript = JSON.stringify({

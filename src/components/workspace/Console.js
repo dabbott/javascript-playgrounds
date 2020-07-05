@@ -102,6 +102,8 @@ export default class extends PureComponent {
   }
 
   renderEntry = (entry) => {
+    const { renderReactElements } = this.props
+
     const lineNumber =
       this.props.showLineNumber && entry.location
         ? this.renderLineNumber(entry.location)
@@ -109,7 +111,10 @@ export default class extends PureComponent {
 
     return (
       <div key={entry.id} style={this.getComputedRowStyle()}>
-        <MultiInspector data={entry.data} />
+        <MultiInspector
+          data={entry.data}
+          renderReactElements={renderReactElements}
+        />
         {lineNumber}
       </div>
     )

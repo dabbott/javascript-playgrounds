@@ -487,6 +487,7 @@ export default class extends PureComponent {
           diff={fileDiff}
           logs={playgroundOptions.enabled ? logs : undefined}
           playgroundDebounceDuration={playgroundOptions.debounceDuration}
+          playgroundRenderReactElements={playgroundOptions.renderReactElements}
           getTypeInfo={
             typescriptOptions.enabled ? this.getTypeScriptInfo : undefined
           }
@@ -649,6 +650,7 @@ export default class extends PureComponent {
                 }
                 showLineNumber={consoleOptions.showLineNumber}
                 logs={logs}
+                renderReactElements={consoleOptions.renderReactElements}
               />
             )}
           </div>

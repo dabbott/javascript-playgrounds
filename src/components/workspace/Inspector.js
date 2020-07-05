@@ -56,7 +56,7 @@ function isNodeInDOM(o) {
 
 export class MultiInspector extends PureComponent {
   render() {
-    const { data } = this.props
+    const { data, renderReactElements } = this.props
 
     const inspectors = []
 
@@ -83,17 +83,23 @@ export class MultiInspector extends PureComponent {
         // Render using the iframe's copy of React
         const { element, ReactDOM } = item
 
-        inspectors.push(
-          <InlineElement
-            key={Math.random().toString()}
-            onMount={(node) => {
-              ReactDOM.render(element, node)
-            }}
-            onUnmount={(node) => {
-              ReactDOM.unmountComponentAtNode(node)
-            }}
-          />
-        )
+        const key = Math.random().toString()
+
+        if (renderReactElements) {
+          inspectors.push(
+            <InlineElement
+              key={key}
+              onMount={(node) => {
+                ReactDOM.render(element, node)
+              }}
+              onUnmount={(node) => {
+                ReactDOM.unmountComponentAtNode(node)
+              }}
+            />
+          )
+        } else {
+          inspectors.push(<Inspector key={key} data={element} />)
+        }
       } else {
         inspectors.push(<Inspector key={i} data={item} />)
       }

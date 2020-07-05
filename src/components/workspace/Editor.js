@@ -163,7 +163,7 @@ export default class extends PureComponent {
   addPlaygroundWidgets() {
     if (!this.cm) return
 
-    const { filename, logs } = this.props
+    const { filename, logs, playgroundRenderReactElements } = this.props
 
     // Skip configuring playgrounds altogether if there are no logs
     if (logs === undefined) return
@@ -239,6 +239,7 @@ export default class extends PureComponent {
         ReactDOM.render(
           <PlaygroundPreview
             indent={4 + location.column * this.cm.defaultCharWidth()}
+            renderReactElements={playgroundRenderReactElements}
             data={data}
             didResize={() => {
               if (this.widgets.includes(widget)) {
