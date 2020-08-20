@@ -11,6 +11,8 @@ import consoleProxy, {
 import VendorComponents from './VendorComponents'
 import * as ExtendedJSON from '../../utils/ExtendedJSON'
 
+window._VendorComponents = VendorComponents
+
 const AppRegistry = ReactNative.AppRegistry
 
 window._consoleProxy = consoleProxy
