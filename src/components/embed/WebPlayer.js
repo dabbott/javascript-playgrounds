@@ -23,6 +23,7 @@ const paramSchema = {
   workspaceCSS: 'text',
   playerCSS: 'text',
   playerStyleSheet: 'text',
+  prelude: 'text',
   sharedEnvironment: 'text',
 
   // JSON-encoded
@@ -92,6 +93,7 @@ export default class WebPlayer extends Component {
     workspaceCSS: PropTypes.string,
     playerCSS: PropTypes.string,
     playerStyleSheet: PropTypes.string,
+    prelude: PropTypes.string,
     files: PropTypes.array,
     vendorComponents: PropTypes.array,
     panes: PropTypes.array,

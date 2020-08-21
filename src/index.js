@@ -46,6 +46,7 @@ let {
   playerStyleSheet = 'reset',
   playerCSS = '',
   workspaceCSS = '',
+  prelude = '',
   console = JSON.stringify({
     enabled: false,
     visible: false,
@@ -171,6 +172,7 @@ class WorkspaceContainer extends Component {
       playerTitle,
       playerStyleSheet,
       playerCSS,
+      prelude,
       onChange: setHashString,
       consoleOptions,
       playgroundOptions,

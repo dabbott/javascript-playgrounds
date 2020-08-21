@@ -23,6 +23,7 @@ export default class extends PureComponent {
     vendorComponents: [],
     playerStyleSheet: '',
     playerCSS: '',
+    prelude: '',
     onError: () => {},
     onRun: () => {},
     onConsole: () => {},
@@ -111,6 +112,7 @@ export default class extends PureComponent {
       statusBarColor,
       statusBarHeight,
       sharedEnvironment,
+      prelude,
     } = this.props
     const { id } = this.state
 
@@ -120,13 +122,14 @@ export default class extends PureComponent {
       JSON.stringify(vendorComponents)
     )
     const css = encodeURIComponent(playerCSS)
+    const preludeEncoded = encodeURIComponent(prelude)
 
     return (
       <iframe
         style={styles.iframe}
         ref={'iframe'}
         frameBorder={0}
-        src={`player.html#id=${id}&sharedEnvironment=${sharedEnvironment}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}&styleSheet=${playerStyleSheet}&css=${css}&statusBarColor=${statusBarColor}&statusBarHeight=${statusBarHeight}`}
+        src={`player.html#id=${id}&sharedEnvironment=${sharedEnvironment}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}&styleSheet=${playerStyleSheet}&css=${css}&statusBarColor=${statusBarColor}&statusBarHeight=${statusBarHeight}&prelude=${preludeEncoded}`}
       />
     )
   }

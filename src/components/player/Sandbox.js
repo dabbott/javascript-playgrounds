@@ -60,6 +60,7 @@ export default class extends PureComponent {
     assetRoot: '',
     onRun: () => {},
     onError: () => {},
+    prelude: '',
     statusBarHeight: 0,
     statusBarColor: 'black',
     sharedEnvironment: true,
@@ -242,6 +243,10 @@ export default class extends PureComponent {
         this.sendMessage,
         this.props.id
       )
+
+      if (this.props.prelude.length > 0) {
+        eval(this.props.prelude)
+      }
 
       this.evaluate(entry, fileMap[entry])
 

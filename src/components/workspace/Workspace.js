@@ -148,6 +148,7 @@ export default class extends PureComponent {
     sharedEnvironment: true,
     playerStyleSheet: null,
     playerCSS: null,
+    prelude: '',
     panes: [],
     consoleOptions: {},
     playgroundOptions: {},
@@ -602,6 +603,7 @@ export default class extends PureComponent {
       playerStyleSheet,
       playerCSS,
       playerTitle,
+      prelude,
       consoleOptions,
       statusBarHeight,
       statusBarColor,
@@ -633,6 +635,7 @@ export default class extends PureComponent {
               vendorComponents={vendorComponents}
               playerStyleSheet={playerStyleSheet}
               playerCSS={playerCSS}
+              prelude={prelude}
               statusBarHeight={statusBarHeight}
               statusBarColor={statusBarColor}
               sharedEnvironment={sharedEnvironment}

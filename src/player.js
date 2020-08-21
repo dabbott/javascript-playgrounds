@@ -23,6 +23,7 @@ const {
   css = '',
   statusBarHeight = '0',
   statusBarColor = 'black',
+  prelude = '',
   sharedEnvironment = 'true',
 } = getHashString()
 
@@ -41,6 +42,7 @@ const root = (
     <Sandbox
       id={id}
       assetRoot={assetRoot}
+      prelude={prelude}
       statusBarHeight={parseFloat(statusBarHeight)}
       statusBarColor={statusBarColor}
       sharedEnvironment={sharedEnvironment === 'true'}
