@@ -204,24 +204,26 @@ export default class extends PureComponent {
     if (typeof window !== 'undefined') {
       initialWindowWidth = window.outerWidth
 
-      window.addEventListener('resize', () => {
-        const nextIndex = findPaneSetIndex(
-          responsivePaneSets,
-          window.outerWidth
-        )
-
-        if (nextIndex !== this.state.paneSetIndex) {
-          this.setState(
-            {
-              paneSetIndex: nextIndex,
-            },
-            () => {
-              // We may be rendering a different player pane, so we need to re-run
-              this.runApplication()
-            }
+      if (responsivePaneSets.length > 1) {
+        window.addEventListener('resize', () => {
+          const nextIndex = findPaneSetIndex(
+            responsivePaneSets,
+            window.outerWidth
           )
-        }
-      })
+
+          if (nextIndex !== this.state.paneSetIndex) {
+            this.setState(
+              {
+                paneSetIndex: nextIndex,
+              },
+              () => {
+                // We may be rendering a different player pane, so we need to re-run
+                this.runApplication()
+              }
+            )
+          }
+        })
+      }
     }
 
     const paneSetIndex = findPaneSetIndex(
