@@ -90,7 +90,8 @@ const styles = prefixObject({
     flexDirection: 'column',
     minWidth: 0,
     minHeight: 0,
-    overflow: 'hidden', // Clip box shadows
+    overflowX: 'hidden', // Clip box shadows
+    overflowY: 'auto',
   },
   overlayContainer: {
     position: 'relative',
@@ -752,9 +753,11 @@ export default class extends PureComponent {
         tabs={tabs}
         getTitle={getTabTitle}
         initialTab={tabs[0]}
-        tabStyle={externalStyles.tab}
-        textStyle={externalStyles.tabText}
-        activeTextStyle={externalStyles.tabTextActive}
+        tabStyle={externalStyles.stackTab || externalStyles.tab}
+        textStyle={externalStyles.stackTabText || externalStyles.tabText}
+        activeTextStyle={
+          externalStyles.stackTabTextActive || externalStyles.tabTextActive
+        }
         renderHiddenContent={true}
         compareTabs={compareTabs}
         renderContent={(tab) => this.renderPane(tab.pane, tab.index)}
