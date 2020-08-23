@@ -25,7 +25,7 @@ export default class extends PureComponent {
     renderHiddenContent: false,
     tabStyle: null,
     textStyle: null,
-    textActiveStyle: null,
+    activeTextStyle: null,
   }
 
   constructor(props) {
@@ -76,7 +76,7 @@ export default class extends PureComponent {
       compareTabs,
       tabStyle,
       textStyle,
-      textActiveStyle,
+      activeTextStyle,
     } = this.props
     const { activeTab } = this.state
 
@@ -90,7 +90,7 @@ export default class extends PureComponent {
           onClickTab={this.onClickTab}
           tabStyle={tabStyle}
           textStyle={textStyle}
-          activeTextStyle={textActiveStyle}
+          activeTextStyle={activeTextStyle}
         >
           {renderRight()}
         </Tabs>
