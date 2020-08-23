@@ -86,6 +86,30 @@ rawStyles.activeRowTitle = {
 
 const styles = prefixObject(rawStyles)
 
+function computeActiveStyle(
+  isActive,
+  style,
+  activeStyle,
+  externalStyle,
+  externalActiveStyle
+) {
+  if (isActive) {
+    if (!externalStyle && !externalActiveStyle) return activeStyle
+
+    return {
+      ...activeStyle,
+      ...(externalStyle ? prefix(externalStyle) : {}),
+      ...(externalActiveStyle ? prefix(externalActiveStyle) : {}),
+    }
+  } else {
+    return externalStyle ? { ...style, ...prefix(externalStyle) } : style
+  }
+}
+
+function computeStyle(style, externalStyle) {
+  return externalStyle ? { ...style, ...prefix(externalStyle) } : style
+}
+
 export default class WorkspacesList extends PureComponent {
   static defaultProps = {
     style: null,
@@ -104,73 +128,63 @@ export default class WorkspacesList extends PureComponent {
   }
 
   getComputedRowStyle = (isActive) => {
-    const { rowStyle } = this.props
-    const defaultStyle = isActive ? styles.activeRow : styles.row
+    const { rowStyle, rowStyleActive } = this.props
 
-    return rowStyle ? prefix({ ...defaultStyle, ...rowStyle }) : defaultStyle
+    return computeActiveStyle(
+      isActive,
+      styles.row,
+      styles.activeRow,
+      rowStyle,
+      rowStyleActive
+    )
   }
 
   getComputedRowTitleStyle = (isActive) => {
-    const { rowTitleStyle } = this.props
-    const defaultStyle = isActive ? styles.activeRowTitle : styles.rowTitle
+    const { rowTitleStyle, rowTitleStyleActive } = this.props
 
-    return rowTitleStyle
-      ? prefix({ ...defaultStyle, ...rowTitleStyle })
-      : defaultStyle
+    return computeActiveStyle(
+      isActive,
+      styles.rowTitle,
+      styles.activeRowTitle,
+      rowTitleStyle,
+      rowTitleStyleActive
+    )
   }
 
   getComputedDescriptionStyle = () => {
     const { descriptionStyle } = this.props
-    const defaultStyle = styles.description
 
-    return descriptionStyle
-      ? prefix({ ...defaultStyle, ...descriptionStyle })
-      : defaultStyle
+    return computeStyle(styles.description, descriptionStyle)
   }
 
   getComputedDescriptionTextStyle = () => {
     const { descriptionTextStyle } = this.props
-    const defaultStyle = styles.descriptionText
 
-    return descriptionTextStyle
-      ? prefix({ ...defaultStyle, ...descriptionTextStyle })
-      : defaultStyle
+    return computeStyle(styles.descriptionText, descriptionTextStyle)
   }
 
   getComputedButtonTextStyle = () => {
     const { buttonTextStyle } = this.props
-    const defaultStyle = styles.buttonText
 
-    return buttonTextStyle
-      ? prefix({ ...defaultStyle, ...buttonTextStyle })
-      : defaultStyle
+    return computeStyle(styles.buttonText, buttonTextStyle)
   }
 
   getComputedButtonContainerStyle = () => {
     const { buttonContainerStyle } = this.props
-    const defaultStyle = styles.buttonContainer
 
-    return buttonContainerStyle
-      ? prefix({ ...defaultStyle, ...buttonContainerStyle })
-      : defaultStyle
+    return computeStyle(styles.buttonContainer, buttonContainerStyle)
   }
 
   getComputedButtonWrapperStyle = () => {
     const { buttonWrapperStyle } = this.props
-    const defaultStyle = styles.buttonWrapper
 
-    return buttonWrapperStyle
-      ? prefix({ ...defaultStyle, ...buttonWrapperStyle })
-      : defaultStyle
+    return computeStyle(styles.buttonWrapper, buttonWrapperStyle)
   }
 
   getComputedDividerStyle = () => {
     const { dividerStyle } = this.props
-    const defaultStyle = styles.divider
 
-    return dividerStyle
-      ? prefix({ ...defaultStyle, ...dividerStyle })
-      : defaultStyle
+    return computeStyle(styles.divider, dividerStyle)
   }
 
   renderStep = (step, index, list) => {

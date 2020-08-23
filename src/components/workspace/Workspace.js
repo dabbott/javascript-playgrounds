@@ -579,7 +579,9 @@ export default class extends PureComponent {
           onChangeActiveStepIndex={onChangeActiveStepIndex}
           style={externalStyles.workspacesList}
           rowStyle={externalStyles.workspacesRow}
+          rowStyleActive={externalStyles.workspacesRowActive}
           rowTitleStyle={externalStyles.workspacesRowTitle}
+          rowTitleStyleActive={externalStyles.workspacesRowTitleActive}
           descriptionStyle={externalStyles.workspacesDescription}
           descriptionTextStyle={externalStyles.workspacesDescriptionText}
           buttonTextStyle={externalStyles.workspacesButtonText}
