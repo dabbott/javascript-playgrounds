@@ -50,12 +50,16 @@ export default class extends PureComponent {
     const { activeTab } = this.state
 
     if (compareTabs(tab, activeTab)) {
-      return <div style={styles.container}>{renderContent(tab, i)}</div>
+      return (
+        <div key={i} style={styles.container}>
+          {renderContent(tab, i)}
+        </div>
+      )
     }
 
     if (renderHiddenContent) {
       return (
-        <div style={{ ...styles.container, flex: '0' }}>
+        <div key={i} style={{ ...styles.container, flex: '0' }}>
           {renderContent(tab, i)}
         </div>
       )

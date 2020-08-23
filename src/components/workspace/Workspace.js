@@ -32,8 +32,21 @@ const containsPane = (panes, target) =>
   panes.some((pane) =>
     typeof pane === 'string'
       ? pane === target
-      : containsPane(pane.children, target)
+      : pane.type === target || containsPane(pane.children || [], target)
   )
+
+const normalizePane = (pane) =>
+  typeof pane === 'string' ? { type: pane } : pane
+
+/**
+ * @param {{ maxWidth: number }[]} responsivePaneSets
+ * @param {number} windowWidth
+ * @returns {number}
+ */
+const findPaneSetIndex = (responsivePaneSets, windowWidth = undefined) =>
+  windowWidth === undefined
+    ? responsivePaneSets.length - 1
+    : responsivePaneSets.findIndex((paneSet) => paneSet.maxWidth > windowWidth)
 
 const styles = prefixObject({
   container: {
@@ -149,7 +162,7 @@ export default class extends PureComponent {
     playerStyleSheet: null,
     playerCSS: null,
     prelude: '',
-    panes: [],
+    responsivePaneSets: [],
     consoleOptions: {},
     playgroundOptions: {},
     typescriptOptions: {},
@@ -164,7 +177,7 @@ export default class extends PureComponent {
 
     const {
       initialTab,
-      panes,
+      responsivePaneSets,
       consoleOptions,
       files,
       diff,
@@ -186,6 +199,37 @@ export default class extends PureComponent {
       console.warn('TypeScript is enabled but there are no .ts or .tsx files.')
     }
 
+    let initialWindowWidth
+
+    if (typeof window !== 'undefined') {
+      initialWindowWidth = window.outerWidth
+
+      window.addEventListener('resize', () => {
+        const nextIndex = findPaneSetIndex(
+          responsivePaneSets,
+          window.outerWidth
+        )
+
+        if (nextIndex !== this.state.paneSetIndex) {
+          this.setState(
+            {
+              paneSetIndex: nextIndex,
+            },
+            () => {
+              // We may be rendering a different player pane, so we need to re-run
+              this.runApplication()
+            }
+          )
+        }
+      })
+    }
+
+    const paneSetIndex = findPaneSetIndex(
+      responsivePaneSets,
+      initialWindowWidth
+    )
+    const panes = responsivePaneSets[paneSetIndex].panes
+
     this.state = {
       compilerError: null,
       runtimeError: null,
@@ -198,6 +242,7 @@ export default class extends PureComponent {
       playerVisible: containsPane(panes, 'player'),
       fileTabs,
       activeFileTab: fileTabs.find((tab) => tab.title === initialTab),
+      paneSetIndex,
     }
 
     this.codeCache = {}
@@ -209,6 +254,7 @@ export default class extends PureComponent {
       transpiler: this.renderTranspiler,
       player: this.renderPlayer,
       workspaces: this.renderWorkspaces,
+      stack: this.renderStack,
     }
 
     babelWorker.addEventListener('message', this.onBabelWorkerMessage)
@@ -261,14 +307,17 @@ export default class extends PureComponent {
 
   runApplication = () => {
     const { playerCache, player } = this
-    const { entry } = this.props
+    const { entry, files } = this.props
 
-    player.runApplication(playerCache, entry)
+    // Run the app once we've transformed each file at least once
+    if (Object.keys(files).every((filename) => playerCache[filename])) {
+      this.clearLogs()
+      player.runApplication(playerCache, entry)
+    }
   }
 
   onBabelWorkerMessage = ({ data }) => {
     const { playerCache } = this
-    const { files } = this.props
     const { transpilerCache } = this.state
     const { filename, type, code, error } = JSON.parse(data)
 
@@ -284,12 +333,7 @@ export default class extends PureComponent {
         })
       } else {
         playerCache[filename] = code
-
-        // Run the app once we've transformed each file at least once
-        if (Object.keys(files).every((filename) => playerCache[filename])) {
-          this.clearLogs()
-          this.runApplication()
-        }
+        this.runApplication()
       }
     }
   }
@@ -671,46 +715,43 @@ export default class extends PureComponent {
     )
   }
 
-  renderPane = (pane, i) => {
+  renderStack = (key, options) => {
     const { externalStyles } = this.props
 
-    if (typeof pane === 'string') {
-      return this.paneMap[pane](i)
-    }
+    const { children } = options
 
-    const { children, type } = pane
-
-    if (type === 'stack') {
-      const tabs = children.map((child, i) => ({
-        title: typeof child === 'string' ? child : child.title,
-        index: i,
-        pane: child,
-      }))
-
-      return (
-        <TabContainer
-          tabs={tabs}
-          getTitle={getTabTitle}
-          initialTab={tabs[0]}
-          tabStyle={externalStyles.tab}
-          textStyle={externalStyles.tabText}
-          activeTextStyle={externalStyles.tabTextActive}
-          renderHiddenContent={true}
-          compareTabs={compareTabs}
-          renderContent={(tab) => this.renderPane(tab.pane, tab.index)}
-        />
-      )
-    }
+    const tabs = children.map(normalizePane).map((pane, i) => ({
+      title: pane.title || pane.type,
+      index: i,
+      pane,
+    }))
 
     return (
-      <div key={i} style={styles[type === 'row' ? 'row' : 'column']}>
-        {children.map(this.renderPane)}
-      </div>
+      <TabContainer
+        key={key}
+        tabs={tabs}
+        getTitle={getTabTitle}
+        initialTab={tabs[0]}
+        tabStyle={externalStyles.tab}
+        textStyle={externalStyles.tabText}
+        activeTextStyle={externalStyles.tabTextActive}
+        renderHiddenContent={true}
+        compareTabs={compareTabs}
+        renderContent={(tab) => this.renderPane(tab.pane, tab.index)}
+      />
     )
   }
 
+  renderPane = (pane, key) => {
+    const { type, ...options } = normalizePane(pane)
+
+    return this.paneMap[type](key, options)
+  }
+
   render() {
-    const { panes } = this.props
+    const { responsivePaneSets } = this.props
+    const { paneSetIndex } = this.state
+    const panes = responsivePaneSets[paneSetIndex].panes
 
     return <div style={styles.container}>{panes.map(this.renderPane)}</div>
   }
