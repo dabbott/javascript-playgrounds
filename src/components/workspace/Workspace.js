@@ -467,7 +467,7 @@ export default class extends PureComponent {
     })
   }
 
-  renderEditor = (key) => {
+  renderEditor = (key, options) => {
     const {
       files,
       title,
@@ -493,8 +493,12 @@ export default class extends PureComponent {
     const error = compilerError || runtimeError
     const isError = !!error
 
+    const style = options.style
+      ? { ...styles.editorPane, ...options.style }
+      : styles.editorPane
+
     return (
-      <div key={key} style={styles.editorPane}>
+      <div key={key} style={style}>
         {title && (
           <Header
             text={title}
@@ -571,12 +575,16 @@ export default class extends PureComponent {
     )
   }
 
-  renderTranspiler = (key) => {
+  renderTranspiler = (key, options) => {
     const { externalStyles, transpilerTitle } = this.props
     const { activeFile, transpilerCache } = this.state
 
+    const style = options.style
+      ? { ...styles.transpilerPane, ...options.style }
+      : styles.transpilerPane
+
     return (
-      <div key={key} style={styles.transpilerPane}>
+      <div key={key} style={style}>
         {transpilerTitle && (
           <Header
             text={transpilerTitle}
@@ -594,7 +602,7 @@ export default class extends PureComponent {
     )
   }
 
-  renderWorkspaces = (key) => {
+  renderWorkspaces = (key, options) => {
     const {
       externalStyles,
       workspacesTitle,
@@ -603,9 +611,14 @@ export default class extends PureComponent {
       onChangeActiveStepIndex,
     } = this.props
 
-    const style = externalStyles.workspacesPane
-      ? { ...styles.workspacesPane, ...externalStyles.workspacesPane }
-      : styles.workspacesPane
+    const style =
+      externalStyles.workspacesPane || options.style
+        ? {
+            ...styles.workspacesPane,
+            ...externalStyles.workspacesPane,
+            ...options.style,
+          }
+        : styles.workspacesPane
 
     return (
       <div key={key} style={style}>
@@ -637,7 +650,7 @@ export default class extends PureComponent {
     )
   }
 
-  renderPlayer = (key) => {
+  renderPlayer = (key, options) => {
     const {
       files,
       width,
@@ -657,9 +670,14 @@ export default class extends PureComponent {
     } = this.props
     const { showLogs, logs } = this.state
 
-    const style = externalStyles.playerPane
-      ? { ...styles.playerPane, ...externalStyles.playerPane }
-      : styles.playerPane
+    const style =
+      externalStyles.playerPane || options.style
+        ? {
+            ...styles.playerPane,
+            ...externalStyles.playerPane,
+            ...options.style,
+          }
+        : styles.playerPane
 
     return (
       <div key={key} style={style}>
