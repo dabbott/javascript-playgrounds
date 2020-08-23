@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 
 import PropTypes from 'prop-types'
 
-const WEB_PLAYER_URL = `https://unpkg.com/react-native-web-player@2.0.0-alpha.23/public/index.html`
+const WEB_PLAYER_URL = `https://unpkg.com/react-native-web-player@2.0.0-alpha.24/public/index.html`
 
 const paramSchema = {
   // Plain text
