@@ -1,4 +1,9 @@
-const messages = [
+type MessageHandler = [
+  string,
+  (message: string) => { summary: string; description: string }
+]
+
+const messages: MessageHandler[] = [
   // IE 10
   [
     `TypeError: Unable to get property 'pos' of undefined or null reference`,
@@ -33,7 +38,7 @@ const messages = [
 
 const defaultDescription = `The web player encountered an error. When you fix the error, the web player will automatically re-run your code.`
 
-export const getErrorDetails = (originalMessage) => {
+export const getErrorDetails = (originalMessage: string) => {
   const firstLine = originalMessage.split('\n')[0]
   const errorLineNumber = firstLine.match(/\((\d+)/)
 

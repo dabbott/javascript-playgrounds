@@ -101,16 +101,14 @@ const common = merge({
   ],
 })
 
-module.exports = ({ production } = {}) => {
+module.exports = (mode = 'development') => {
   const defines = new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify(
-      production ? 'production' : 'development'
-    ),
+    'process.env.NODE_ENV': JSON.stringify(mode),
   })
 
-  if (production) {
+  if (mode === 'production') {
     return merge(common, {
-      mode: 'production',
+      mode,
       plugins: [defines],
       optimization: {
         splitChunks: {
@@ -121,7 +119,7 @@ module.exports = ({ production } = {}) => {
     })
   } else {
     return merge(common, {
-      mode: 'development',
+      mode,
       devtool: 'source-map',
       plugins: [defines],
     })
