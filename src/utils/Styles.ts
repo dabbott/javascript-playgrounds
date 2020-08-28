@@ -1,4 +1,4 @@
-export const appendCSS = (css) => {
+export const appendCSS = (css: string) => {
   const textNode = document.createTextNode(css)
   const element = document.createElement('style')
   element.type = 'text/css'

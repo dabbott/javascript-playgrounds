@@ -94,10 +94,13 @@ let fileMap: any
 
 if (parsedFiles.length > 0) {
   // Build a map of {filename => code}
-  fileMap = parsedFiles.reduce((fileMap, [filename, code]) => {
-    fileMap[filename] = code
-    return fileMap
-  }, {})
+  fileMap = parsedFiles.reduce(
+    (fileMap: any, [filename, code]: [string, string]) => {
+      fileMap[filename] = code
+      return fileMap
+    },
+    {}
+  )
 
   // If entry file is invalid, choose the first file
   if (!fileMap.hasOwnProperty(entry)) {
@@ -112,7 +115,7 @@ if (!fileMap.hasOwnProperty(initialTab)) {
   initialTab = entry
 }
 
-function workspacesStepDiff(targetStep, sourceStep) {
+function workspacesStepDiff(targetStep: any, sourceStep: any) {
   const {
     workspace: { files: sourceFiles },
   } = sourceStep
@@ -120,9 +123,9 @@ function workspacesStepDiff(targetStep, sourceStep) {
     workspace: { files: targetFiles },
   } = targetStep
 
-  const result = {}
+  const result: any = {}
 
-  Object.keys(targetFiles).forEach((filename, index) => {
+  Object.keys(targetFiles).forEach((filename: string, index: number) => {
     if (!(filename in sourceFiles)) {
       result[filename] = {
         type: 'added',
@@ -142,7 +145,7 @@ function workspacesStepDiff(targetStep, sourceStep) {
 class WorkspaceContainer extends Component {
   state = { activeStepIndex: 0 }
 
-  handleChangeActiveStepIndex = (activeStepIndex) => {
+  handleChangeActiveStepIndex = (activeStepIndex: number) => {
     this.setState({ activeStepIndex })
   }
 
