@@ -26,7 +26,7 @@ import { prefixObject } from '../../utils/PrefixInlineStyles'
 // functionName = 20,
 // regularExpressionLiteral = 21
 //
-function classNameForKind(kind) {
+function classNameForKind(kind: string) {
   switch (kind) {
     case 'keyword':
       return 'cm-keyword'
@@ -61,7 +61,12 @@ const styles = prefixObject({
   },
 })
 
-export default class extends PureComponent {
+interface Props {
+  type: any[]
+  documentation: any[]
+}
+
+export default class extends PureComponent<Props> {
   static defaultProps = {
     type: [],
     documentation: [],

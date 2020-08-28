@@ -47,13 +47,15 @@ const styles = prefixObject({
   },
 })
 
-type SourceLocation = {
+export type SourceLocation = {
   file: string
-  line: string
+  line: number
+  column: number
 }
 
-type LogEntry = {
+export type LogEntry = {
   id: string
+  command: string
   location: SourceLocation
   data: unknown[]
 }

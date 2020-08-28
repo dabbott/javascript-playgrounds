@@ -51,7 +51,7 @@ function useResizeObserver(ref: RefObject<HTMLDivElement>, f: () => void) {
 }
 
 interface Props {
-  indent: string
+  indent: number
   renderReactElements: boolean
   data: unknown[]
   didResize: () => void

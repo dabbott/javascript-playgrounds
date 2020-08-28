@@ -1,9 +1,9 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, CSSProperties } from 'react'
 import snarkdown from 'snarkdown'
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 import Button from './Button'
 
-const rawStyles = {
+const rawStyles: Record<string, CSSProperties> = {
   container: {
     flex: '1 1 auto',
     display: 'flex',
@@ -86,12 +86,35 @@ rawStyles.activeRowTitle = {
 
 const styles = prefixObject(rawStyles)
 
+interface Step {
+  title: string
+  description: string
+}
+
+interface Props {
+  steps: Step[]
+  activeStepIndex: number
+  onChangeActiveStepIndex: (index: number) => void
+  isActive: boolean
+  style?: CSSProperties
+  rowStyle?: CSSProperties
+  rowStyleActive?: CSSProperties
+  rowTitleStyle?: CSSProperties
+  rowTitleStyleActive?: CSSProperties
+  descriptionStyle?: CSSProperties
+  descriptionTextStyle?: CSSProperties
+  buttonTextStyle?: CSSProperties
+  buttonContainerStyle?: CSSProperties
+  buttonWrapperStyle?: CSSProperties
+  dividerStyle?: CSSProperties
+}
+
 function computeActiveStyle(
-  isActive,
-  style,
-  activeStyle,
-  externalStyle,
-  externalActiveStyle
+  isActive: boolean,
+  style: CSSProperties,
+  activeStyle?: CSSProperties,
+  externalStyle?: CSSProperties,
+  externalActiveStyle?: CSSProperties
 ) {
   if (isActive) {
     if (!externalStyle && !externalActiveStyle) return activeStyle
@@ -106,11 +129,11 @@ function computeActiveStyle(
   }
 }
 
-function computeStyle(style, externalStyle) {
+function computeStyle(style: CSSProperties, externalStyle?: CSSProperties) {
   return externalStyle ? { ...style, ...prefix(externalStyle) } : style
 }
 
-export default class WorkspacesList extends PureComponent {
+export default class WorkspacesList extends PureComponent<Props> {
   static defaultProps = {
     style: null,
     rowStyle: null,
@@ -127,7 +150,7 @@ export default class WorkspacesList extends PureComponent {
     return style ? prefix({ ...defaultStyle, ...style }) : defaultStyle
   }
 
-  getComputedRowStyle = (isActive) => {
+  getComputedRowStyle = (isActive: boolean) => {
     const { rowStyle, rowStyleActive } = this.props
 
     return computeActiveStyle(
@@ -139,7 +162,7 @@ export default class WorkspacesList extends PureComponent {
     )
   }
 
-  getComputedRowTitleStyle = (isActive) => {
+  getComputedRowTitleStyle = (isActive: boolean) => {
     const { rowTitleStyle, rowTitleStyleActive } = this.props
 
     return computeActiveStyle(
@@ -187,7 +210,7 @@ export default class WorkspacesList extends PureComponent {
     return computeStyle(styles.divider, dividerStyle)
   }
 
-  renderStep = (step, index, list) => {
+  renderStep = (step: Step, index: number, list: Step[]) => {
     const { activeStepIndex, onChangeActiveStepIndex } = this.props
     const { title, description } = step
 

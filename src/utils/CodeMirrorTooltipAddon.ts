@@ -1,11 +1,31 @@
 import { prefixAndApply } from './PrefixInlineStyles'
+import { CSSProperties } from 'react'
+
+export interface TooltipValue {
+  getNode: (
+    cm: CodeMirror.Editor,
+    options: { index: number },
+    callback: (node: HTMLElement) => void
+  ) => void
+  getContainerNode?: () => HTMLElement
+  removeNode: (node: HTMLElement) => void
+  style?: CSSProperties
+}
+
+type ExtendedToken = CodeMirror.Token & {
+  id: string
+  pos: CodeMirror.Position
+}
 
 export function tooltipAddon() {
   const CodeMirror = require('codemirror')
 
   const tooltipClassName = 'CodeMirror-tooltip'
 
-  CodeMirror.defineOption('tooltip', null, function (cm, value) {
+  CodeMirror.defineOption('tooltip', null, function (
+    cm: CodeMirror.Editor,
+    value: TooltipValue
+  ) {
     // Remove existing state
     if (cm.state.tooltip) {
       const state = cm.state.tooltip
@@ -37,7 +57,7 @@ export function tooltipAddon() {
     }
   })
 
-  function mousemove(cm, event) {
+  function mousemove(cm: CodeMirror.Editor, event: MouseEvent) {
     var data = cm.state.tooltip
     if (event.buttons == null ? event.which : event.buttons) {
       delete data.coords
@@ -47,25 +67,19 @@ export function tooltipAddon() {
     scheduleUpdate(cm)
   }
 
-  function mouseout(cm, event) {
-    if (!cm.getWrapperElement().contains(event.relatedTarget)) {
+  function mouseout(cm: CodeMirror.Editor, event: MouseEvent) {
+    if (!cm.getWrapperElement().contains(event.relatedTarget as Node | null)) {
       var data = cm.state.tooltip
       delete data.coords
       scheduleUpdate(cm)
     }
   }
 
-  /**
-   * @param {CodeMirror} cm
-   */
-  function reset(cm) {
+  function reset(cm: CodeMirror.Editor) {
     clear(cm)
   }
 
-  /**
-   * @param {CodeMirror} cm
-   */
-  function clear(cm) {
+  function clear(cm: CodeMirror.Editor) {
     // Clear any existing timer
     clearTimeout(cm.state.tooltip.updateTimer)
 
@@ -79,10 +93,7 @@ export function tooltipAddon() {
     }
   }
 
-  /**
-   * @param {CodeMirror} cm
-   */
-  function scheduleUpdate(cm) {
+  function scheduleUpdate(cm: CodeMirror.Editor) {
     const { coords } = cm.state.tooltip
 
     if (!coords) {
@@ -116,7 +127,7 @@ export function tooltipAddon() {
    * currently over. We want to disable that behavior, and always select.
    * the character under the mouse.
    */
-  function snapToChar(pos) {
+  function snapToChar(pos: CodeMirror.Position) {
     if (pos.sticky === 'before') {
       return new CodeMirror.Pos(pos.line, pos.ch - 1)
     }
@@ -124,11 +135,10 @@ export function tooltipAddon() {
     return pos
   }
 
-  /**
-   * @param {CodeMirror} cm
-   * @returns {CodeMirror.Token | undefined}
-   */
-  function getToken(cm, coords) {
+  function getToken(
+    cm: CodeMirror.Editor,
+    coords: { left: number; top: number }
+  ): ExtendedToken | undefined {
     const pos = snapToChar(cm.coordsChar(coords))
 
     if (pos.ch <= 0 && pos.xRel <= 0) return
@@ -144,10 +154,7 @@ export function tooltipAddon() {
     }
   }
 
-  /**
-   * @param {CodeMirror} cm
-   */
-  function update(cm) {
+  function update(cm: CodeMirror.Editor) {
     const { coords, getNode } = cm.state.tooltip
 
     if (!coords) return
@@ -167,7 +174,7 @@ export function tooltipAddon() {
       {
         index: cm.indexFromPos(pos) + 1,
       },
-      (node) => {
+      (node: HTMLElement) => {
         if (!node) return
 
         cm.state.tooltip.removeTooltip = makeTooltip(
@@ -181,13 +188,11 @@ export function tooltipAddon() {
 
   // Tooltips
 
-  /**
-   *
-   * @param {CodeMirror} cm
-   * @param {*} coords
-   * @param {HTMLElement} child
-   */
-  function makeTooltip(cm, coords, child) {
+  function makeTooltip(
+    cm: CodeMirror.Editor,
+    coords: { top: number; left: number },
+    child: HTMLElement
+  ) {
     const tooltip = document.createElement('div')
     tooltip.className = tooltipClassName
     prefixAndApply(cm.state.tooltip.style, tooltip)
@@ -209,10 +214,7 @@ export function tooltipAddon() {
     }
   }
 
-  /**
-   * @param {HTMLElement} node
-   */
-  function removeFromParent(node) {
+  function removeFromParent(node: HTMLElement) {
     const parent = node && node.parentNode
 
     if (parent) {
@@ -220,7 +222,7 @@ export function tooltipAddon() {
     }
   }
 
-  function removeAllTooltipNodes(callback) {
+  function removeAllTooltipNodes(callback: (element: ChildNode) => void) {
     document.querySelectorAll(`.${tooltipClassName}`).forEach((element) => {
       const parent = element.parentNode
 

@@ -1,10 +1,13 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, CSSProperties } from 'react'
 import ReactDOM from 'react-dom'
 import { options, requireAddons } from '../../utils/CodeMirror'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import PlaygroundPreview from './PlaygroundPreview'
-import { tooltipAddon } from '../../utils/CodeMirrorTooltipAddon'
+import { tooltipAddon, TooltipValue } from '../../utils/CodeMirrorTooltipAddon'
 import Tooltip from './Tooltip'
+import type * as CM from 'codemirror'
+import type { LogEntry, SourceLocation } from './Console'
+import type { DiffRange } from '../../utils/Diff'
 
 // Work around a codemirror + flexbox + chrome issue by creating an absolute
 // positioned parent and flex grandparent of the codemirror element.
@@ -24,9 +27,25 @@ const styles = prefixObject({
   },
 })
 
-const docCache = {}
+const docCache: Record<string, CM.Doc> = {}
 
-export default class extends PureComponent {
+interface Props {
+  filename: string
+  initialValue: string | null
+  value: string | null
+  onChange: (value: string) => void
+  readOnly: boolean
+  showDiff: boolean
+  diff: DiffRange[]
+  logs?: LogEntry[] // Undefined instead of array to simplify re-rendering,
+  playgroundDebounceDuration: number
+  getTypeInfo: unknown
+  tooltipStyle?: CSSProperties
+  errorLineNumber?: number
+  playgroundRenderReactElements: boolean
+}
+
+export default class extends PureComponent<Props> {
   static defaultProps = {
     initialValue: null,
     value: null,
@@ -38,9 +57,11 @@ export default class extends PureComponent {
     playgroundDebounceDuration: 200,
     getTypeInfo: undefined,
     tooltipStyle: undefined,
+    playgroundRenderReactElements: false,
   }
 
-  currentDiff = []
+  currentDiff: DiffRange[] = []
+  cm!: CM.Editor
 
   componentDidMount() {
     if (typeof navigator !== 'undefined') {
@@ -68,38 +89,40 @@ export default class extends PureComponent {
         )
       }
 
+      const toolipPlugin: TooltipValue = {
+        getNode: (cm, { index }, callback) => {
+          ;(getTypeInfo as any)(
+            filename,
+            index - 1,
+            ({ displayParts, documentation }: any) => {
+              const reactHost = document.createElement('div')
+              reactHost.className = 'cm-s-react'
+
+              ReactDOM.render(
+                <Tooltip type={displayParts} documentation={documentation} />,
+                reactHost
+              )
+
+              callback(reactHost)
+            }
+          )
+        },
+        removeNode: (node) => {
+          ReactDOM.unmountComponentAtNode(node)
+        },
+        style: tooltipStyle,
+      }
+
       this.cm = CodeMirror(this.refs.editor, {
         ...options,
         ...(getTypeInfo && {
-          tooltip: {
-            getNode: (cm, { index }, callback) => {
-              getTypeInfo(
-                filename,
-                index - 1,
-                ({ displayParts, documentation }) => {
-                  const reactHost = document.createElement('div')
-                  reactHost.className = 'cm-s-react'
-
-                  ReactDOM.render(
-                    <Tooltip
-                      type={displayParts}
-                      documentation={documentation}
-                    />,
-                    reactHost
-                  )
-
-                  callback(reactHost)
-                }
-              )
-            },
-            removeNode: (node) => {
-              ReactDOM.unmountComponentAtNode(node)
-            },
-            style: tooltipStyle,
-          },
+          tooltip: toolipPlugin,
         }),
         readOnly,
-        value: docCache[filename].linkedDoc({ sharedHist: true }),
+        value: docCache[filename].linkedDoc({
+          sharedHist: true,
+          mode: undefined,
+        }),
       })
 
       this.cm.on('beforeChange', (cm) => {
@@ -125,14 +148,16 @@ export default class extends PureComponent {
   }
 
   componentWillUnmount() {
-    clearTimeout(this.updateTimerId)
+    if (typeof this.updateTimerId !== 'undefined') {
+      clearTimeout(this.updateTimerId)
+    }
 
     if (typeof navigator !== 'undefined') {
       const { filename } = this.props
       const CodeMirror = require('codemirror')
 
       // Store a reference to the current linked doc
-      const linkedDoc = this.cm.doc
+      const linkedDoc = this.cm.getDoc()
 
       this.cm.swapDoc(new CodeMirror.Doc('', options.mode))
 
@@ -141,7 +166,7 @@ export default class extends PureComponent {
     }
   }
 
-  updateTimerId = undefined
+  updateTimerId?: ReturnType<typeof setTimeout> = undefined
 
   componentDidUpdate() {
     const { playgroundDebounceDuration } = this.props
@@ -155,7 +180,7 @@ export default class extends PureComponent {
     }, playgroundDebounceDuration)
   }
 
-  widgets = []
+  widgets: CM.LineWidget[] = []
 
   addPlaygroundWidgets() {
     if (!this.cm) return
@@ -166,10 +191,10 @@ export default class extends PureComponent {
     if (logs === undefined) return
 
     // Line numbers start at 1 in the logs and UI, but 0 in CodeMirror
-    const editorLine = (location) => location.line - 1
+    const editorLine = (location: SourceLocation): number => location.line - 1
 
     // Take the latest log for each line
-    const createLogMap = (logs) => {
+    const createLogMap = (logs: LogEntry[]) => {
       return logs
         .filter(
           (log) =>
@@ -178,34 +203,35 @@ export default class extends PureComponent {
             log.location &&
             filename.endsWith(log.location.file)
         )
-        .reduce((result, log) => {
-          result[editorLine(log.location)] = log
+        .reduce((result: Record<number, LogEntry>, log) => {
+          const line = editorLine(log.location)
+          result[line] = log
           return result
         }, {})
     }
 
-    const logMap = createLogMap(logs)
+    const logMap: Record<string, LogEntry> = createLogMap(logs)
 
     // Remove widgets that aren't needed from CodeMirror
     this.widgets.forEach((widget) => {
-      const lineNumber = this.cm.getLineNumber(widget.line)
+      const lineNumber = this.cm.getLineNumber((widget as any).line) as number
 
       if (logMap[lineNumber]) return
 
-      ReactDOM.unmountComponentAtNode(widget.node)
+      ReactDOM.unmountComponentAtNode((widget as any).node)
 
       this.cm.removeLineWidget(widget)
     })
 
     // Delete widgets from our array of widgets
     this.widgets = this.widgets.filter((widget) => {
-      const lineNumber = this.cm.getLineNumber(widget.line)
+      const lineNumber = this.cm.getLineNumber((widget as any).line) as number
 
       return !!logMap[lineNumber]
     })
 
     // Create or update all widgets
-    Object.values(logMap).forEach((entry) => {
+    Object.values(logMap).forEach((entry: LogEntry) => {
       const { data, location } = entry
 
       const handle = this.cm.getLineHandle(editorLine(location))
@@ -214,7 +240,8 @@ export default class extends PureComponent {
         const ensureWidget = () => {
           const found = this.widgets.find(
             (widget) =>
-              this.cm.getLineNumber(widget.line) === editorLine(location)
+              this.cm.getLineNumber((widget as any).line) ===
+              editorLine(location)
           )
 
           if (found) return found
@@ -244,7 +271,7 @@ export default class extends PureComponent {
               }
             }}
           />,
-          widget.node
+          (widget as any).node
         )
       }
     })
@@ -294,7 +321,7 @@ export default class extends PureComponent {
     }
   }
 
-  componentWillUpdate(nextProps) {
+  componentWillUpdate(nextProps: Props) {
     const { errorLineNumber: nextLineNumber, value } = nextProps
     const { errorLineNumber: prevLineNumber } = this.props
 

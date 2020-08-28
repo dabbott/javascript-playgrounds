@@ -1,20 +1,24 @@
+import type * as Diff from 'diff'
+
+export type DiffRange = [number, number]
+
+type ExtendedChange = Diff.Change & { ranges: DiffRange[] }
+
 const newlineRegex = /\r\n|\n|\r/g
 
-export default function changedRanges(originalText, newText) {
+export default function changedRanges(originalText: string, newText: string) {
   if (typeof navigator === 'undefined') return { added: [] }
 
-  const diff = require('diff')
+  const diff = require('diff') as typeof Diff
 
-  function diffLines(originalText, newText) {
+  function diffLines(originalText: string, newText: string) {
     const lineDiff = diff.diffLines(originalText, newText, {
       newlineIsToken: true,
-    })
+    }) as ExtendedChange[]
 
     const result = lineDiff.reduce(
-      (result, change, index) => {
-        if (change.removed) {
-          return result
-        }
+      (result, change) => {
+        if (change.removed) return result
 
         let { ranges, value } = result
 

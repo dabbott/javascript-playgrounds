@@ -11,7 +11,34 @@ const styles = prefixObject({
   },
 })
 
-export default class extends PureComponent {
+interface Props {
+  platform: string
+  width: number
+  scale: number
+  assetRoot: string
+  statusBarHeight: 0
+  statusBarColor: string
+  sharedEnvironment: boolean
+  vendorComponents: any[]
+  playerStyleSheet: string
+  playerCSS: string
+  prelude: string
+  onError: (payload: unknown) => void
+  onRun: () => void
+  onConsole: (payload: unknown) => void
+}
+
+interface State {
+  id: string | null
+}
+
+type MessageData = {
+  id: string
+  type: string
+  payload: unknown
+}
+
+export default class extends PureComponent<Props, State> {
   static defaultProps = {
     platform: 'ios',
     width: 300,
@@ -29,16 +56,12 @@ export default class extends PureComponent {
     onConsole: () => {},
   }
 
-  constructor(props) {
-    super(props)
+  status: string = 'loading'
+  fileMap?: Record<string, string>
+  entry?: string
 
-    this.state = {
-      id: null,
-    }
-
-    this.status = 'loading'
-    this.fileMap = null
-    this.entry = null
+  state = {
+    id: null,
   }
 
   componentDidMount() {
@@ -48,7 +71,7 @@ export default class extends PureComponent {
       id: Math.random().toString().slice(2),
     })
 
-    const handleMessageData = (data) => {
+    const handleMessageData = (data: MessageData) => {
       const { id, type, payload } = data
 
       if (id !== this.state.id) return
@@ -57,9 +80,9 @@ export default class extends PureComponent {
         case 'ready':
           this.status = 'ready'
           if (this.fileMap) {
-            this.runApplication(this.fileMap, this.entry)
-            this.fileMap = null
-            this.entry = null
+            this.runApplication(this.fileMap, this.entry!)
+            this.fileMap = undefined
+            this.entry = undefined
           }
           break
         case 'error':
@@ -72,7 +95,7 @@ export default class extends PureComponent {
     }
 
     if (sharedEnvironment) {
-      window.__message = handleMessageData
+      ;(window as any).__message = handleMessageData
     }
 
     window.addEventListener('message', (e) => {
@@ -87,7 +110,7 @@ export default class extends PureComponent {
     })
   }
 
-  runApplication(fileMap, entry) {
+  runApplication(fileMap: Record<string, string>, entry: string) {
     this.props.onRun()
     switch (this.status) {
       case 'loading':
@@ -95,7 +118,7 @@ export default class extends PureComponent {
         this.entry = entry
         break
       case 'ready':
-        this.refs.iframe.contentWindow.postMessage(
+        ;(this.refs.iframe as HTMLIFrameElement).contentWindow!.postMessage(
           { fileMap, entry, source: 'rnwp' },
           '*'
         )

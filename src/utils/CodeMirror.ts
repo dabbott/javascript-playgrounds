@@ -13,9 +13,9 @@ export const options = {
   },
   extraKeys: {
     Tab: 'indentMore',
-    'Cmd-/': (cm) => {
+    'Cmd-/': (cm: CodeMirror.Editor) => {
       cm.listSelections().forEach((selection) => {
-        cm.toggleComment({ lineComment: '//' })
+        ;(cm as any).toggleComment({ lineComment: '//' })
       })
     },
   },
