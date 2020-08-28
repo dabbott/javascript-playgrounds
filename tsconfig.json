@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "CommonJS",
+    "rootDir": "./src",
+    // "strict": true,
+    "esModuleInterop": true,
+    "types": ["node"],
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["ES2017"],
+    "sourceMap": true,
+    "allowJs": true,
+    "noImplicitAny": false,
+    "jsx": "react"
+  },
+  "exclude": ["node_modules"]
+}

@@ -5,11 +5,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const paths = {
   root: path.join(__dirname, '..'),
+  get src() {
+    return path.join(this.root, 'src')
+  },
   get index() {
-    return path.join(this.root, 'src/index.js')
+    return path.join(this.src, 'index.tsx')
   },
   get player() {
-    return path.join(this.root, 'src/player.js')
+    return path.join(this.src, 'player.js')
   },
   get public() {
     return path.join(this.root, 'public')
@@ -30,7 +33,12 @@ const common = merge({
   module: {
     rules: [
       {
-        test: /\.js/,
+        test: /\.tsx?$/,
+        use: ['ts-loader'],
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.jsx?$/,
         exclude: /node_modules/,
         use: [
           {
@@ -70,6 +78,7 @@ const common = merge({
     globalObject: 'this',
   },
   resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     alias: {
       '@babel/plugin-transform-unicode-regex': path.join(__dirname, 'empty.js'),
     },

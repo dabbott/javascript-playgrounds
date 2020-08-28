@@ -1,12 +1,7 @@
 export const appendCSS = (css) => {
+  const textNode = document.createTextNode(css)
   const element = document.createElement('style')
   element.type = 'text/css'
-
-  if (element.styleSheet) {
-    element.styleSheet.cssText = css
-  } else {
-    element.appendChild(document.createTextNode(css))
-  }
-
+  element.appendChild(textNode)
   document.head.appendChild(element)
 }

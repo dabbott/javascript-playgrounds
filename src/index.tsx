@@ -67,7 +67,7 @@ let {
     /* libs */
     /* types */
   }),
-} = getHashString()
+} = getHashString() as any
 
 const typescriptOptions = Object.assign(
   { libs: defaultLibs, types: [] },
@@ -90,7 +90,7 @@ if (typescriptOptions.enabled && !(entry || initialTab)) {
 }
 
 const parsedFiles = JSON.parse(files)
-let fileMap
+let fileMap: any
 
 if (parsedFiles.length > 0) {
   // Build a map of {filename => code}
@@ -165,7 +165,7 @@ class WorkspaceContainer extends Component {
       vendorComponents: JSON.parse(vendorComponents),
       externalStyles: JSON.parse(styles),
       sharedEnvironment: sharedEnvironment === 'true',
-      fullscreen: fullscreen === 'true' && screenfull.enabled,
+      fullscreen: fullscreen === 'true' && (screenfull as any).enabled,
       responsivePaneSets: [
         ...JSON.parse(responsivePaneSets),
         { panes: JSON.parse(panes), maxWidth: Infinity },
@@ -193,9 +193,9 @@ class WorkspaceContainer extends Component {
       const workspaceDiff = workspacesStepDiff(
         parsedWorkspaces[activeStepIndex],
         parsedWorkspaces[activeStepIndex - 1]
-      )
+      ) as any
 
-      workspaceProps.diff = workspaceDiff
+      ;(workspaceProps as any).diff = workspaceDiff
     }
 
     return Object.assign(
