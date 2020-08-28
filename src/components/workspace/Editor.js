@@ -6,9 +6,6 @@ import PlaygroundPreview from './PlaygroundPreview'
 import { tooltipAddon } from '../../utils/CodeMirrorTooltipAddon'
 import Tooltip from './Tooltip'
 
-require('codemirror/lib/codemirror.css')
-require('../../styles/codemirror-theme.css')
-
 // Work around a codemirror + flexbox + chrome issue by creating an absolute
 // positioned parent and flex grandparent of the codemirror element.
 // https://github.com/jlongster/debugger.html/issues/63

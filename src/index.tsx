@@ -1,5 +1,7 @@
-require('./styles/reset.css')
-require('./styles/index.css')
+import 'codemirror/lib/codemirror.css'
+import './styles/codemirror-theme.css'
+import './styles/reset.css'
+import './styles/index.css'
 
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
@@ -218,7 +220,7 @@ class WorkspaceContainer extends Component {
   }
 }
 
-const mount = document.getElementById('react-root')
+const mount = document.getElementById('react-root') as HTMLDivElement
 
 // Set mount node to flex in a vendor-prefixed way
 prefixAndApply({ display: 'flex' }, mount)
