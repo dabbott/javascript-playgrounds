@@ -1,7 +1,7 @@
-import React, { PureComponent } from 'react'
+import React, { CSSProperties, memo, ReactNode } from 'react'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
-let styles = {
+let styles: Record<string, CSSProperties> = {
   container: {
     flex: '1',
     display: 'flex',
@@ -27,19 +27,18 @@ styles.error = {
 
 styles = prefixObject(styles)
 
-export default class extends PureComponent {
-  static defaultProps = {
-    children: '',
-    isError: false,
-  }
-
-  render() {
-    const { children, isError } = this.props
-
-    return (
-      <div style={styles.container}>
-        <div style={isError ? styles.error : styles.text}>{children}</div>
-      </div>
-    )
-  }
+interface Props {
+  children?: ReactNode
+  isError: boolean
 }
+
+export default memo(function Overlay({
+  children = '',
+  isError = false,
+}: Props) {
+  return (
+    <div style={styles.container}>
+      <div style={isError ? styles.error : styles.text}>{children}</div>
+    </div>
+  )
+})

@@ -22,8 +22,16 @@
 
 import iphone6silver from '../assets/iphone-6-silver.svg'
 
+type Device = {
+  deviceImageUrl: string
+  deviceImageWidth: number
+  deviceImageHeight: number
+  screenWidth: number
+  screenHeight: number
+}
+
 // Devices have pixel density of 2, but we also zoom in for visibility at small sizes.
-export default {
+const phones: Record<string, Device> = {
   ios: {
     deviceImageUrl: iphone6silver,
     deviceImageWidth: 870,
@@ -41,3 +49,5 @@ export default {
     screenHeight: 1920,
   },
 }
+
+export default phones

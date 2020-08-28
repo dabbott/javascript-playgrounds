@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, CSSProperties } from 'react'
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 
 const styles = prefixObject({
@@ -40,35 +40,46 @@ styles.activeText = {
   color: '#FFF',
 }
 
-export default class extends PureComponent {
+interface Props<T> {
+  tabs: T[]
+  activeTab?: T
+  onClickTab: (tab: T) => void
+  getTitle: (a: T) => string
+  getChanged: (a: T) => boolean
+  compareTabs: (a: T, b: T) => boolean
+  textStyle?: CSSProperties
+  activeTextStyle?: CSSProperties
+  changedTextStyle?: CSSProperties
+  tabStyle?: CSSProperties
+}
+
+export default class Tabs<T> extends PureComponent<Props<T>> {
   static defaultProps = {
     tabs: [],
     activeTab: null,
-    onClickTab: () => {},
-    getTitle: (a) => a,
-    getChanged: (a) => false,
-    compareTabs: (a, b) => a === b,
+    onClickTab: (tab: string) => {},
+    getTitle: (a: string) => a,
+    getChanged: (a: string) => false,
+    compareTabs: (a: string, b: string) => a === b,
     textStyle: null,
     activeTextStyle: null,
     tabStyle: null,
   }
 
-  onClickTab = (tab) => this.props.onClickTab(tab)
+  onClickTab = (tab: T) => this.props.onClickTab(tab)
 
-  getComputedStyles = () => {
+  getContainerStyle = () => {
     const { tabStyle } = this.props
 
-    return {
-      container: tabStyle
-        ? prefix({ ...styles.container, ...tabStyle })
-        : styles.container,
-    }
+    return tabStyle
+      ? prefix({ ...styles.container, ...tabStyle })
+      : styles.container
   }
 
-  getTextStyle = (tab) => {
+  getTextStyle = (tab: T) => {
     const { activeTab, textStyle, activeTextStyle, compareTabs } = this.props
 
-    if (compareTabs(tab, activeTab)) {
+    if (activeTab && compareTabs(tab, activeTab)) {
       const base = textStyle
         ? prefix({ ...styles.activeText, ...textStyle })
         : styles.activeText
@@ -79,24 +90,23 @@ export default class extends PureComponent {
     }
   }
 
-  getChangedTextStyle = (tab) => {
+  getChangedTextStyle = (tab: T) => {
     const { getChanged, changedTextStyle } = this.props
 
     const base = this.getTextStyle(tab)
 
     if (getChanged(tab)) {
-      return prefix({ ...base, ...styles.changedText, changedTextStyle })
+      return prefix({ ...base, ...styles.changedText, ...changedTextStyle })
     } else {
       return base
     }
   }
 
   render() {
-    const { children, tabs, titles, getTitle, getChanged } = this.props
-    const computedStyles = this.getComputedStyles()
+    const { children, tabs, getTitle } = this.props
 
     return (
-      <div style={computedStyles.container}>
+      <div style={this.getContainerStyle()}>
         {tabs.map((tab, i) => {
           const title = getTitle(tab)
 

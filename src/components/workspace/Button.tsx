@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, CSSProperties } from 'react'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
 const colors = {
@@ -7,7 +7,7 @@ const colors = {
   inverse: 'white',
 }
 
-const baseStyles = {
+const baseStyles: Record<string, CSSProperties> = {
   container: {
     flex: '0 0 auto',
     display: 'flex',
@@ -33,8 +33,8 @@ const baseStyles = {
   },
 }
 
-const styles = {}
-const variants = ['normal', 'error']
+const styles: Record<string, any> = {}
+const variants: ('normal' | 'error')[] = ['normal', 'error']
 
 // Generate a style for all variants: normal & error, base & active
 variants.forEach((variant) => {
@@ -55,7 +55,21 @@ variants.forEach((variant) => {
   }
 })
 
-export default class extends PureComponent {
+interface Props {
+  active: boolean
+  inverse: boolean
+  isError: boolean
+  onClick: () => void
+  onChange: (active: boolean) => void
+  containerStyle?: CSSProperties
+  textStyle?: CSSProperties
+}
+
+interface State {
+  hover: boolean
+}
+
+export default class extends PureComponent<Props, State> {
   static defaultProps = {
     active: false,
     inverse: false,
@@ -64,12 +78,8 @@ export default class extends PureComponent {
     onChange: () => {},
   }
 
-  constructor() {
-    super()
-
-    this.state = {
-      hover: false,
-    }
+  state = {
+    hover: false,
   }
 
   render() {
@@ -78,7 +88,9 @@ export default class extends PureComponent {
     const hoverOpacity = hover ? 0.7 : 0.85
 
     let currentStyles =
-      styles[isError ? 'error' : 'normal'][active ^ inverse ? 'active' : 'base']
+      styles[isError ? 'error' : 'normal'][
+        active !== inverse ? 'active' : 'base'
+      ]
     const containerStyle = {
       ...currentStyles.container,
       opacity: hoverOpacity,

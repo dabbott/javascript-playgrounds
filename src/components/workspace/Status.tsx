@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component, ReactNode } from 'react'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
-let styles = {
+let styles: any = {
   container: {
     flex: '0 0 40px',
     display: 'flex',
@@ -34,20 +34,17 @@ styles.error = {
 
 styles = prefixObject(styles)
 
-export default class extends Component {
-  static defaultProps = {
-    text: '',
-    isError: false,
-  }
+interface Props {
+  text: string
+  isError: boolean
+  children?: ReactNode
+}
 
-  render() {
-    const { text, isError, children } = this.props
-
-    return (
-      <div style={styles.container}>
-        <div style={isError ? styles.error : styles.text}>{text}</div>
-        {children}
-      </div>
-    )
-  }
+export default function Status({ text, isError, children }: Props) {
+  return (
+    <div style={styles.container}>
+      <div style={isError ? styles.error : styles.text}>{text}</div>
+      {children}
+    </div>
+  )
 }

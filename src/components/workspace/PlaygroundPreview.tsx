@@ -1,6 +1,5 @@
-import React, { Component, useLayoutEffect, useRef, useEffect } from 'react'
-import { PureComponent } from 'react'
-
+import { ResizeObserver } from '@juggle/resize-observer'
+import React, { MutableRefObject, useEffect, useRef, RefObject } from 'react'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import { MultiInspector } from './Inspector'
 
@@ -24,9 +23,9 @@ const styles = prefixObject({
   },
 })
 
-function useResizeObserver(ref, f) {
+function useResizeObserver(ref: RefObject<HTMLDivElement>, f: () => void) {
   useEffect(() => {
-    let resizeObserver
+    let resizeObserver: ResizeObserver
     let mounted = true
 
     import('@juggle/resize-observer').then(({ ResizeObserver }) => {
@@ -36,17 +35,26 @@ function useResizeObserver(ref, f) {
         f()
       })
 
-      resizeObserver.observe(ref.current)
+      if (ref.current) {
+        resizeObserver.observe(ref.current)
+      }
     })
 
     return () => {
       mounted = false
 
-      if (resizeObserver) {
+      if (ref.current && resizeObserver) {
         resizeObserver.unobserve(ref.current)
       }
     }
   }, [])
+}
+
+interface Props {
+  indent: string
+  renderReactElements: boolean
+  data: unknown[]
+  didResize: () => void
 }
 
 export default function PlaygroundPreview({
@@ -54,8 +62,8 @@ export default function PlaygroundPreview({
   data,
   didResize,
   renderReactElements,
-}) {
-  const ref = useRef(null)
+}: Props) {
+  const ref = useRef<HTMLDivElement>(null)
 
   useResizeObserver(ref, didResize)
 

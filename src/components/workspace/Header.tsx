@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, CSSProperties } from 'react'
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 
 const styles = prefixObject({
@@ -24,11 +24,15 @@ const styles = prefixObject({
   },
 })
 
-export default class extends PureComponent {
+interface Props {
+  text: string
+  textStyle?: CSSProperties
+  headerStyle?: CSSProperties
+}
+
+export default class Header extends PureComponent<Props> {
   static defaultProps = {
     text: '',
-    textStyle: null,
-    headerStyle: null,
   }
 
   getComputedStyles = () => {

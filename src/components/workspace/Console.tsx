@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, CSSProperties } from 'react'
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 import { MultiInspector } from './Inspector'
 
@@ -47,15 +47,36 @@ const styles = prefixObject({
   },
 })
 
-export default class extends PureComponent {
+type SourceLocation = {
+  file: string
+  line: string
+}
+
+type LogEntry = {
+  id: string
+  location: SourceLocation
+  data: unknown[]
+}
+
+interface Props {
+  maximize: boolean
+  showFileName: boolean
+  showLineNumber: boolean
+  renderReactElements: boolean
+  logs: LogEntry[]
+  style?: CSSProperties
+  rowStyle?: CSSProperties
+}
+
+export default class extends PureComponent<Props> {
   static defaultProps = {
     maximize: false,
     showFileName: false,
     showLineNumber: true,
     logs: [],
-    style: null,
-    rowStyle: null,
   }
+
+  container?: HTMLDivElement | null
 
   getComputedStyle = () => {
     const { style, maximize } = this.props
@@ -72,23 +93,23 @@ export default class extends PureComponent {
   }
 
   componentDidMount() {
-    const { clientHeight, scrollHeight } = this.container
+    const { clientHeight, scrollHeight } = this.container!
     const maxScrollTop = scrollHeight - clientHeight
 
-    this.container.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
+    this.container!.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
   }
 
   componentDidUpdate() {
-    const { clientHeight, scrollHeight, scrollTop } = this.container
+    const { clientHeight, scrollHeight, scrollTop } = this.container!
     const maxScrollTop = scrollHeight - clientHeight
 
     // If we're within one clientHeight of the bottom, scroll to bottom
     if (maxScrollTop - clientHeight < scrollTop) {
-      this.container.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
+      this.container!.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
     }
   }
 
-  renderLineNumber = (location) => {
+  renderLineNumber = (location: SourceLocation) => {
     const string = this.props.showFileName
       ? `${location.file}:${location.line}`
       : `:${location.line}`
@@ -101,7 +122,7 @@ export default class extends PureComponent {
     )
   }
 
-  renderEntry = (entry) => {
+  renderEntry = (entry: LogEntry) => {
     const { renderReactElements } = this.props
 
     const lineNumber =
@@ -126,7 +147,9 @@ export default class extends PureComponent {
     return (
       <div
         style={this.getComputedStyle()}
-        ref={(ref) => (this.container = ref)}
+        ref={(ref) => {
+          this.container = ref
+        }}
       >
         {logs.map(this.renderEntry)}
       </div>

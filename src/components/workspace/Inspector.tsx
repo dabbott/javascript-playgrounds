@@ -1,5 +1,5 @@
-import React, { PureComponent, useRef, useEffect } from 'react'
-import Loadable from 'react-loadable'
+import React, { PureComponent, useRef, useEffect, ReactNode } from 'react'
+const Loadable = require('react-loadable')
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import * as DOMCoding from '../../utils/DOMCoding'
 
@@ -9,7 +9,7 @@ const styles = prefixObject({
   },
 })
 
-const createInspectorTheme = (base) => ({
+const createInspectorTheme = (base: any) => ({
   ...base,
   BASE_FONT_SIZE: '13px',
   TREENODE_FONT_SIZE: '13px',
@@ -23,19 +23,24 @@ export const Inspector = Loadable({
     import('react-inspector').then(({ default: Inspector, chromeLight }) => {
       const theme = createInspectorTheme(chromeLight)
 
-      return (props) => <Inspector {...props} theme={theme} />
+      return (props: any) => <Inspector {...props} theme={theme} />
     }),
   loading: () => null,
 })
 
-const InlineElement = ({ onMount, onUnmount }) => {
+interface InlineElementProps {
+  onMount: (node: HTMLElement) => void
+  onUnmount: (node: HTMLElement) => void
+}
+
+const InlineElement = ({ onMount, onUnmount }: InlineElementProps) => {
   const ref = useRef(null)
 
   useEffect(() => {
-    onMount(ref.current)
+    onMount(ref.current!)
 
     return () => {
-      onUnmount(ref.current)
+      onUnmount(ref.current!)
     }
   }, [])
 
@@ -43,7 +48,7 @@ const InlineElement = ({ onMount, onUnmount }) => {
 }
 
 // https://stackoverflow.com/a/20476546
-function isNodeInDOM(o) {
+function isNodeInDOM(o: any) {
   return (
     typeof o === 'object' &&
     o !== null &&
@@ -54,7 +59,12 @@ function isNodeInDOM(o) {
   )
 }
 
-export class MultiInspector extends PureComponent {
+interface Props {
+  data: unknown[]
+  renderReactElements: boolean
+}
+
+export class MultiInspector extends PureComponent<Props> {
   render() {
     const { data, renderReactElements } = this.props
 
@@ -66,12 +76,12 @@ export class MultiInspector extends PureComponent {
       if (isNodeInDOM(item) || item instanceof HTMLElement) {
         inspectors.push(
           <InlineElement
-            key={JSON.stringify(DOMCoding.toJSON(item))}
+            key={JSON.stringify(DOMCoding.toJSON(item as HTMLElement))}
             onMount={(node) => {
-              node.appendChild(item)
+              node.appendChild(item as HTMLElement)
             }}
             onUnmount={(node) => {
-              node.removeChild(item)
+              node.removeChild(item as HTMLElement)
             }}
           />
         )
@@ -81,7 +91,10 @@ export class MultiInspector extends PureComponent {
         '__is_react_element' in item
       ) {
         // Render using the iframe's copy of React
-        const { element, ReactDOM } = item
+        const { element, ReactDOM } = item as {
+          element: JSX.Element
+          ReactDOM: typeof import('react-dom')
+        }
 
         const key = Math.random().toString()
 
@@ -89,10 +102,10 @@ export class MultiInspector extends PureComponent {
           inspectors.push(
             <InlineElement
               key={key}
-              onMount={(node) => {
+              onMount={(node: Element) => {
                 ReactDOM.render(element, node)
               }}
-              onUnmount={(node) => {
+              onUnmount={(node: Element) => {
                 ReactDOM.unmountComponentAtNode(node)
               }}
             />
@@ -107,7 +120,7 @@ export class MultiInspector extends PureComponent {
 
     let content = inspectors
       // Add spacers between each item
-      .reduce((result, value, index, list) => {
+      .reduce((result: JSX.Element[], value, index, list) => {
         result.push(value)
 
         if (index !== list.length - 1) {

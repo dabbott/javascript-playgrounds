@@ -1,10 +1,28 @@
+type Position = { line: string; column: string }
+type Location = { start: Position; end: Position }
+type CallExpression = {
+  loc: Location
+  callee: {
+    object: {
+      name: string
+    }
+    property: {
+      name: string
+    }
+  }
+  arguments: any[]
+}
+
 // Add line & column info to console.log calls.
 //
 // console.log(arg) becomes console._rnwp_log("index.js", "8", "2", arg)
 export default () => {
   return {
     visitor: {
-      CallExpression(path, state) {
+      CallExpression(
+        path: { node: CallExpression },
+        state: { filename: string }
+      ) {
         if (
           path.node.callee.object &&
           path.node.callee.object.name === 'console' &&
