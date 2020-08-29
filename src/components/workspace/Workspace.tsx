@@ -1,6 +1,6 @@
 import React, { PureComponent, CSSProperties, RefObject } from 'react'
 import { getErrorDetails } from '../../utils/ErrorMessage'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefixObject } from '../../utils/Styles'
 import About from './About'
 import Button from './Button'
 import Console from './Console'

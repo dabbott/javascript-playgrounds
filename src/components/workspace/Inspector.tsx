@@ -1,5 +1,5 @@
 import React, { PureComponent, useRef, useEffect } from 'react'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefixObject } from '../../utils/Styles'
 import * as DOMCoding from '../../utils/DOMCoding'
 import type { InspectorThemeDefinition, InspectorProps } from 'react-inspector'
 

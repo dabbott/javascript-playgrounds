@@ -1,5 +1,5 @@
-import React, { PureComponent, CSSProperties } from 'react'
-import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
+import React, { PureComponent, CSSProperties, memo } from 'react'
+import { prefix, prefixObject } from '../../utils/Styles'
 import { MultiInspector } from './Inspector'
 import { LogCommand, SourceLocation } from '../../types/Messages'
 
@@ -58,6 +58,27 @@ interface Props {
   rowStyle?: CSSProperties
 }
 
+const LineNumber = memo(
+  ({
+    showFileName,
+    location,
+  }: {
+    showFileName: boolean
+    location: SourceLocation
+  }) => {
+    const string = showFileName
+      ? `${location.file}:${location.line}`
+      : `:${location.line}`
+
+    return (
+      <>
+        <span style={styles.lineNumberSpacer}></span>
+        <span style={styles.lineNumber}>{string}</span>
+      </>
+    )
+  }
+)
+
 export default class extends PureComponent<Props> {
   static defaultProps = {
     maximize: false,
@@ -99,26 +120,13 @@ export default class extends PureComponent<Props> {
     }
   }
 
-  renderLineNumber = (location: SourceLocation) => {
-    const string = this.props.showFileName
-      ? `${location.file}:${location.line}`
-      : `:${location.line}`
-
-    return (
-      <>
-        <span style={styles.lineNumberSpacer}></span>
-        <span style={styles.lineNumber}>{string}</span>
-      </>
-    )
-  }
-
   renderEntry = (entry: LogCommand) => {
-    const { renderReactElements } = this.props
+    const { renderReactElements, showFileName } = this.props
 
     const lineNumber =
-      this.props.showLineNumber && entry.location
-        ? this.renderLineNumber(entry.location)
-        : null
+      this.props.showLineNumber && entry.location ? (
+        <LineNumber showFileName={showFileName} location={entry.location} />
+      ) : null
 
     return (
       <div key={entry.id} style={this.getComputedRowStyle()}>

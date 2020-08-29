@@ -1,7 +1,7 @@
 import React, { PureComponent, CSSProperties } from 'react'
 import ReactDOM from 'react-dom'
 import { options, requireAddons } from '../../utils/CodeMirror'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefixObject } from '../../utils/Styles'
 import PlaygroundPreview from './PlaygroundPreview'
 import { tooltipAddon, TooltipValue } from '../../utils/CodeMirrorTooltipAddon'
 import Tooltip from './Tooltip'

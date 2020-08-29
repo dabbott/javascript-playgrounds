@@ -1,5 +1,5 @@
-import React, { PureComponent, CSSProperties } from 'react'
-import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
+import React, { CSSProperties, ReactNode, useMemo } from 'react'
+import { mergeStyles, prefixObject } from '../../utils/Styles'
 
 const styles = prefixObject({
   container: {
@@ -28,34 +28,28 @@ interface Props {
   text: string
   textStyle?: CSSProperties
   headerStyle?: CSSProperties
+  children?: ReactNode
 }
 
-export default class Header extends PureComponent<Props> {
-  static defaultProps = {
-    text: '',
-  }
+export default function Header({
+  text = '',
+  textStyle,
+  headerStyle,
+  children,
+}: Props) {
+  const computedContainerStyle = useMemo(
+    () => mergeStyles(styles.container, headerStyle),
+    [headerStyle]
+  )
+  const computedTextStyle = useMemo(() => mergeStyles(styles.text, textStyle), [
+    textStyle,
+  ])
 
-  getComputedStyles = () => {
-    const { textStyle, headerStyle } = this.props
-
-    return {
-      container: headerStyle
-        ? prefix({ ...styles.container, ...headerStyle })
-        : styles.container,
-      text: textStyle ? prefix({ ...styles.text, ...textStyle }) : styles.text,
-    }
-  }
-
-  render() {
-    const { children, text } = this.props
-    const computedStyles = this.getComputedStyles()
-
-    return (
-      <div style={computedStyles.container}>
-        <div style={computedStyles.text}>{text}</div>
-        <div style={styles.spacer} />
-        {children}
-      </div>
-    )
-  }
+  return (
+    <div style={computedContainerStyle}>
+      <div style={computedTextStyle}>{text}</div>
+      <div style={styles.spacer} />
+      {children}
+    </div>
+  )
 }

@@ -1,9 +1,5 @@
 import React, { CSSProperties, memo, ReactNode } from 'react'
-import {
-  prefixObject,
-  prefix,
-  mergeStyles,
-} from '../../utils/PrefixInlineStyles'
+import { prefixObject, prefix, mergeStyles } from '../../utils/Styles'
 
 const baseTextStyle = prefix({
   flex: '1',

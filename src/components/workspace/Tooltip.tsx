@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
 import type * as ts from 'typescript'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefixObject } from '../../utils/Styles'
 
 // TypeScript's SymbolDisplayPartKind
 //

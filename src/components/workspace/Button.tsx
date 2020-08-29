@@ -1,5 +1,5 @@
 import React, { PureComponent, CSSProperties } from 'react'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefixObject } from '../../utils/Styles'
 
 const colors = {
   normal: '#D8D8D8',

@@ -1,6 +1,6 @@
 import React, { PureComponent, CSSProperties } from 'react'
 import snarkdown from 'snarkdown'
-import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefix, prefixObject } from '../../utils/Styles'
 import Button from './Button'
 
 const rawStyles: Record<string, CSSProperties> = {

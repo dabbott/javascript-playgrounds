@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom'
 
 import Sandbox from './components/player/Sandbox'
 import { getHashString } from './utils/HashString'
-import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
-import { appendCSS } from './utils/Styles'
+import { prefix, prefixAndApply } from './utils/Styles'
+import { appendCSS } from './utils/CSS'
 import VendorComponents from './components/player/VendorComponents'
 
 const style = prefix({

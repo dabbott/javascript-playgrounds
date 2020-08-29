@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useState,
 } from 'react'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefixObject } from '../../utils/Styles'
 import Tabs from './Tabs'
 
 const styles = prefixObject({

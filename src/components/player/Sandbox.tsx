@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import ReactDOM from 'react-dom'
 import * as ReactNative from 'react-native-web'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefixObject } from '../../utils/Styles'
 import consoleProxy, {
   consoleClear,
   consoleLog,

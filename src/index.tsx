@@ -12,8 +12,8 @@ import Workspace, {
 } from './components/workspace/Workspace'
 import { getHashString, setHashString } from './utils/HashString'
 import DefaultCode from './constants/DefaultCode'
-import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
-import { appendCSS } from './utils/Styles'
+import { prefix, prefixAndApply } from './utils/Styles'
+import { appendCSS } from './utils/CSS'
 import diff, { DiffRange } from './utils/Diff'
 import defaultLibs from './utils/TypeScriptDefaultLibs'
 

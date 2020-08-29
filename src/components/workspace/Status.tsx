@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefix, prefixObject } from '../../utils/Styles'
 
 const baseTextStyle = prefix({
   color: '#D8D8D8',

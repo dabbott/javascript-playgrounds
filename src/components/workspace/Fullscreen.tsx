@@ -1,6 +1,6 @@
 import React, { CSSProperties, memo } from 'react'
 import screenfull from 'screenfull'
-import { mergeStyles, prefixObject } from '../../utils/PrefixInlineStyles'
+import { mergeStyles, prefixObject } from '../../utils/Styles'
 
 const styles = prefixObject({
   text: {

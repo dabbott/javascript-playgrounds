@@ -1,6 +1,6 @@
 import React, { PureComponent, ReactNode, memo, useMemo } from 'react'
 import PHONES from '../../constants/Phones'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefixObject } from '../../utils/Styles'
 
 interface Props {
   width: number

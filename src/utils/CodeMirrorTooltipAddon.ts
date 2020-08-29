@@ -1,4 +1,4 @@
-import { prefixAndApply } from './PrefixInlineStyles'
+import { prefixAndApply } from './Styles'
 import { CSSProperties } from 'react'
 
 export interface TooltipValue {

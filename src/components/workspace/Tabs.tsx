@@ -1,9 +1,5 @@
 import React, { CSSProperties, memo, ReactNode, useMemo } from 'react'
-import {
-  prefixObject,
-  mergeStyles,
-  prefix,
-} from '../../utils/PrefixInlineStyles'
+import { prefixObject, mergeStyles, prefix } from '../../utils/Styles'
 
 const baseTextStyle = prefix({
   userSelect: 'none',

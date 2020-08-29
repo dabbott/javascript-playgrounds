@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import * as ExtendedJSON from '../../utils/ExtendedJSON'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefixObject } from '../../utils/Styles'
 import Phone from './Phone'
 import { Message, ConsoleCommand } from '../../types/Messages'
 

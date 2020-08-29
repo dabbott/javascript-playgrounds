@@ -1,6 +1,6 @@
 import { ResizeObserver } from '@juggle/resize-observer'
 import React, { useEffect, useRef, RefObject } from 'react'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import { prefixObject } from '../../utils/Styles'
 import { MultiInspector } from './Inspector'
 
 const styles = prefixObject({
