@@ -12,5 +12,5 @@
     "allowJs": true,
     "jsx": "react"
   },
-  "exclude": ["node_modules", "public"]
+  "exclude": ["node_modules", "public", "webpack", "dist"]
 }
