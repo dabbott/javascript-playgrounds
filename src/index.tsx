@@ -44,17 +44,6 @@ let {
   sharedEnvironment = 'false',
   panes = JSON.stringify(['editor', 'player']),
   responsivePaneSets = '[]',
-  // responsivePaneSets = JSON.stringify([
-  //   {
-  //     maxWidth: 1200,
-  //     panes: [
-  //       {
-  //         type: 'stack',
-  //         children: ['editor', 'player'],
-  //       },
-  //     ],
-  //   },
-  // ]),
   transpilerTitle = '',
   playerTitle = '',
   workspacesTitle = '',
@@ -64,7 +53,7 @@ let {
   workspaceCSS = '',
   prelude = '',
   console = JSON.stringify({
-    enabled: true,
+    enabled: false,
     visible: false,
     maximized: false,
     collapsible: true,
