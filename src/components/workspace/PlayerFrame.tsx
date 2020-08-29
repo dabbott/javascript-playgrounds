@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import * as ExtendedJSON from '../../utils/ExtendedJSON'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import Phone from './Phone'
+import { LogEntry } from './Console'
 
 const styles = prefixObject({
   iframe: {
@@ -16,16 +17,16 @@ interface Props {
   width: number
   scale: number
   assetRoot: string
-  statusBarHeight: 0
+  statusBarHeight: number
   statusBarColor: string
   sharedEnvironment: boolean
-  vendorComponents: any[]
+  vendorComponents: unknown[]
   playerStyleSheet: string
   playerCSS: string
   prelude: string
-  onError: (payload: unknown) => void
+  onError: (payload: string) => void
   onRun: () => void
-  onConsole: (payload: unknown) => void
+  onConsole: (payload: LogEntry) => void
 }
 
 interface State {
@@ -34,9 +35,19 @@ interface State {
 
 type MessageData = {
   id: string
-  type: string
-  payload: unknown
-}
+} & (
+  | {
+      type: 'ready'
+    }
+  | {
+      type: 'error'
+      payload: string
+    }
+  | {
+      type: 'console'
+      payload: LogEntry
+    }
+)
 
 export default class extends PureComponent<Props, State> {
   static defaultProps = {
@@ -72,11 +83,9 @@ export default class extends PureComponent<Props, State> {
     })
 
     const handleMessageData = (data: MessageData) => {
-      const { id, type, payload } = data
+      if (data.id !== this.state.id) return
 
-      if (id !== this.state.id) return
-
-      switch (type) {
+      switch (data.type) {
         case 'ready':
           this.status = 'ready'
           if (this.fileMap) {
@@ -86,10 +95,10 @@ export default class extends PureComponent<Props, State> {
           }
           break
         case 'error':
-          this.props.onError(payload)
+          this.props.onError(data.payload)
           break
         case 'console':
-          this.props.onConsole(payload)
+          this.props.onConsole(data.payload)
           break
       }
     }

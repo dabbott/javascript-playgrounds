@@ -24,7 +24,7 @@ export default memo(function Phone(
     screenHeight,
   } = PHONES[device]
 
-  const imageScale = width / deviceImageWidth
+  const imageScale = Number(width) / deviceImageWidth
   const height = imageScale * deviceImageHeight
 
   const styles = prefixObject({

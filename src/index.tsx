@@ -7,12 +7,14 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import screenfull from 'screenfull'
 
-import Workspace from './components/workspace/Workspace'
+import Workspace, {
+  Props as WorkspaceProps,
+} from './components/workspace/Workspace'
 import { getHashString, setHashString } from './utils/HashString'
 import DefaultCode from './constants/DefaultCode'
 import { prefix, prefixAndApply } from './utils/PrefixInlineStyles'
 import { appendCSS } from './utils/Styles'
-import diff from './utils/Diff'
+import diff, { DiffRange } from './utils/Diff'
 import defaultLibs from './utils/TypeScriptDefaultLibs'
 
 const style = prefix({
@@ -103,12 +105,12 @@ if (typescriptOptions.enabled && !(entry || initialTab)) {
 }
 
 const parsedFiles = JSON.parse(files)
-let fileMap: any
+let fileMap: Record<string, string>
 
 if (parsedFiles.length > 0) {
   // Build a map of {filename => code}
   fileMap = parsedFiles.reduce(
-    (fileMap: any, [filename, code]: [string, string]) => {
+    (fileMap: Record<string, string>, [filename, code]: [string, string]) => {
       fileMap[filename] = code
       return fileMap
     },
@@ -128,7 +130,19 @@ if (!fileMap.hasOwnProperty(initialTab)) {
   initialTab = entry
 }
 
-function workspacesStepDiff(targetStep: any, sourceStep: any) {
+export type WorkspaceDiff = {
+  type: 'added' | 'changed'
+  ranges: DiffRange[]
+}
+
+type WorkspaceStep = {
+  workspace: { files: Record<string, string> }
+}
+
+function workspacesStepDiff(
+  targetStep: WorkspaceStep,
+  sourceStep: WorkspaceStep
+): Record<string, WorkspaceDiff> {
   const {
     workspace: { files: sourceFiles },
   } = sourceStep
@@ -136,19 +150,16 @@ function workspacesStepDiff(targetStep: any, sourceStep: any) {
     workspace: { files: targetFiles },
   } = targetStep
 
-  const result: any = {}
+  const result: Record<string, WorkspaceDiff> = {}
 
-  Object.keys(targetFiles).forEach((filename: string, index: number) => {
-    if (!(filename in sourceFiles)) {
-      result[filename] = {
-        type: 'added',
-        ranges: diff('', targetFiles[filename]).added,
-      }
-    } else {
-      result[filename] = {
-        type: 'changed',
-        ranges: diff(sourceFiles[filename], targetFiles[filename]).added,
-      }
+  Object.keys(targetFiles).forEach((filename: string) => {
+    const exists = filename in sourceFiles
+    const source = sourceFiles[filename] ?? ''
+    const lineDiff = diff(source, targetFiles[filename])
+
+    result[filename] = {
+      type: exists ? 'changed' : 'added',
+      ranges: lineDiff.added,
     }
   })
 
@@ -167,8 +178,9 @@ class WorkspaceContainer extends Component {
 
     const parsedWorkspaces = JSON.parse(workspaces)
 
-    const workspaceProps = {
+    const workspaceProps: WorkspaceProps = {
       title,
+      description: '', // Not currently used
       files: fileMap,
       entry,
       initialTab,
@@ -199,6 +211,7 @@ class WorkspaceContainer extends Component {
       typescriptOptions,
       activeStepIndex: activeStepIndex,
       onChangeActiveStepIndex: this.handleChangeActiveStepIndex,
+      diff: {},
     }
 
     if (!parsedWorkspaces || parsedWorkspaces.length === 0) {
@@ -209,9 +222,9 @@ class WorkspaceContainer extends Component {
       const workspaceDiff = workspacesStepDiff(
         parsedWorkspaces[activeStepIndex],
         parsedWorkspaces[activeStepIndex - 1]
-      ) as any
+      )
 
-      ;(workspaceProps as any).diff = workspaceDiff
+      workspaceProps.diff = workspaceDiff
     }
 
     return Object.assign(

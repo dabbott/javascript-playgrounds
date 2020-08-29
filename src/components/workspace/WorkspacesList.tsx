@@ -86,7 +86,7 @@ rawStyles.activeRowTitle = {
 
 const styles = prefixObject(rawStyles)
 
-interface Step {
+export interface Step {
   title: string
   description: string
 }
@@ -95,7 +95,6 @@ interface Props {
   steps: Step[]
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
-  isActive: boolean
   style?: CSSProperties
   rowStyle?: CSSProperties
   rowStyleActive?: CSSProperties

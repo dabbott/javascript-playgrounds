@@ -1,4 +1,4 @@
-import React, { PureComponent, ReactNode } from 'react'
+import React, { PureComponent, ReactNode, CSSProperties } from 'react'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import Tabs from './Tabs'
 
@@ -22,9 +22,9 @@ interface Props<T> {
   getTitle: (a: T) => string
   compareTabs: (a: T, b: T) => boolean
   renderHiddenContent: boolean
-  tabStyle?: T
-  textStyle?: T
-  activeTextStyle?: T
+  tabStyle?: CSSProperties
+  textStyle?: CSSProperties
+  activeTextStyle?: CSSProperties
 }
 
 interface State<T> {

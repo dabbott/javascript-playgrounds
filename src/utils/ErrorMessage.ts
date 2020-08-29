@@ -1,3 +1,5 @@
+import { PublicError } from '../components/workspace/Workspace'
+
 type MessageHandler = [
   string,
   (message: string) => { summary: string; description: string }
@@ -38,12 +40,13 @@ const messages: MessageHandler[] = [
 
 const defaultDescription = `The web player encountered an error. When you fix the error, the web player will automatically re-run your code.`
 
-export const getErrorDetails = (originalMessage: string) => {
+export const getErrorDetails = (originalMessage: string): PublicError => {
   const firstLine = originalMessage.split('\n')[0]
   const errorLineNumber = firstLine.match(/\((\d+)/)
 
   const details = {
-    lineNumber: errorLineNumber && parseInt(errorLineNumber[1]) - 1,
+    lineNumber:
+      errorLineNumber !== null ? parseInt(errorLineNumber[1]) - 1 : undefined,
     summary: firstLine,
     description: defaultDescription,
     errorMessage: originalMessage,

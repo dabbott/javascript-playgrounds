@@ -1,9 +1,9 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, CSSProperties, RefObject } from 'react'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import About from './About'
 import Button from './Button'
-import Console from './Console'
+import Console, { LogEntry } from './Console'
 import Editor from './Editor'
 import Fullscreen from './Fullscreen'
 import Header from './Header'
@@ -14,6 +14,40 @@ import TabContainer from './TabContainer'
 import Tabs from './Tabs'
 import WorkspacesList from './WorkspacesList'
 import { workerRequest } from '../../utils/WorkerRequest'
+import type { WorkspaceDiff } from '../../index'
+import * as ts from 'typescript'
+
+export type BabelWorkerMessage = {
+  filename: string
+} & (
+  | {
+      type: 'code'
+      code: string
+    }
+  | {
+      type: 'error'
+      error: {
+        message: string
+      }
+    }
+)
+
+export type TypeScriptRequest =
+  | {
+      type: 'libs'
+      libs: string[]
+      types: string[]
+    }
+  | {
+      type: 'file'
+      filename: string
+      code: string
+    }
+  | {
+      type: 'quickInfo'
+      filename: string
+      position: number
+    }
 
 const BabelWorker = require('../../babel-worker.js')
 const babelWorker = new BabelWorker()
@@ -21,29 +55,43 @@ const babelWorker = new BabelWorker()
 // Utilities for determining which babel worker responses are for the player vs
 // the transpiler view, since we encode this information in the filename.
 const transpilerPrefix = '@babel-'
-const getTranspilerId = (filename) => `${transpilerPrefix}${filename}`
-const isTranspilerId = (filename) => filename.indexOf(transpilerPrefix) === 0
+const getTranspilerId = (filename: string): string =>
+  `${transpilerPrefix}${filename}`
+const isTranspilerId = (filename: string): boolean =>
+  filename.indexOf(transpilerPrefix) === 0
 
-const compareTabs = (a, b) => a.index === b.index
-const getTabTitle = (tab) => tab.title
-const getTabChanged = (tab) => tab.changed
+type Tab = {
+  index: number
+  title: string
+  changed: boolean
+}
+const compareTabs = (a: Tab, b: Tab) => a.index === b.index
+const getTabTitle = (tab: Tab) => tab.title
+const getTabChanged = (tab: Tab) => tab.changed
 
-const containsPane = (panes, target) =>
-  panes.some((pane) =>
-    typeof pane === 'string'
-      ? pane === target
-      : pane.type === target || containsPane(pane.children || [], target)
-  )
+const containsPane = (panes: Pane[], target: string): boolean =>
+  panes.some((pane: Pane) => {
+    if (typeof pane === 'string') return pane === target
 
-const normalizePane = (pane) =>
-  typeof pane === 'string' ? { type: pane } : pane
+    if (pane.type === target) return true
 
-/**
- * @param {{ maxWidth: number }[]} responsivePaneSets
- * @param {number} windowWidth
- * @returns {number}
- */
-const findPaneSetIndex = (responsivePaneSets, windowWidth = undefined) =>
+    const children = (pane.type === 'stack' && pane.children) || []
+
+    return containsPane(children, target)
+  })
+
+const normalizePane = (pane: Pane): PaneObject => {
+  if (typeof pane === 'string') {
+    return { type: pane } as any
+  }
+
+  return pane
+}
+
+const findPaneSetIndex = (
+  responsivePaneSets: ResponsivePaneSet[],
+  windowWidth?: number
+): number =>
   windowWidth === undefined
     ? responsivePaneSets.length - 1
     : responsivePaneSets.findIndex((paneSet) => paneSet.maxWidth > windowWidth)
@@ -145,7 +193,117 @@ const styles = prefixObject({
   },
 })
 
-export default class extends PureComponent {
+export type PaneBase = {
+  title?: string
+  style?: CSSProperties
+}
+export type StackPane = PaneBase & {
+  type: 'stack'
+  children: Pane[]
+}
+export type EditorPane = PaneBase & {
+  type: 'editor'
+}
+export type TranspilerPane = PaneBase & {
+  type: 'transpiler'
+}
+export type PlayerPane = PaneBase & {
+  type: 'player'
+}
+export type WorkspacesPane = PaneBase & {
+  type: 'workspaces'
+}
+export type PaneObject =
+  | StackPane
+  | EditorPane
+  | TranspilerPane
+  | PlayerPane
+  | WorkspacesPane
+export type PaneShorthand = PaneObject['type']
+export type Pane = PaneShorthand | PaneObject
+export type ResponsivePaneSet = {
+  maxWidth: number
+  panes: Pane[]
+}
+
+export type PublicError = {
+  lineNumber?: number
+  errorMessage: string
+  summary: string
+  description: string
+}
+
+interface ConsoleOptions {
+  enabled: boolean
+  visible: boolean
+  maximized: boolean
+  collapsible: boolean
+  showFileName: boolean
+  showLineNumber: boolean
+  renderReactElements: boolean
+}
+
+interface PlaygroundOptions {
+  enabled: boolean
+  renderReactElements: boolean
+  debounceDuration: number
+}
+
+interface TypeScriptOptions {
+  enabled: false
+  libs?: string[]
+  types?: string[]
+}
+
+export interface Props {
+  title: string
+  description: string
+  files: Record<string, string>
+  entry: string
+  initialTab: string
+  onChange: (files: Record<string, string>) => void
+  platform?: string
+  scale?: number
+  width?: number
+  assetRoot?: string
+  vendorComponents: unknown[]
+  externalStyles: Record<string, CSSProperties>
+  fullscreen: boolean
+  sharedEnvironment: boolean
+  playerStyleSheet?: string
+  playerCSS?: string
+  prelude: string
+  responsivePaneSets: ResponsivePaneSet[]
+  consoleOptions: ConsoleOptions
+  playgroundOptions: PlaygroundOptions
+  typescriptOptions: TypeScriptOptions
+  workspaces: Props[]
+  diff: Record<string, WorkspaceDiff>
+  statusBarHeight: number
+  statusBarColor: string
+  playerTitle?: string
+  transpilerTitle?: string
+  workspacesTitle?: string
+  activeStepIndex: number
+  onChangeActiveStepIndex: (index: number) => void
+}
+
+interface State {
+  compilerError?: PublicError
+  runtimeError?: PublicError
+  showDetails: boolean
+  showLogs: boolean
+  logs: LogEntry[]
+  activeFile: string
+  transpilerCache: Record<string, string>
+  transpilerVisible: boolean
+  playerVisible: boolean
+  fileTabs: Tab[]
+  activeFileTab?: Tab
+  paneSetIndex: number
+}
+
+export default class Workspace extends PureComponent<Props, State> {
   static defaultProps = {
     title: 'Live Editor',
     files: { ['index.js']: '' },
@@ -173,8 +331,12 @@ export default class extends PureComponent {
     statusBarColor: 'black',
   }
 
-  constructor(props) {
-    super()
+  codeCache: Record<string, string> = {}
+  playerCache: Record<string, string> = {}
+  player?: PlayerFrame
+
+  constructor(props: Props) {
+    super(props)
 
     const {
       initialTab,
@@ -185,10 +347,10 @@ export default class extends PureComponent {
       typescriptOptions,
     } = props
 
-    const fileTabs = Object.keys(files).map((filename, index) => {
+    const fileTabs: Tab[] = Object.keys(files).map((filename, index) => {
       return {
         title: filename,
-        changed: diff[filename] && diff[filename].ranges.length > 0,
+        changed: diff[filename] ? diff[filename].ranges.length > 0 : false,
         index,
       }
     })
@@ -234,8 +396,8 @@ export default class extends PureComponent {
     const panes = responsivePaneSets[paneSetIndex].panes
 
     this.state = {
-      compilerError: null,
-      runtimeError: null,
+      compilerError: undefined,
+      runtimeError: undefined,
       showDetails: false,
       showLogs: consoleOptions.visible,
       logs: [],
@@ -246,18 +408,6 @@ export default class extends PureComponent {
       fileTabs,
       activeFileTab: fileTabs.find((tab) => tab.title === initialTab),
       paneSetIndex,
-    }
-
-    this.codeCache = {}
-    this.playerCache = {}
-
-    // Map pane names to render methods
-    this.paneMap = {
-      editor: this.renderEditor,
-      transpiler: this.renderTranspiler,
-      player: this.renderPlayer,
-      workspaces: this.renderWorkspaces,
-      stack: this.renderStack,
     }
 
     babelWorker.addEventListener('message', this.onBabelWorkerMessage)
@@ -313,20 +463,25 @@ export default class extends PureComponent {
     const { entry, files } = this.props
 
     // Run the app once we've transformed each file at least once
-    if (Object.keys(files).every((filename) => playerCache[filename])) {
+    if (
+      player &&
+      Object.keys(files).every((filename) => playerCache[filename])
+    ) {
       this.clearLogs()
       player.runApplication(playerCache, entry)
     }
   }
 
-  onBabelWorkerMessage = ({ data }) => {
+  onBabelWorkerMessage = ({ data }: MessageEvent) => {
     const { playerCache } = this
     const { transpilerCache } = this.state
-    const { filename, type, code, error } = JSON.parse(data)
+    const babelMessage = JSON.parse(data) as BabelWorkerMessage
 
-    this.updateStatus(type, error)
+    this.updateStatus(babelMessage)
 
-    if (type === 'code') {
+    if (babelMessage.type === 'code') {
+      const { filename, code } = babelMessage
+
       if (isTranspilerId(filename)) {
         this.setState({
           transpilerCache: {
@@ -341,23 +496,25 @@ export default class extends PureComponent {
     }
   }
 
-  updateStatus = (type, error) => {
-    switch (type) {
+  updateStatus = (babelMessage: BabelWorkerMessage) => {
+    switch (babelMessage.type) {
       case 'code':
         this.setState({
-          compilerError: null,
+          compilerError: undefined,
           showDetails: false,
         })
         break
       case 'error':
         this.setState({
-          compilerError: getErrorDetails(error.message),
+          compilerError: getErrorDetails(babelMessage.error.message),
         })
         break
     }
   }
 
-  runTypeScriptRequest = (payload) => {
+  typeScriptWorker: any
+
+  runTypeScriptRequest = (payload: TypeScriptRequest) => {
     if (!this.props.typescriptOptions.enabled) {
       return Promise.resolve()
     }
@@ -365,15 +522,19 @@ export default class extends PureComponent {
     if (!this.typeScriptWorker) {
       this.typeScriptWorker = import(
         '../../typescript-worker.js'
-      ).then((worker) => worker.default())
+      ).then((worker) => (worker as any).default())
     }
 
-    return this.typeScriptWorker.then((worker) =>
+    return this.typeScriptWorker.then((worker: unknown) =>
       workerRequest(worker, payload)
     )
   }
 
-  getTypeScriptInfo = (prefixedFilename, index, done) => {
+  getTypeScriptInfo = (
+    prefixedFilename: string,
+    index: number,
+    done: (info: ts.QuickInfo) => void
+  ) => {
     const [, filename] = prefixedFilename.split(':')
 
     this.runTypeScriptRequest({
@@ -381,17 +542,17 @@ export default class extends PureComponent {
       filename,
       position: index,
     })
-      .then((info) => {
-        if (info && info.displayParts.length > 0) {
+      .then((info?: ts.QuickInfo) => {
+        if (info && info.displayParts && info.displayParts.length > 0) {
           done(info)
         }
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         console.log('Error finding type info', error)
       })
   }
 
-  onCodeChange = (code) => {
+  onCodeChange = (code: string) => {
     const { activeFile, transpilerVisible, playerVisible } = this.state
 
     this.runTypeScriptRequest({
@@ -419,25 +580,25 @@ export default class extends PureComponent {
     this.props.onChange(this.codeCache)
   }
 
-  onToggleDetails = (showDetails) => {
+  onToggleDetails = (showDetails: boolean) => {
     this.setState({ showDetails })
   }
 
-  onToggleLogs = (showLogs) => {
+  onToggleLogs = (showLogs: boolean) => {
     this.setState({ showLogs })
   }
 
   onPlayerRun = () => {
-    this.setState({ runtimeError: null })
+    this.setState({ runtimeError: undefined })
   }
 
   // TODO: Runtime errors should indicate which file they're coming from,
   // and only cause a line highlight on that file.
-  onPlayerError = (message) => {
+  onPlayerError = (message: string) => {
     this.setState({ runtimeError: getErrorDetails(message) })
   }
 
-  onPlayerConsole = (payload) => {
+  onPlayerConsole = (payload: LogEntry) => {
     const { consoleOptions, playgroundOptions } = this.props
     const { logs } = this.state
 
@@ -463,14 +624,14 @@ export default class extends PureComponent {
     this.setState({ logs: [] })
   }
 
-  onClickTab = (tab) => {
+  onClickTab = (tab: Tab) => {
     this.setState({
       activeFile: tab.title,
       activeFileTab: tab,
     })
   }
 
-  renderEditor = (key, options) => {
+  renderEditor = (key: number, options: EditorPane) => {
     const {
       files,
       title,
@@ -534,7 +695,7 @@ export default class extends PureComponent {
           initialValue={files[activeFile]}
           filename={activeStepIndex + ':' + activeFile}
           onChange={this.onCodeChange}
-          errorLineNumber={isError && error.lineNumber}
+          errorLineNumber={error?.lineNumber}
           showDiff={true}
           diff={fileDiff}
           logs={playgroundOptions.enabled ? logs : undefined}
@@ -551,10 +712,12 @@ export default class extends PureComponent {
               <Overlay isError={isError}>
                 {isError ? (
                   <React.Fragment>
-                    <b style={styles.boldMessage}>{error.description}</b>
+                    <b style={styles.boldMessage}>{error?.description}</b>
                     <br />
                     <br />
-                    <code style={styles.codeMessage}>{error.errorMessage}</code>
+                    <code style={styles.codeMessage}>
+                      {error?.errorMessage}
+                    </code>
                     <br />
                   </React.Fragment>
                 ) : (
@@ -565,7 +728,7 @@ export default class extends PureComponent {
             </div>
           </div>
         )}
-        <Status text={isError ? error.summary : 'No Errors'} isError={isError}>
+        <Status text={!!error ? error.summary : 'No Errors'} isError={isError}>
           <Button
             active={showDetails}
             isError={isError}
@@ -578,7 +741,7 @@ export default class extends PureComponent {
     )
   }
 
-  renderTranspiler = (key, options) => {
+  renderTranspiler = (key: number, options: TranspilerPane) => {
     const { externalStyles, transpilerTitle } = this.props
     const { activeFile, transpilerCache } = this.state
 
@@ -605,7 +768,7 @@ export default class extends PureComponent {
     )
   }
 
-  renderWorkspaces = (key, options) => {
+  renderWorkspaces = (key: number, options: WorkspacesPane) => {
     const {
       externalStyles,
       workspacesTitle,
@@ -653,7 +816,7 @@ export default class extends PureComponent {
     )
   }
 
-  renderPlayer = (key, options) => {
+  renderPlayer = (key: number, options: PlayerPane) => {
     const {
       files,
       width,
@@ -694,7 +857,9 @@ export default class extends PureComponent {
         <div style={styles.column}>
           <div style={styles.row}>
             <PlayerFrame
-              ref={(ref) => (this.player = ref)}
+              ref={(ref) => {
+                this.player = ref || undefined
+              }}
               width={width}
               scale={scale}
               platform={platform}
@@ -725,7 +890,10 @@ export default class extends PureComponent {
             )}
           </div>
           {consoleOptions.enabled && consoleOptions.collapsible !== false && (
-            <Status text={'Logs' + (showLogs ? '' : ` (${logs.length})`)}>
+            <Status
+              text={'Logs' + (showLogs ? '' : ` (${logs.length})`)}
+              isError={false}
+            >
               <Button active={showLogs} onChange={this.onToggleLogs}>
                 {'Show Logs'}
               </Button>
@@ -736,16 +904,19 @@ export default class extends PureComponent {
     )
   }
 
-  renderStack = (key, options) => {
+  renderStack = (key: number, options: StackPane) => {
     const { externalStyles } = this.props
 
     const { children } = options
 
-    const tabs = children.map(normalizePane).map((pane, i) => ({
-      title: pane.title || pane.type,
-      index: i,
-      pane,
-    }))
+    const tabs: (Tab & { pane: Pane })[] = children
+      .map(normalizePane)
+      .map((pane, i) => ({
+        title: pane.title || pane.type,
+        index: i,
+        pane,
+        changed: false,
+      }))
 
     return (
       <TabContainer
@@ -765,10 +936,23 @@ export default class extends PureComponent {
     )
   }
 
-  renderPane = (pane, key) => {
-    const { type, ...options } = normalizePane(pane)
+  renderPane = (pane: Pane, key: number) => {
+    const paneObject = normalizePane(pane)
 
-    return this.paneMap[type](key, options)
+    switch (paneObject.type) {
+      case 'editor':
+        return this.renderEditor(key, paneObject)
+      case 'transpiler':
+        return this.renderTranspiler(key, paneObject)
+      case 'player':
+        return this.renderPlayer(key, paneObject)
+      case 'workspaces':
+        return this.renderWorkspaces(key, paneObject)
+      case 'stack':
+        return this.renderStack(key, paneObject)
+      default:
+        return `Unknown pane type: ${paneObject['type']}`
+    }
   }
 
   render() {
