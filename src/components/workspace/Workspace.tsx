@@ -61,7 +61,7 @@ const getTranspilerId = (filename: string): string =>
 const isTranspilerId = (filename: string): boolean =>
   filename.indexOf(transpilerPrefix) === 0
 
-type Tab = {
+interface Tab {
   index: number
   title: string
   changed: boolean

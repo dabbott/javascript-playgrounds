@@ -1,18 +1,42 @@
 import { prefix as prefixStyle } from 'inline-style-prefixer'
 import type { CSSProperties } from 'react'
 
-type Style = CSSProperties
+type Style = CSSProperties & { _prefixed?: boolean }
 type StyleSheet = Record<string, Style>
 
+const prefixMarker = '_prefixed'
+
+// Add a special marker to avoid prefixing multiple times
+const addPrefixMarker = (style: CSSProperties): void => {
+  Object.defineProperty(style, prefixMarker, {
+    enumerable: false,
+    value: true,
+  })
+}
+
 export const prefix = (style: Style) => {
-  const prefixed = prefixStyle({ ...style })
+  const prefixedStyle = prefixStyle({ ...style })
 
   // Display becomes an array - we just shouldn't prefix it
   if (style.display) {
-    prefixed.display = style.display
+    prefixedStyle.display = style.display
   }
 
-  return prefixed
+  addPrefixMarker(prefixedStyle)
+
+  return prefixedStyle
+}
+
+export const mergeStyles = (...styles: (Style | undefined)[]): Style => {
+  const filtered = styles.filter((style) => !!style) as Style[]
+  const prefixedStyles = filtered.map((style) =>
+    style._prefixed === true ? style : prefix(style)
+  )
+  const prefixedStyle = Object.assign({}, ...prefixedStyles)
+
+  addPrefixMarker(prefixedStyle)
+
+  return prefixedStyle
 }
 
 export const prefixObject = (

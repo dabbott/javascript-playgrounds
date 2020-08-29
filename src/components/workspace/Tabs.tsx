@@ -1,5 +1,5 @@
-import React, { PureComponent, CSSProperties } from 'react'
-import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
+import React, { CSSProperties, memo, ReactNode, useMemo } from 'react'
+import { prefixObject, mergeStyles } from '../../utils/PrefixInlineStyles'
 
 const styles = prefixObject({
   container: {
@@ -51,78 +51,83 @@ interface Props<T> {
   activeTextStyle?: CSSProperties
   changedTextStyle?: CSSProperties
   tabStyle?: CSSProperties
+  children?: ReactNode
 }
 
-export default class Tabs<T> extends PureComponent<Props<T>> {
-  static defaultProps = {
-    tabs: [],
-    activeTab: null,
-    onClickTab: (tab: string) => {},
-    getTitle: (a: string) => a,
-    getChanged: (a: string) => false,
-    compareTabs: (a: string, b: string) => a === b,
-    textStyle: null,
-    activeTextStyle: null,
-    tabStyle: null,
-  }
-
-  onClickTab = (tab: T) => this.props.onClickTab(tab)
-
-  getContainerStyle = () => {
-    const { tabStyle } = this.props
-
-    return tabStyle
-      ? prefix({ ...styles.container, ...tabStyle })
-      : styles.container
-  }
-
-  getTextStyle = (tab: T) => {
-    const { activeTab, textStyle, activeTextStyle, compareTabs } = this.props
-
-    if (activeTab && compareTabs(tab, activeTab)) {
-      const base = textStyle
-        ? prefix({ ...styles.activeText, ...textStyle })
-        : styles.activeText
-
-      return activeTextStyle ? prefix({ ...base, ...activeTextStyle }) : base
-    } else {
-      return textStyle ? prefix({ ...styles.text, ...textStyle }) : styles.text
-    }
-  }
-
-  getChangedTextStyle = (tab: T) => {
-    const { getChanged, changedTextStyle } = this.props
-
-    const base = this.getTextStyle(tab)
-
-    if (getChanged(tab)) {
-      return prefix({ ...base, ...styles.changedText, ...changedTextStyle })
-    } else {
-      return base
-    }
-  }
-
-  render() {
-    const { children, tabs, getTitle } = this.props
-
-    return (
-      <div style={this.getContainerStyle()}>
-        {tabs.map((tab, i) => {
-          const title = getTitle(tab)
-
-          return (
-            <div
-              key={title}
-              style={this.getChangedTextStyle(tab)}
-              onClick={this.onClickTab.bind(this, tab)}
-            >
-              {title}
-            </div>
-          )
-        })}
-        <div style={styles.spacer} />
-        {children}
-      </div>
-    )
-  }
+interface TabProps<T> {
+  title: string
+  style: CSSProperties
+  onClick: () => void
 }
+
+const Tab = memo(function Tab<T>({ title, style, onClick }: TabProps<T>) {
+  return (
+    <div key={title} style={style} onClick={onClick}>
+      {title}
+    </div>
+  )
+})
+
+export default memo(function Tabs<T>({
+  children = undefined,
+  tabs = [],
+  getTitle,
+  tabStyle,
+  activeTab,
+  textStyle,
+  activeTextStyle,
+  changedTextStyle,
+  compareTabs,
+  onClickTab,
+  getChanged,
+}: Props<T>) {
+  const activeTabIndex = tabs.findIndex(
+    (tab) => activeTab && compareTabs(tab, activeTab)
+  )
+  const clickHandlers = useMemo(
+    () => tabs.map((tab) => onClickTab.bind(null, tab)),
+    [tabs, onClickTab]
+  )
+
+  const containerStyle = useMemo(
+    () => mergeStyles(styles.container, tabStyle),
+    [tabStyle]
+  )
+  const computedTabStyle = useMemo(() => mergeStyles(styles.text, textStyle), [
+    textStyle,
+  ])
+  const computedActiveTabStyle = useMemo(
+    () => mergeStyles(styles.activeText, textStyle, activeTextStyle),
+    [textStyle, activeTextStyle]
+  )
+  const computedChangedTabStyle = useMemo(
+    () => mergeStyles(computedTabStyle, styles.changedText, changedTextStyle),
+    [textStyle, activeTextStyle]
+  )
+
+  return (
+    <div style={containerStyle}>
+      {tabs.map((tab, index) => {
+        const isActive = activeTabIndex === index
+        const isChanged = getChanged(tab)
+
+        return (
+          <Tab
+            key={index}
+            style={
+              isActive
+                ? computedActiveTabStyle
+                : isChanged
+                ? computedChangedTabStyle
+                : computedTabStyle
+            }
+            title={getTitle(tab)}
+            onClick={clickHandlers[index]}
+          />
+        )
+      })}
+      <div style={styles.spacer} />
+      {children}
+    </div>
+  )
+})
