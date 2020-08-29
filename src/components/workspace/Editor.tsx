@@ -6,8 +6,8 @@ import PlaygroundPreview from './PlaygroundPreview'
 import { tooltipAddon, TooltipValue } from '../../utils/CodeMirrorTooltipAddon'
 import Tooltip from './Tooltip'
 import type * as CM from 'codemirror'
-import type { LogEntry, SourceLocation } from './Console'
 import type { DiffRange } from '../../utils/Diff'
+import { SourceLocation, LogCommand } from '../../types/Messages'
 
 // Work around a codemirror + flexbox + chrome issue by creating an absolute
 // positioned parent and flex grandparent of the codemirror element.
@@ -37,7 +37,7 @@ interface Props {
   readOnly: boolean
   showDiff: boolean
   diff: DiffRange[]
-  logs?: LogEntry[] // Undefined instead of array to simplify re-rendering,
+  logs?: LogCommand[] // Undefined instead of array to simplify re-rendering,
   playgroundDebounceDuration: number
   getTypeInfo: unknown
   tooltipStyle?: CSSProperties
@@ -194,7 +194,7 @@ export default class extends PureComponent<Props> {
     const editorLine = (location: SourceLocation): number => location.line - 1
 
     // Take the latest log for each line
-    const createLogMap = (logs: LogEntry[]) => {
+    const createLogMap = (logs: LogCommand[]) => {
       return logs
         .filter(
           (log) =>
@@ -203,14 +203,14 @@ export default class extends PureComponent<Props> {
             log.location &&
             filename.endsWith(log.location.file)
         )
-        .reduce((result: Record<number, LogEntry>, log) => {
+        .reduce((result: Record<number, LogCommand>, log) => {
           const line = editorLine(log.location)
           result[line] = log
           return result
         }, {})
     }
 
-    const logMap: Record<string, LogEntry> = createLogMap(logs)
+    const logMap: Record<string, LogCommand> = createLogMap(logs)
 
     // Remove widgets that aren't needed from CodeMirror
     this.widgets.forEach((widget) => {
@@ -231,7 +231,7 @@ export default class extends PureComponent<Props> {
     })
 
     // Create or update all widgets
-    Object.values(logMap).forEach((entry: LogEntry) => {
+    Object.values(logMap).forEach((entry: LogCommand) => {
       const { data, location } = entry
 
       const handle = this.cm.getLineHandle(editorLine(location))

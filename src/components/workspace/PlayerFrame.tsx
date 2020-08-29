@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import * as ExtendedJSON from '../../utils/ExtendedJSON'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import Phone from './Phone'
-import { LogEntry } from './Console'
+import { Message, ConsoleCommand } from '../../types/Messages'
 
 const styles = prefixObject({
   iframe: {
@@ -26,28 +26,12 @@ interface Props {
   prelude: string
   onError: (payload: string) => void
   onRun: () => void
-  onConsole: (payload: LogEntry) => void
+  onConsole: (payload: ConsoleCommand) => void
 }
 
 interface State {
   id: string | null
 }
-
-type MessageData = {
-  id: string
-} & (
-  | {
-      type: 'ready'
-    }
-  | {
-      type: 'error'
-      payload: string
-    }
-  | {
-      type: 'console'
-      payload: LogEntry
-    }
-)
 
 export default class extends PureComponent<Props, State> {
   static defaultProps = {
@@ -82,7 +66,7 @@ export default class extends PureComponent<Props, State> {
       id: Math.random().toString().slice(2),
     })
 
-    const handleMessageData = (data: MessageData) => {
+    const handleMessageData = (data: Message) => {
       if (data.id !== this.state.id) return
 
       switch (data.type) {

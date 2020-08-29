@@ -3,7 +3,7 @@ import { getErrorDetails } from '../../utils/ErrorMessage'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import About from './About'
 import Button from './Button'
-import Console, { LogEntry } from './Console'
+import Console from './Console'
 import Editor from './Editor'
 import Fullscreen from './Fullscreen'
 import Header from './Header'
@@ -16,6 +16,7 @@ import WorkspacesList from './WorkspacesList'
 import { workerRequest } from '../../utils/WorkerRequest'
 import type { WorkspaceDiff } from '../../index'
 import * as ts from 'typescript'
+import { ConsoleCommand, LogCommand } from '../../types/Messages'
 
 export type BabelWorkerMessage = {
   filename: string
@@ -293,7 +294,7 @@ interface State {
   runtimeError?: PublicError
   showDetails: boolean
   showLogs: boolean
-  logs: LogEntry[]
+  logs: LogCommand[]
   activeFile: string
   transpilerCache: Record<string, string>
   transpilerVisible: boolean
@@ -598,14 +599,12 @@ export default class Workspace extends PureComponent<Props, State> {
     this.setState({ runtimeError: getErrorDetails(message) })
   }
 
-  onPlayerConsole = (payload: LogEntry) => {
+  onPlayerConsole = (payload: ConsoleCommand) => {
     const { consoleOptions, playgroundOptions } = this.props
     const { logs } = this.state
 
     if (consoleOptions.enabled || playgroundOptions.enabled) {
-      const { command } = payload
-
-      switch (command) {
+      switch (payload.command) {
         case 'log':
           this.setState({ logs: logs.concat(payload) })
           break

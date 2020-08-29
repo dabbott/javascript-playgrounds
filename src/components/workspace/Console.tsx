@@ -1,6 +1,7 @@
 import React, { PureComponent, CSSProperties } from 'react'
 import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 import { MultiInspector } from './Inspector'
+import { LogCommand, SourceLocation } from '../../types/Messages'
 
 const styles = prefixObject({
   overlay: {
@@ -47,25 +48,12 @@ const styles = prefixObject({
   },
 })
 
-export type SourceLocation = {
-  file: string
-  line: number
-  column: number
-}
-
-export type LogEntry = {
-  id: string
-  command: string
-  location: SourceLocation
-  data: unknown[]
-}
-
 interface Props {
   maximize: boolean
   showFileName: boolean
   showLineNumber: boolean
   renderReactElements: boolean
-  logs: LogEntry[]
+  logs: LogCommand[]
   style?: CSSProperties
   rowStyle?: CSSProperties
 }
@@ -124,7 +112,7 @@ export default class extends PureComponent<Props> {
     )
   }
 
-  renderEntry = (entry: LogEntry) => {
+  renderEntry = (entry: LogCommand) => {
     const { renderReactElements } = this.props
 
     const lineNumber =
