@@ -1,15 +1,3 @@
 {
-  "presets": [
-    "@babel/preset-react",
-    ["@babel/preset-env", { "modules": false }]
-  ],
-  "plugins": [
-    "@babel/plugin-proposal-class-properties",
-    [
-      "@babel/plugin-transform-typescript",
-      {
-        "isTSX": true
-      }
-    ]
-  ]
+  "presets": ["es2015", "stage-1", "react"]
 }
