@@ -5,7 +5,10 @@ import {
   SourceLocation,
 } from '../../types/Messages'
 
-const consoleProxy = ({ id: '0' } as unknown) as typeof window.console
+const consoleProxy = ({ id: '0' } as unknown) as typeof window.console & {
+  id: string
+  _rnwp_log?: typeof window.console.log
+}
 
 // I don't think this can fail, but the console object can be strange...
 // If it fails, we won't proxy all the methods (which is likely fine)
@@ -14,7 +17,7 @@ try {
     let f = (window.console as any)[key]
 
     if (typeof f === 'function') {
-      (consoleProxy as any)[key] = f.bind(window.console)
+      ;(consoleProxy as any)[key] = f.bind(window.console)
     }
   }
 } catch (e) {}
@@ -59,8 +62,17 @@ export const consoleLogRNWP = (
   return consoleLogCommon(callback, id, location, ...logs)
 }
 
-export const consoleLog = (callback: MessageCallback, id: string, ...args: unknown[]) => {
-  return consoleLogCommon(callback, id, { file: '<unknown>', line: 0, column: 0}, ...args)
+export const consoleLog = (
+  callback: MessageCallback,
+  id: string,
+  ...args: unknown[]
+) => {
+  return consoleLogCommon(
+    callback,
+    id,
+    { file: '<unknown>', line: 0, column: 0 },
+    ...args
+  )
 }
 
 export const consoleClear = (callback: MessageCallback, id: string) => {

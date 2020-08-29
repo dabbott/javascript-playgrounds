@@ -38,6 +38,7 @@
     "@types/react-dom": "^16.9.8",
     "@types/react-inspector": "^4.0.1",
     "@types/react-loadable": "^5.5.3",
+    "@types/scriptjs": "^0.0.2",
     "babel-cli": "^6.3.17",
     "babel-core": "^6.26.3",
     "babel-eslint": "^4.1.6",

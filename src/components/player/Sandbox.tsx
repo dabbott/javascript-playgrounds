@@ -1,5 +1,10 @@
 import PropTypes from 'prop-types'
-import React, { PureComponent, isValidElement } from 'react'
+import React, {
+  PureComponent,
+  isValidElement,
+  createRef,
+  CSSProperties,
+} from 'react'
 import ReactDOM from 'react-dom'
 import * as ReactNative from 'react-native-web'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
@@ -10,10 +15,26 @@ import consoleProxy, {
 } from './ConsoleProxy'
 import VendorComponents from './VendorComponents'
 import * as ExtendedJSON from '../../utils/ExtendedJSON'
+import hasProperty from '../../utils/hasProperty'
+import { Message } from '../../types/Messages'
+
+declare global {
+  interface Window {
+    ReactNative: unknown
+    PropTypes: unknown
+    _VendorComponents: typeof VendorComponents
+    _consoleProxy: typeof console
+    regeneratorRuntime: unknown
+    _requireCache: Record<string, unknown>
+    _didRegisterComponent: boolean
+    _require: (name: string) => unknown
+    __message: (message: Message) => void
+  }
+}
 
 window._VendorComponents = VendorComponents
 
-const AppRegistry = ReactNative.AppRegistry
+const AppRegistry = (ReactNative as any).AppRegistry
 
 window._consoleProxy = consoleProxy
 
@@ -24,7 +45,7 @@ const APP_NAME = 'App'
 
 // Override registerComponent in order to ignore the name used
 const registerComponent = AppRegistry.registerComponent.bind(AppRegistry)
-AppRegistry.registerComponent = (name, f) => {
+AppRegistry.registerComponent = (name: string, f: () => void) => {
   registerComponent(APP_NAME, f)
   window._didRegisterComponent = true
 }
@@ -37,7 +58,7 @@ var console = window._consoleProxy;
 (function(module, exports, require) {
 `
 
-const getSuffix = (filename) => `
+const getSuffix = (filename: string) => `
 })(module, exports, window._require);
 window._requireCache['${filename}'] = module.exports;
 ;
@@ -55,7 +76,18 @@ const styles = prefixObject({
   },
 })
 
-export default class extends PureComponent {
+interface Props {
+  id: string
+  assetRoot: string
+  prelude: string
+  statusBarHeight: number
+  statusBarColor: string
+  sharedEnvironment: boolean
+  onRun: () => {}
+  onError: (error: Error) => {}
+}
+
+export default class Sandbox extends PureComponent<Props> {
   static defaultProps = {
     assetRoot: '',
     onRun: () => {},
@@ -66,20 +98,20 @@ export default class extends PureComponent {
     sharedEnvironment: true,
   }
 
-  constructor(props) {
-    super(props)
-  }
-
   componentDidMount() {
-    window.onmessage = (e) => {
+    window.onmessage = (e: MessageEvent) => {
       if (!e.data || e.data.source !== 'rnwp') return
 
       this.runApplication(e.data)
     }
 
-    window.onerror = (message, source, line) => {
-      line -= prefixLineCount
-      this.throwError(`${message} (${line})`)
+    window.onerror = (
+      message: Event | string,
+      source?: string,
+      line?: number
+    ) => {
+      const editorLine = (line || 0) - prefixLineCount
+      this.throwError(`${message} (${editorLine})`)
       return true
     }
 
@@ -92,17 +124,17 @@ export default class extends PureComponent {
     )
   }
 
-  buildErrorMessage(e) {
+  buildErrorMessage(e: Error) {
     let message = `${e.name}: ${e.message}`
     let line = null
 
     // Safari
-    if (e.line != null) {
-      line = e.line
+    if ((e as any).line != null) {
+      line = (e as any).line
 
       // FF
-    } else if (e.lineNumber != null) {
-      line = e.lineNumber
+    } else if ((e as any).lineNumber != null) {
+      line = (e as any).lineNumber
 
       // Chrome
     } else if (e.stack) {
@@ -120,7 +152,7 @@ export default class extends PureComponent {
     return message
   }
 
-  throwError(message) {
+  throwError(message: string) {
     parent.postMessage(
       JSON.stringify({
         id: this.props.id,
@@ -131,7 +163,7 @@ export default class extends PureComponent {
     )
   }
 
-  require = (fileMap, entry, name) => {
+  require = (fileMap: Record<string, string>, entry: string, name: string) => {
     const { _requireCache } = window
     let { assetRoot } = this.props
 
@@ -190,13 +222,13 @@ export default class extends PureComponent {
     }
   }
 
-  sendMessage = (message) => {
+  sendMessage = (message: Message) => {
     const { sharedEnvironment } = this.props
 
     if (sharedEnvironment) {
       if (message.type === 'console' && message.payload.command === 'log') {
         message.payload.data = message.payload.data.map((log) => {
-          if (isValidElement(log)) {
+          if (isValidElement(log as any)) {
             return {
               __is_react_element: true,
               element: log,
@@ -214,8 +246,16 @@ export default class extends PureComponent {
     }
   }
 
-  runApplication({ fileMap, entry }) {
-    const screenElement = this.refs.root
+  runApplication({
+    fileMap,
+    entry,
+  }: {
+    fileMap: Record<string, string>
+    entry: string
+  }) {
+    const screenElement = this.root.current
+
+    if (!screenElement) return
 
     if (window._didRegisterComponent) {
       this.resetApplication()
@@ -254,7 +294,12 @@ export default class extends PureComponent {
       if (!window._didRegisterComponent) {
         const EntryComponent = window._requireCache[entry]
 
-        if (EntryComponent && EntryComponent.default) {
+        if (
+          EntryComponent &&
+          typeof EntryComponent === 'object' &&
+          hasProperty(EntryComponent, 'default')
+        ) {
+          const def = EntryComponent.default
           AppRegistry.registerComponent(APP_NAME, () => EntryComponent.default)
         }
       }
@@ -270,7 +315,8 @@ export default class extends PureComponent {
 
       // After rendering, add {overflow: hidden} to prevent scrollbars
       if (screenElement.firstElementChild) {
-        screenElement.firstElementChild.style.overflow = 'hidden'
+        ;(screenElement.firstElementChild as HTMLElement).style.overflow =
+          'hidden'
       }
     } catch (e) {
       const message = this.buildErrorMessage(e)
@@ -280,34 +326,40 @@ export default class extends PureComponent {
   }
 
   resetApplication() {
-    const screenElement = this.refs.root
+    const screenElement = this.root.current
 
-    ReactDOM.unmountComponentAtNode(screenElement)
+    if (screenElement) {
+      ReactDOM.unmountComponentAtNode(screenElement)
+    }
   }
 
-  evaluate(filename, code) {
+  evaluate(filename: string, code: string) {
     const wrapped = prefix + code + getSuffix(filename)
 
     eval(wrapped)
   }
+
+  root = React.createRef<HTMLDivElement>()
 
   render() {
     const { statusBarHeight, statusBarColor } = this.props
 
     const showStatusBar = statusBarHeight > 0
 
-    const statusBarStyle = showStatusBar && {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: statusBarHeight,
-      backgroundColor: statusBarColor,
-    }
+    const statusBarStyle: CSSProperties | undefined = showStatusBar
+      ? {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: statusBarHeight,
+          backgroundColor: statusBarColor,
+        }
+      : undefined
 
     return (
       <div style={styles.root}>
-        <div ref={'root'} id={'app'} style={styles.root} />
+        <div ref={this.root} id={'app'} style={styles.root} />
         {showStatusBar && <div style={statusBarStyle} />}
       </div>
     )
