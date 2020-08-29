@@ -34,7 +34,7 @@ declare global {
 
 window._VendorComponents = VendorComponents
 
-const AppRegistry = (ReactNative as any).AppRegistry
+const AppRegistry = ReactNative.AppRegistry
 
 window._consoleProxy = consoleProxy
 

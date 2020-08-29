@@ -87,11 +87,10 @@ export function toJSON(node: HTMLElement) {
 
 /**
  * Deserialize a DOM element
- *
- * @param {*} input
- * @returns {HTMLElement}
  */
-export function toDOM(input: any) {
+export function toDOM(
+  input: any
+): HTMLElement | Text | Comment | DocumentFragment {
   let obj: NodeObject = typeof input === 'string' ? JSON.parse(input) : input
   let node
   let nodeType = obj.nodeType

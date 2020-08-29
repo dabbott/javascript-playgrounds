@@ -15,7 +15,7 @@ import Tabs from './Tabs'
 import WorkspacesList from './WorkspacesList'
 import { workerRequest } from '../../utils/WorkerRequest'
 import type { WorkspaceDiff } from '../../index'
-import * as ts from 'typescript'
+import type * as ts from 'typescript'
 import { ConsoleCommand, LogCommand } from '../../types/Messages'
 
 export type BabelWorkerMessage = {
@@ -83,7 +83,7 @@ const containsPane = (panes: Pane[], target: string): boolean =>
 
 const normalizePane = (pane: Pane): PaneObject => {
   if (typeof pane === 'string') {
-    return { type: pane } as any
+    return { type: pane } as PaneObject
   }
 
   return pane
@@ -513,7 +513,7 @@ export default class Workspace extends PureComponent<Props, State> {
     }
   }
 
-  typeScriptWorker: any
+  typeScriptWorker?: Promise<any>
 
   runTypeScriptRequest = (payload: TypeScriptRequest) => {
     if (!this.props.typescriptOptions.enabled) {
@@ -535,7 +535,7 @@ export default class Workspace extends PureComponent<Props, State> {
     prefixedFilename: string,
     index: number,
     done: (info: ts.QuickInfo) => void
-  ) => {
+  ): void => {
     const [, filename] = prefixedFilename.split(':')
 
     this.runTypeScriptRequest({
@@ -710,7 +710,7 @@ export default class Workspace extends PureComponent<Props, State> {
             <div style={styles.overlay}>
               <Overlay isError={isError}>
                 {isError ? (
-                  <React.Fragment>
+                  <>
                     <b style={styles.boldMessage}>{error?.description}</b>
                     <br />
                     <br />
@@ -718,7 +718,7 @@ export default class Workspace extends PureComponent<Props, State> {
                       {error?.errorMessage}
                     </code>
                     <br />
-                  </React.Fragment>
+                  </>
                 ) : (
                   ''
                 )}

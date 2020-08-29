@@ -105,10 +105,10 @@ export default class extends PureComponent<Props> {
       : `:${location.line}`
 
     return (
-      <React.Fragment>
+      <>
         <span style={styles.lineNumberSpacer}></span>
         <span style={styles.lineNumber}>{string}</span>
-      </React.Fragment>
+      </>
     )
   }
 

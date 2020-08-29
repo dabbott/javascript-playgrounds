@@ -88,13 +88,13 @@ export default class extends PureComponent<Props, State> {
     }
 
     if (sharedEnvironment) {
-      ;(window as any).__message = handleMessageData
+      window.__message = handleMessageData
     }
 
     window.addEventListener('message', (e) => {
-      let data
+      let data: Message
       try {
-        data = ExtendedJSON.parse(e.data)
+        data = ExtendedJSON.parse(e.data) as Message
       } catch (err) {
         return
       }

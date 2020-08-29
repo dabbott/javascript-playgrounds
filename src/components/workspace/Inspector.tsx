@@ -1,7 +1,10 @@
-import React, { PureComponent, useRef, useEffect, ReactNode } from 'react'
-const Loadable = require('react-loadable')
+import React, { PureComponent, useRef, useEffect } from 'react'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 import * as DOMCoding from '../../utils/DOMCoding'
+import type { InspectorThemeDefinition, InspectorProps } from 'react-inspector'
+
+// Types don't match the version we're using. TODO: Upgrade or remove
+const Loadable = require('react-loadable')
 
 const styles = prefixObject({
   itemSpacer: {
@@ -9,7 +12,7 @@ const styles = prefixObject({
   },
 })
 
-const createInspectorTheme = (base: any) => ({
+const createInspectorTheme = (base: InspectorThemeDefinition) => ({
   ...base,
   BASE_FONT_SIZE: '13px',
   TREENODE_FONT_SIZE: '13px',
@@ -23,7 +26,7 @@ export const Inspector = Loadable({
     import('react-inspector').then(({ default: Inspector, chromeLight }) => {
       const theme = createInspectorTheme(chromeLight)
 
-      return (props: any) => <Inspector {...props} theme={theme} />
+      return (props: InspectorProps) => <Inspector {...props} theme={theme} />
     }),
   loading: () => null,
 })

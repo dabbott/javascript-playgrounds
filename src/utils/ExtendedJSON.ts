@@ -8,7 +8,7 @@ export const functionMarker = '__rnwp_function__'
 export const domNodeMarker = '__rnwp_dom_node__'
 
 // Parse, preserving values that can't be represented in JSON
-export function parse(json: string) {
+export function parse(json: string): unknown {
   return JSON.parse(json, (key, value) => {
     if (typeof value === 'string') {
       if (value.startsWith(undefinedMarker)) {

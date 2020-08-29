@@ -8,6 +8,7 @@ import Tooltip from './Tooltip'
 import type * as CM from 'codemirror'
 import type { DiffRange } from '../../utils/Diff'
 import { SourceLocation, LogCommand } from '../../types/Messages'
+import type * as ts from 'typescript'
 
 // Work around a codemirror + flexbox + chrome issue by creating an absolute
 // positioned parent and flex grandparent of the codemirror element.
@@ -39,7 +40,11 @@ interface Props {
   diff: DiffRange[]
   logs?: LogCommand[] // Undefined instead of array to simplify re-rendering,
   playgroundDebounceDuration: number
-  getTypeInfo: unknown
+  getTypeInfo?: (
+    prefixedFilename: string,
+    index: number,
+    done: (info: ts.QuickInfo) => void
+  ) => void
   tooltipStyle?: CSSProperties
   errorLineNumber?: number
   playgroundRenderReactElements: boolean
@@ -75,8 +80,33 @@ export default class extends PureComponent<Props> {
         tooltipStyle,
       } = this.props
 
+      let toolipPlugin: TooltipValue | undefined
+
       if (getTypeInfo) {
         tooltipAddon()
+        toolipPlugin = {
+          getNode: (cm, { index }, callback) => {
+            getTypeInfo(
+              filename,
+              index - 1,
+              ({ displayParts, documentation }) => {
+                const reactHost = document.createElement('div')
+                reactHost.className = 'cm-s-react'
+
+                ReactDOM.render(
+                  <Tooltip type={displayParts} documentation={documentation} />,
+                  reactHost
+                )
+
+                callback(reactHost)
+              }
+            )
+          },
+          removeNode: (node) => {
+            ReactDOM.unmountComponentAtNode(node)
+          },
+          style: tooltipStyle,
+        }
       }
 
       requireAddons()
@@ -89,33 +119,9 @@ export default class extends PureComponent<Props> {
         )
       }
 
-      const toolipPlugin: TooltipValue = {
-        getNode: (cm, { index }, callback) => {
-          ;(getTypeInfo as any)(
-            filename,
-            index - 1,
-            ({ displayParts, documentation }: any) => {
-              const reactHost = document.createElement('div')
-              reactHost.className = 'cm-s-react'
-
-              ReactDOM.render(
-                <Tooltip type={displayParts} documentation={documentation} />,
-                reactHost
-              )
-
-              callback(reactHost)
-            }
-          )
-        },
-        removeNode: (node) => {
-          ReactDOM.unmountComponentAtNode(node)
-        },
-        style: tooltipStyle,
-      }
-
       this.cm = CodeMirror(this.refs.editor, {
         ...options,
-        ...(getTypeInfo && {
+        ...(typeof toolipPlugin && {
           tooltip: toolipPlugin,
         }),
         readOnly,

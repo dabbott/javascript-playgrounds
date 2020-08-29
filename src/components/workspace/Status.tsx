@@ -1,7 +1,7 @@
-import React, { Component, ReactNode } from 'react'
+import React, { Component, ReactNode, CSSProperties } from 'react'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
-let styles: any = {
+let styles: Record<string, CSSProperties> = {
   container: {
     flex: '0 0 40px',
     display: 'flex',

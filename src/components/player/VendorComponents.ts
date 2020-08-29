@@ -11,7 +11,7 @@ const components: Record<string, unknown> = {}
 const requires: Record<string, string> = {}
 
 // Allow for keypaths for use in namespacing (Org.Component.Blah)
-const getObjectFromKeyPath = (data: any, keyPath: string) => {
+const getObjectFromKeyPath = (data: any, keyPath: string): unknown => {
   return keyPath
     .split('.')
     .reduce((prev: any, curr: string) => prev[curr], data)

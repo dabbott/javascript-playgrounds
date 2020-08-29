@@ -1,4 +1,5 @@
-import React, { PureComponent } from 'react'
+import React, { memo } from 'react'
+import type * as ts from 'typescript'
 import { prefixObject } from '../../utils/PrefixInlineStyles'
 
 // TypeScript's SymbolDisplayPartKind
@@ -62,37 +63,28 @@ const styles = prefixObject({
 })
 
 interface Props {
-  type: any[]
-  documentation: any[]
+  type?: ts.SymbolDisplayPart[]
+  documentation?: ts.SymbolDisplayPart[]
 }
 
-export default class extends PureComponent<Props> {
-  static defaultProps = {
-    type: [],
-    documentation: [],
-  }
-
-  render() {
-    const { type, documentation } = this.props
-
-    return (
-      <React.Fragment>
-        <span style={styles.type}>
-          {type.map(({ text, kind }, index) => (
-            <span className={classNameForKind(kind)} key={index}>
-              {text}
-            </span>
-          ))}
-        </span>
-        {documentation.length > 0 && <div style={styles.divider} />}
-        <span style={styles.documentation}>
-          {documentation.map(({ text }, index) => (
-            <span style={styles.documentationPart} key={index}>
-              {text}
-            </span>
-          ))}
-        </span>
-      </React.Fragment>
-    )
-  }
-}
+export default memo(function Tooltip({ type = [], documentation = [] }: Props) {
+  return (
+    <>
+      <span style={styles.type}>
+        {type.map(({ text, kind }, index) => (
+          <span className={classNameForKind(kind)} key={index}>
+            {text}
+          </span>
+        ))}
+      </span>
+      {documentation.length > 0 && <div style={styles.divider} />}
+      <span style={styles.documentation}>
+        {documentation.map(({ text }, index) => (
+          <span style={styles.documentationPart} key={index}>
+            {text}
+          </span>
+        ))}
+      </span>
+    </>
+  )
+})
