@@ -97,6 +97,7 @@ export default memo(function Tabs<T>({
     () => mergeStyles(styles.container, tabStyle),
     [tabStyle]
   )
+  // Pre-compute all tabs styles. The combinations: normal, active, changed, active + changed
   const computedTabStyle = useMemo(() => mergeStyles(styles.text, textStyle), [
     textStyle,
   ])
@@ -106,7 +107,12 @@ export default memo(function Tabs<T>({
   )
   const computedChangedTabStyle = useMemo(
     () => mergeStyles(computedTabStyle, styles.changedText, changedTextStyle),
-    [textStyle, activeTextStyle]
+    [computedTabStyle, changedTextStyle]
+  )
+  const computedChangedActiveTabStyle = useMemo(
+    () =>
+      mergeStyles(computedActiveTabStyle, styles.changedText, changedTextStyle),
+    [computedActiveTabStyle, changedTextStyle]
   )
 
   return (
@@ -119,7 +125,9 @@ export default memo(function Tabs<T>({
           <Tab
             key={index}
             style={
-              isActive
+              isActive && isChanged
+                ? computedChangedActiveTabStyle
+                : isActive
                 ? computedActiveTabStyle
                 : isChanged
                 ? computedChangedTabStyle
