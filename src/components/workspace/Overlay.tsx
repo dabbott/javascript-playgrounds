@@ -1,7 +1,20 @@
 import React, { CSSProperties, memo, ReactNode } from 'react'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import {
+  prefixObject,
+  prefix,
+  mergeStyles,
+} from '../../utils/PrefixInlineStyles'
 
-let styles: Record<string, CSSProperties> = {
+const baseTextStyle = prefix({
+  flex: '1',
+  color: 'rgba(0,0,0,0.5)',
+  fontSize: 13,
+  fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
+  lineHeight: '20px',
+  padding: '12px',
+})
+
+let styles = prefixObject({
   container: {
     flex: '1',
     display: 'flex',
@@ -10,22 +23,11 @@ let styles: Record<string, CSSProperties> = {
     alignItems: 'stretch',
     whiteSpace: 'pre-wrap',
   },
-  text: {
-    flex: '1',
-    color: 'rgba(0,0,0,0.5)',
-    fontSize: 13,
-    fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
-    lineHeight: '20px',
-    padding: '12px',
-  },
-}
-
-styles.error = {
-  ...styles.text,
-  color: '#C92C2C',
-}
-
-styles = prefixObject(styles)
+  text: baseTextStyle,
+  error: mergeStyles(baseTextStyle, {
+    color: '#C92C2C',
+  }),
+})
 
 interface Props {
   children?: ReactNode

@@ -1,5 +1,23 @@
 import React, { CSSProperties, memo, ReactNode, useMemo } from 'react'
-import { prefixObject, mergeStyles } from '../../utils/PrefixInlineStyles'
+import {
+  prefixObject,
+  mergeStyles,
+  prefix,
+} from '../../utils/PrefixInlineStyles'
+
+const baseTextStyle = prefix({
+  userSelect: 'none',
+  color: 'rgba(255,255,255,0.6)',
+  fontSize: 13,
+  fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
+  lineHeight: '40px',
+  padding: '0 20px',
+  cursor: 'pointer',
+  borderBottomStyle: 'solid',
+  borderBottomColor: '#1990B8',
+  borderBottomWidth: 0,
+  transition: 'border-width 0.1s, color 0.1s',
+})
 
 const styles = prefixObject({
   container: {
@@ -13,19 +31,11 @@ const styles = prefixObject({
     zIndex: 1000,
     overflow: 'hidden',
   },
-  text: {
-    userSelect: 'none',
-    color: 'rgba(255,255,255,0.6)',
-    fontSize: 13,
-    fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
-    lineHeight: '40px',
-    padding: '0 20px',
-    cursor: 'pointer',
-    borderBottomStyle: 'solid',
-    borderBottomColor: '#1990B8',
-    borderBottomWidth: 0,
-    transition: 'border-width 0.1s, color 0.1s',
-  },
+  text: baseTextStyle,
+  activeText: mergeStyles(baseTextStyle, {
+    borderBottomWidth: 3,
+    color: '#FFF',
+  }),
   changedText: {
     color: '#7ABE66',
   },
@@ -33,12 +43,6 @@ const styles = prefixObject({
     flex: '1 1 auto',
   },
 })
-
-styles.activeText = {
-  ...styles.text,
-  borderBottomWidth: 3,
-  color: '#FFF',
-}
 
 interface Props<T> {
   tabs: T[]

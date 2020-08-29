@@ -1,7 +1,19 @@
-import React, { Component, ReactNode, CSSProperties } from 'react'
-import { prefixObject } from '../../utils/PrefixInlineStyles'
+import React, { ReactNode } from 'react'
+import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
 
-let styles: Record<string, CSSProperties> = {
+const baseTextStyle = prefix({
+  color: '#D8D8D8',
+  fontSize: 13,
+  fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
+  padding: '0 12px',
+  fontWeight: 'bold',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  transition: 'color 0.2s',
+})
+
+const styles = prefixObject({
   container: {
     flex: '0 0 40px',
     display: 'flex',
@@ -14,25 +26,12 @@ let styles: Record<string, CSSProperties> = {
     boxSizing: 'border-box',
     paddingRight: 7,
   },
-  text: {
-    color: '#D8D8D8',
-    fontSize: 13,
-    fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
-    padding: '0 12px',
-    fontWeight: 'bold',
-    textOverflow: 'ellipsis',
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    transition: 'color 0.2s',
+  text: baseTextStyle,
+  error: {
+    ...baseTextStyle,
+    color: '#C92C2C',
   },
-}
-
-styles.error = {
-  ...styles.text,
-  color: '#C92C2C',
-}
-
-styles = prefixObject(styles)
+})
 
 interface Props {
   text: string

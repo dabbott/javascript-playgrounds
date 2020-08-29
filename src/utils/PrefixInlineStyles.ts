@@ -2,7 +2,6 @@ import { prefix as prefixStyle } from 'inline-style-prefixer'
 import type { CSSProperties } from 'react'
 
 type Style = CSSProperties & { _prefixed?: boolean }
-type StyleSheet = Record<string, Style>
 
 const prefixMarker = '_prefixed'
 
@@ -39,10 +38,11 @@ export const mergeStyles = (...styles: (Style | undefined)[]): Style => {
   return prefixedStyle
 }
 
-export const prefixObject = (
-  styles: StyleSheet,
-  output: StyleSheet = {}
-): StyleSheet => {
+export const prefixObject = <T extends { [K in string]: Style }>(
+  styles: T
+): T => {
+  const output: any = {}
+
   for (let key in styles) {
     if (styles.hasOwnProperty(key)) {
       output[key] = prefix(styles[key])

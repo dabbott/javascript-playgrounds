@@ -1,6 +1,6 @@
-import React, { PureComponent, CSSProperties } from 'react'
+import React, { CSSProperties, memo } from 'react'
 import screenfull from 'screenfull'
-import { prefix, prefixObject } from '../../utils/PrefixInlineStyles'
+import { mergeStyles, prefixObject } from '../../utils/PrefixInlineStyles'
 
 const styles = prefixObject({
   text: {
@@ -17,28 +17,14 @@ interface Props {
   textStyle?: CSSProperties
 }
 
-export default class Fullscreen extends PureComponent<Props> {
-  static defaultProps = {
-    textStyle: null,
-  }
+const toggleFullscreen = () => (screenfull as any).toggle()
 
-  getComputedStyles = () => {
-    const { textStyle } = this.props
+export default memo(function Fullscreen({ textStyle }: Props) {
+  const computedTextStyle = mergeStyles(styles.text, textStyle)
 
-    return {
-      text: textStyle ? prefix({ ...styles.text, ...textStyle }) : styles.text,
-    }
-  }
-
-  toggleFullscreen = () => (screenfull as any).toggle()
-
-  render() {
-    const computedStyles = this.getComputedStyles()
-
-    return (
-      <div style={computedStyles.text} onClick={this.toggleFullscreen}>
-        Fullscreen
-      </div>
-    )
-  }
-}
+  return (
+    <div style={computedTextStyle} onClick={toggleFullscreen}>
+      Fullscreen
+    </div>
+  )
+})
