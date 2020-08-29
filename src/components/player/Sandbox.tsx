@@ -299,7 +299,6 @@ export default class Sandbox extends PureComponent<Props> {
           typeof EntryComponent === 'object' &&
           hasProperty(EntryComponent, 'default')
         ) {
-          const def = EntryComponent.default
           AppRegistry.registerComponent(APP_NAME, () => EntryComponent.default)
         }
       }

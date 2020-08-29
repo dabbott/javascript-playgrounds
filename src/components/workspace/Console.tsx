@@ -1,4 +1,4 @@
-import React, { PureComponent, CSSProperties, memo } from 'react'
+import React, { PureComponent, CSSProperties, memo, createRef } from 'react'
 import { prefix, prefixObject } from '../../utils/Styles'
 import { MultiInspector } from './Inspector'
 import { LogCommand, SourceLocation } from '../../types/Messages'
@@ -87,7 +87,7 @@ export default class extends PureComponent<Props> {
     logs: [],
   }
 
-  container?: HTMLDivElement | null
+  container = createRef<HTMLDivElement>()
 
   getComputedStyle = () => {
     const { style, maximize } = this.props
@@ -104,19 +104,23 @@ export default class extends PureComponent<Props> {
   }
 
   componentDidMount() {
-    const { clientHeight, scrollHeight } = this.container!
+    if (!this.container.current) return
+
+    const { clientHeight, scrollHeight } = this.container.current
     const maxScrollTop = scrollHeight - clientHeight
 
-    this.container!.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
+    this.container.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
   }
 
   componentDidUpdate() {
-    const { clientHeight, scrollHeight, scrollTop } = this.container!
+    if (!this.container.current) return
+
+    const { clientHeight, scrollHeight, scrollTop } = this.container.current
     const maxScrollTop = scrollHeight - clientHeight
 
     // If we're within one clientHeight of the bottom, scroll to bottom
     if (maxScrollTop - clientHeight < scrollTop) {
-      this.container!.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
+      this.container.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
     }
   }
 
@@ -143,12 +147,7 @@ export default class extends PureComponent<Props> {
     const { logs } = this.props
 
     return (
-      <div
-        style={this.getComputedStyle()}
-        ref={(ref) => {
-          this.container = ref
-        }}
-      >
+      <div style={this.getComputedStyle()} ref={this.container}>
         {logs.map(this.renderEntry)}
       </div>
     )
