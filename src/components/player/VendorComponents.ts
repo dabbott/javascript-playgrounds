@@ -87,11 +87,11 @@ export default class VendorComponents {
 
   // Load components from urls
   static load(components: ComponentDescription[], callback: () => void) {
-    ;(ReactNative as any).default = ReactNative
-
     // Necessary for dependency mapping
     window.React = React
     window.ReactNative = ReactNative
+    // Add default export, although it's uncommon
+    ;(window.ReactNative as any).default = ReactNative
     window.ReactDOM = ReactDOM
     window.PropTypes = PropTypes
 

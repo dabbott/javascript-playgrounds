@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 
 import Sandbox from './components/player/Sandbox'
@@ -53,7 +53,7 @@ const root = (
 const mount = document.getElementById('react-root')
 
 // Set mount node to flex in a vendor-prefixed way
-prefixAndApply({ display: 'flex' }, mount)
+prefixAndApply({ display: 'flex' }, mount!)
 
 // if we have vendor components, we need to pre-load those
 // otherwise, we can just render normally

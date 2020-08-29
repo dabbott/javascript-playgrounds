@@ -12,7 +12,7 @@ const paths = {
     return path.join(this.src, 'index.tsx')
   },
   get player() {
-    return path.join(this.src, 'player.js')
+    return path.join(this.src, 'player.tsx')
   },
   get public() {
     return path.join(this.root, 'public')
