@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "ES2020",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "types": ["node"],
+    "typeRoots": ["node_modules/@types", "src/types"],
+    "lib": ["DOM", "ES2017"],
+    "sourceMap": true,
+    "allowJs": true,
+    "jsx": "react",
+    "moduleResolution": "node"
+  },
+  "exclude": ["node_modules", "public", "webpack", "dist"]
+}

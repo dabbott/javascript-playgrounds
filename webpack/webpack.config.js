@@ -5,11 +5,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const paths = {
   root: path.join(__dirname, '..'),
+  get src() {
+    return path.join(this.root, 'src')
+  },
   get index() {
-    return path.join(this.root, 'src/index.js')
+    return path.join(this.src, 'index.tsx')
   },
   get player() {
-    return path.join(this.root, 'src/player.js')
+    return path.join(this.src, 'player.tsx')
   },
   get public() {
     return path.join(this.root, 'public')
@@ -30,7 +33,12 @@ const common = merge({
   module: {
     rules: [
       {
-        test: /\.js/,
+        test: /\.tsx?$/,
+        use: ['ts-loader'],
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.jsx?$/,
         exclude: /node_modules/,
         use: [
           {
@@ -70,6 +78,7 @@ const common = merge({
     globalObject: 'this',
   },
   resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     alias: {
       '@babel/plugin-transform-unicode-regex': path.join(__dirname, 'empty.js'),
     },
@@ -92,16 +101,14 @@ const common = merge({
   ],
 })
 
-module.exports = ({ production } = {}) => {
+module.exports = (mode = 'development') => {
   const defines = new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify(
-      production ? 'production' : 'development'
-    ),
+    'process.env.NODE_ENV': JSON.stringify(mode),
   })
 
-  if (production) {
+  if (mode === 'production') {
     return merge(common, {
-      mode: 'production',
+      mode,
       plugins: [defines],
       optimization: {
         splitChunks: {
@@ -112,7 +119,7 @@ module.exports = ({ production } = {}) => {
     })
   } else {
     return merge(common, {
-      mode: 'development',
+      mode,
       devtool: 'source-map',
       plugins: [defines],
     })
