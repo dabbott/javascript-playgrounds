@@ -1,13 +1,14 @@
-import React, {
-  createRef,
-  CSSProperties,
-  PureComponent,
-  RefObject,
-} from 'react'
+import React, { CSSProperties, PureComponent } from 'react'
 import type * as ts from 'typescript'
 import type { WorkspaceDiff } from '../../index'
 import { ConsoleCommand, LogCommand } from '../../types/Messages'
 import { getErrorDetails } from '../../utils/ErrorMessage'
+import {
+  containsPane,
+  EditorPaneOptions,
+  Pane,
+  StackPaneOptions,
+} from '../../utils/Panes'
 import {
   columnStyle,
   mergeStyles,
@@ -15,7 +16,6 @@ import {
   rowStyle,
 } from '../../utils/Styles'
 import { workerRequest } from '../../utils/WorkerRequest'
-import { ComponentDescription } from '../player/VendorComponents'
 import About from './About'
 import Button from './Button'
 import Editor from './Editor'
@@ -24,22 +24,15 @@ import Header from './Header'
 import Overlay from './Overlay'
 import ConsolePane from './panes/ConsolePane'
 import PlayerPane from './panes/PlayerPane'
-import PlayerFrame from './PlayerFrame'
-import Status from './Status'
-import TabContainer from './TabContainer'
-import Tabs from './Tabs'
-import WorkspacesList from './WorkspacesList'
 import TranspilerPane, {
   getTranspilerId,
   isTranspilerId,
 } from './panes/TranspilerPane'
-import {
-  Pane,
-  containsPane,
-  EditorPaneOptions,
-  WorkspacesPaneOptions,
-  StackPaneOptions,
-} from '../../utils/Panes'
+import WorkspacesPane from './panes/WorkspacesPane'
+import PlayerFrame from './PlayerFrame'
+import Status from './Status'
+import TabContainer from './TabContainer'
+import Tabs from './Tabs'
 
 export type BabelWorkerMessage = {
   filename: string
@@ -96,11 +89,6 @@ const findPaneSetIndex = (
 const styles = prefixObject({
   container: rowStyle,
   editorPane: columnStyle,
-  workspacesPane: mergeStyles(columnStyle, {
-    width: 220,
-    overflowX: 'hidden',
-    overflowY: 'auto',
-  }),
   overlayContainer: {
     position: 'relative',
     flex: 0,
@@ -611,52 +599,6 @@ export default class Workspace extends PureComponent<Props, State> {
     )
   }
 
-  renderWorkspaces = (key: number, options: WorkspacesPaneOptions) => {
-    const {
-      externalStyles,
-      workspaces,
-      activeStepIndex,
-      onChangeActiveStepIndex,
-    } = this.props
-
-    const { title } = options
-
-    const style = mergeStyles(
-      styles.workspacesPane,
-      externalStyles.workspacesPane,
-      options.style
-    )
-
-    return (
-      <div key={key} style={style}>
-        {title && (
-          <Header
-            text={title}
-            headerStyle={externalStyles.workspacesHeader}
-            textStyle={externalStyles.workspacesHeaderText}
-          />
-        )}
-        <WorkspacesList
-          key={key}
-          steps={workspaces}
-          activeStepIndex={activeStepIndex}
-          onChangeActiveStepIndex={onChangeActiveStepIndex}
-          style={externalStyles.workspacesList}
-          rowStyle={externalStyles.workspacesRow}
-          rowStyleActive={externalStyles.workspacesRowActive}
-          rowTitleStyle={externalStyles.workspacesRowTitle}
-          rowTitleStyleActive={externalStyles.workspacesRowTitleActive}
-          descriptionStyle={externalStyles.workspacesDescription}
-          descriptionTextStyle={externalStyles.workspacesDescriptionText}
-          buttonTextStyle={externalStyles.workspacesButtonText}
-          buttonContainerStyle={externalStyles.workspacesButtonContainer}
-          buttonWrapperStyle={externalStyles.workspacesButtonWrapper}
-          dividerStyle={externalStyles.workspacesDivider}
-        />
-      </div>
-    )
-  }
-
   renderStack = (key: number, options: StackPaneOptions) => {
     const { externalStyles } = this.props
 
@@ -688,7 +630,14 @@ export default class Workspace extends PureComponent<Props, State> {
   }
 
   renderPane = (options: Pane, key: number) => {
-    const { files, externalStyles, sharedEnvironment } = this.props
+    const {
+      files,
+      externalStyles,
+      sharedEnvironment,
+      workspaces,
+      activeStepIndex,
+      onChangeActiveStepIndex,
+    } = this.props
     const { logs, transpilerCache, activeFile } = this.state
 
     switch (options.type) {
@@ -705,7 +654,6 @@ export default class Workspace extends PureComponent<Props, State> {
           />
         )
       case 'player':
-        // TODO: Validate only one player allowed for now, OR support multiple refs
         return (
           <PlayerPane
             ref={(player) => {
@@ -727,7 +675,16 @@ export default class Workspace extends PureComponent<Props, State> {
           />
         )
       case 'workspaces':
-        return this.renderWorkspaces(key, options)
+        return (
+          <WorkspacesPane
+            key={key}
+            options={options}
+            externalStyles={externalStyles}
+            workspaces={workspaces}
+            activeStepIndex={activeStepIndex}
+            onChangeActiveStepIndex={onChangeActiveStepIndex}
+          />
+        )
       case 'stack':
         return this.renderStack(key, options)
       case 'console':

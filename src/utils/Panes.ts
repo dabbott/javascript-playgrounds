@@ -72,8 +72,6 @@ export type Pane = /* PaneShorthand | */ PaneOptions
 
 export const containsPane = (panes: Pane[], target: string): boolean =>
   panes.some((pane: Pane) => {
-    if (typeof pane === 'string') return pane === target
-
     if (pane.type === target) return true
 
     const children = (pane.type === 'stack' && pane.children) || []
