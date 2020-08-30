@@ -1,9 +1,8 @@
-import { Tab } from '../utils/Tab'
-import { LogCommand, ConsoleCommand } from '../types/Messages'
 import { PublicError } from '../components/workspace/Workspace'
-import { containsPane, PaneOptions } from '../utils/Panes'
-import { isTranspilerId } from '../components/workspace/panes/TranspilerPane'
+import { LogCommand } from '../types/Messages'
 import { getErrorDetails } from '../utils/ErrorMessage'
+import { PaneOptions } from '../utils/Panes'
+import { Tab } from '../utils/Tab'
 
 export const types = {
   COMPILED: 'COMPILED',
@@ -73,23 +72,16 @@ export interface State {
   codeCache: Record<string, string>
   playerCache: Record<string, string>
   transpilerCache: Record<string, string>
-  transpilerVisible: boolean
-  playerVisible: boolean
   fileTabs: Tab[]
   activeFileTab?: Tab
-  paneSetIndex: number
 }
 
 export const initialState = ({
   initialTab,
-  panes,
   fileTabs,
-  paneSetIndex,
 }: {
   initialTab: string
-  panes: PaneOptions[]
   fileTabs: Tab[]
-  paneSetIndex: number
 }): State => ({
   compilerError: undefined,
   runtimeError: undefined,
@@ -101,18 +93,13 @@ export const initialState = ({
   playerCache: {},
   // Compiled files for the transpiler
   transpilerCache: {},
-  transpilerVisible: containsPane(panes, 'transpiler'),
-  playerVisible: containsPane(panes, 'player'),
   fileTabs,
   activeFileTab: fileTabs.find((tab) => tab.title === initialTab),
-  paneSetIndex,
 })
 
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
     case types.COMPILED: {
-      // TODO: Make sure we call runApplication in component
-      // TODO: We may need to ref this for perf and use a mutable value
       return {
         ...state,
         playerCache: {
@@ -145,7 +132,6 @@ export function reducer(state: State, action: Action): State {
       }
     }
     case types.CODE_CHANGE: {
-      // TODO: Call onChange in index.tsx
       return {
         ...state,
         codeCache: {

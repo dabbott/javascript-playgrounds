@@ -9,14 +9,6 @@ import Editor from '../Editor'
 import Header from '../Header'
 import { TranspilerPaneOptions } from '../../../utils/Panes'
 
-// Utilities for determining which babel worker responses are for the player vs
-// the transpiler view, since we encode this information in the filename.
-export const transpilerPrefix = '@babel-'
-export const getTranspilerId = (filename: string): string =>
-  `${transpilerPrefix}${filename}`
-export const isTranspilerId = (filename: string): boolean =>
-  filename.indexOf(transpilerPrefix) === 0
-
 const styles = prefixObject({
   transpilerPane: columnStyle,
   column: columnStyle,

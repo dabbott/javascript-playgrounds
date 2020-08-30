@@ -72,9 +72,9 @@ export const containsPane = (panes: PaneOptions[], target: string): boolean =>
   panes.some((pane: PaneOptions) => {
     if (pane.type === target) return true
 
-    const children = (pane.type === 'stack' && pane.children) || []
-
-    return containsPane(children, target)
+    return pane.type === 'stack' && pane.children
+      ? containsPane(pane.children, target)
+      : false
   })
 
 let initialId = 0

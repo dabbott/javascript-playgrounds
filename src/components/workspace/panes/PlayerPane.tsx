@@ -30,7 +30,6 @@ export interface Props {
   onPlayerConsole: (payload: ConsoleCommand) => void
 }
 
-// TODO: Memo
 const PlayerPane = memo(
   React.forwardRef<PlayerFrame, Props>(function renderPlayer(
     {
