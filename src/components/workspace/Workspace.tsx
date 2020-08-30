@@ -1,35 +1,29 @@
-import React, {
-  PureComponent,
-  CSSProperties,
-  RefObject,
-  createRef,
-} from 'react'
+import React, { createRef, CSSProperties, PureComponent } from 'react'
+import type * as ts from 'typescript'
+import type { WorkspaceDiff } from '../../index'
+import { ConsoleCommand, LogCommand } from '../../types/Messages'
 import { getErrorDetails } from '../../utils/ErrorMessage'
 import {
-  prefixObject,
-  mergeStyles,
-  prefix,
-  rowStyle,
   columnStyle,
+  mergeStyles,
+  prefixObject,
+  rowStyle,
 } from '../../utils/Styles'
+import { workerRequest } from '../../utils/WorkerRequest'
+import { ComponentDescription } from '../player/VendorComponents'
 import About from './About'
 import Button from './Button'
-import Console from './Console'
 import Editor from './Editor'
 import Fullscreen from './Fullscreen'
 import Header from './Header'
 import Overlay from './Overlay'
+import ConsolePane from './panes/ConsolePane'
+import PlayerPane from './panes/PlayerPane'
 import PlayerFrame from './PlayerFrame'
 import Status from './Status'
 import TabContainer from './TabContainer'
 import Tabs from './Tabs'
 import WorkspacesList from './WorkspacesList'
-import { workerRequest } from '../../utils/WorkerRequest'
-import type { WorkspaceDiff } from '../../index'
-import type * as ts from 'typescript'
-import { ConsoleCommand, LogCommand } from '../../types/Messages'
-import { ComponentDescription } from '../player/VendorComponents'
-import PlayerPane from './panes/PlayerPane'
 
 export type BabelWorkerMessage = {
   filename: string
@@ -114,7 +108,6 @@ const styles = prefixObject({
   container: rowStyle,
   editorPane: columnStyle,
   transpilerPane: columnStyle,
-  consolePane: columnStyle,
   workspacesPane: mergeStyles(columnStyle, {
     width: 220,
     overflowX: 'hidden',
@@ -771,69 +764,6 @@ export default class Workspace extends PureComponent<Props, State> {
     )
   }
 
-  // TODO: Validate only one player allowed for now, OR support multiple refs
-  renderPlayer = (key: number, options: PlayerPaneOptions) => {
-    const { files, externalStyles, sharedEnvironment } = this.props
-    const { logs } = this.state
-
-    return (
-      <PlayerPane
-        ref={this.player}
-        key={key}
-        options={options}
-        externalStyles={externalStyles}
-        sharedEnvironment={sharedEnvironment}
-        files={files}
-        logs={logs}
-        onPlayerRun={this.onPlayerRun}
-        onPlayerError={this.onPlayerError}
-        onPlayerConsole={this.onPlayerConsole}
-      />
-    )
-  }
-
-  renderConsole = (key: number, options: ConsolePaneOptions) => {
-    const { logs } = this.state
-
-    const { files, externalStyles } = this.props
-
-    const style =
-      externalStyles.consolePane || options.style
-        ? {
-            ...styles.consolePane,
-            ...externalStyles.consolePane,
-            ...options.style,
-          }
-        : styles.consolePane
-
-    return (
-      <div key={key} style={style}>
-        {options.title && (
-          <Header
-            text={options.title}
-            headerStyle={externalStyles.playerHeader}
-            textStyle={externalStyles.playerHeaderText}
-          />
-        )}
-        <div style={styles.column}>
-          <div style={styles.row}>
-            <Console
-              style={externalStyles.consolePane}
-              rowStyle={externalStyles.consoleRow}
-              maximize={true}
-              showFileName={
-                Object.keys(files).length > 1 && options.showFileName
-              }
-              showLineNumber={options.showLineNumber}
-              logs={logs}
-              renderReactElements={options.renderReactElements}
-            />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   renderStack = (key: number, options: StackPaneOptions) => {
     const { externalStyles } = this.props
 
@@ -867,23 +797,48 @@ export default class Workspace extends PureComponent<Props, State> {
   }
 
   renderPane = (pane: Pane, key: number) => {
-    const paneObject = normalizePane(pane)
+    const options = normalizePane(pane)
 
-    switch (paneObject.type) {
+    const { files, externalStyles, sharedEnvironment } = this.props
+    const { logs } = this.state
+
+    switch (options.type) {
       case 'editor':
-        return this.renderEditor(key, paneObject)
+        return this.renderEditor(key, options)
       case 'transpiler':
-        return this.renderTranspiler(key, paneObject)
+        return this.renderTranspiler(key, options)
       case 'player':
-        return this.renderPlayer(key, paneObject)
+        // TODO: Validate only one player allowed for now, OR support multiple refs
+        return (
+          <PlayerPane
+            ref={this.player}
+            key={key}
+            options={options}
+            externalStyles={externalStyles}
+            sharedEnvironment={sharedEnvironment}
+            files={files}
+            logs={logs}
+            onPlayerRun={this.onPlayerRun}
+            onPlayerError={this.onPlayerError}
+            onPlayerConsole={this.onPlayerConsole}
+          />
+        )
       case 'workspaces':
-        return this.renderWorkspaces(key, paneObject)
+        return this.renderWorkspaces(key, options)
       case 'stack':
-        return this.renderStack(key, paneObject)
+        return this.renderStack(key, options)
       case 'console':
-        return this.renderConsole(key, paneObject)
+        return (
+          <ConsolePane
+            key={key}
+            options={options}
+            externalStyles={externalStyles}
+            files={files}
+            logs={logs}
+          />
+        )
       default:
-        return `Unknown pane type: ${paneObject['type']}`
+        return `Unknown pane type: ${options['type']}`
     }
   }
 
