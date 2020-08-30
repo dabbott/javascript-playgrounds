@@ -21,8 +21,8 @@ interface Props {
   statusBarColor: string
   sharedEnvironment: boolean
   vendorComponents: unknown[]
-  playerStyleSheet: string
-  playerCSS: string
+  styleSheet: string
+  css: string
   prelude: string
   onError: (payload: string) => void
   onRun: () => void
@@ -43,8 +43,8 @@ export default class extends PureComponent<Props, State> {
     statusBarColor: 'black',
     sharedEnvironment: true,
     vendorComponents: [],
-    playerStyleSheet: '',
-    playerCSS: '',
+    styleSheet: '',
+    css: '',
     prelude: '',
     onError: () => {},
     onRun: () => {},
@@ -123,8 +123,8 @@ export default class extends PureComponent<Props, State> {
     const {
       assetRoot,
       vendorComponents,
-      playerStyleSheet,
-      playerCSS,
+      styleSheet,
+      css,
       statusBarColor,
       statusBarHeight,
       sharedEnvironment,
@@ -137,7 +137,7 @@ export default class extends PureComponent<Props, State> {
     const vendorComponentsEncoded = encodeURIComponent(
       JSON.stringify(vendorComponents)
     )
-    const css = encodeURIComponent(playerCSS)
+    const cssEncoded = encodeURIComponent(css)
     const preludeEncoded = encodeURIComponent(prelude)
 
     return (
@@ -145,7 +145,7 @@ export default class extends PureComponent<Props, State> {
         style={styles.iframe}
         ref={'iframe'}
         frameBorder={0}
-        src={`player.html#id=${id}&sharedEnvironment=${sharedEnvironment}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}&styleSheet=${playerStyleSheet}&css=${css}&statusBarColor=${statusBarColor}&statusBarHeight=${statusBarHeight}&prelude=${preludeEncoded}`}
+        src={`player.html#id=${id}&sharedEnvironment=${sharedEnvironment}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}&styleSheet=${styleSheet}&css=${cssEncoded}&statusBarColor=${statusBarColor}&statusBarHeight=${statusBarHeight}&prelude=${preludeEncoded}`}
       />
     )
   }

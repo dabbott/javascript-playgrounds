@@ -1,6 +1,6 @@
 import React, { PureComponent, CSSProperties, RefObject } from 'react'
 import { getErrorDetails } from '../../utils/ErrorMessage'
-import { prefixObject } from '../../utils/Styles'
+import { prefixObject, mergeStyles, prefix } from '../../utils/Styles'
 import About from './About'
 import Button from './Button'
 import Console from './Console'
@@ -17,6 +17,7 @@ import { workerRequest } from '../../utils/WorkerRequest'
 import type { WorkspaceDiff } from '../../index'
 import type * as ts from 'typescript'
 import { ConsoleCommand, LogCommand } from '../../types/Messages'
+import { ComponentDescription } from '../player/VendorComponents'
 
 export type BabelWorkerMessage = {
   filename: string
@@ -97,51 +98,39 @@ const findPaneSetIndex = (
     ? responsivePaneSets.length - 1
     : responsivePaneSets.findIndex((paneSet) => paneSet.maxWidth > windowWidth)
 
+const columnStyle: CSSProperties = prefix({
+  flex: '1',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'stretch',
+  minWidth: 0,
+  minHeight: 0,
+  overflow: 'hidden', // Clip box shadows
+  position: 'relative',
+})
+
+const rowStyle: CSSProperties = prefix({
+  flex: '1',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'stretch',
+  minWidth: 0,
+  minHeight: 0,
+  overflow: 'hidden', // Clip box shadows
+  position: 'relative',
+})
+
 const styles = prefixObject({
-  container: {
-    flex: '1',
-    display: 'flex',
-    alignItems: 'stretch',
-    minWidth: 0,
-    minHeight: 0,
-  },
-  editorPane: {
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    minWidth: 0,
-    minHeight: 0,
-    overflow: 'hidden', // Clip box shadows
-  },
-  transpilerPane: {
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    minWidth: 0,
-    minHeight: 0,
-    overflow: 'hidden', // Clip box shadows
-  },
-  playerPane: {
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: 0,
-    minHeight: 0,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  workspacesPane: {
+  container: rowStyle,
+  editorPane: columnStyle,
+  transpilerPane: columnStyle,
+  consolePane: columnStyle,
+  playerPane: mergeStyles(columnStyle, { flex: '0 0 auto' }),
+  workspacesPane: mergeStyles(columnStyle, {
     width: 220,
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: 0,
-    minHeight: 0,
-    overflowX: 'hidden', // Clip box shadows
+    overflowX: 'hidden',
     overflowY: 'auto',
-  },
+  }),
   overlayContainer: {
     position: 'relative',
     flex: 0,
@@ -161,26 +150,8 @@ const styles = prefixObject({
     overflow: 'auto',
     maxHeight: 300,
   },
-  column: {
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    minWidth: 0,
-    minHeight: 0,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  row: {
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    minWidth: 0,
-    minHeight: 0,
-    overflow: 'hidden',
-    position: 'relative',
-  },
+  column: columnStyle,
+  row: rowStyle,
   boldMessage: {
     fontWeight: 'bold',
   },
@@ -210,16 +181,31 @@ export type TranspilerPane = PaneBase & {
 }
 export type PlayerPane = PaneBase & {
   type: 'player'
+  platform?: string
+  scale?: number
+  width?: number
+  assetRoot?: string
+  vendorComponents: ComponentDescription[]
+  styleSheet?: string
+  css?: string
+  prelude: string
+  statusBarHeight: number
+  statusBarColor: string
 }
 export type WorkspacesPane = PaneBase & {
   type: 'workspaces'
 }
+export type ConsolePane = PaneBase &
+  ConsoleOptions & {
+    type: 'console'
+  }
 export type PaneObject =
   | StackPane
   | EditorPane
   | TranspilerPane
   | PlayerPane
   | WorkspacesPane
+  | ConsolePane
 export type PaneShorthand = PaneObject['type']
 export type Pane = PaneShorthand | PaneObject
 export type ResponsivePaneSet = {
@@ -235,14 +221,19 @@ export type PublicError = {
 }
 
 interface ConsoleOptions {
-  enabled: boolean
-  visible: boolean
-  maximized: boolean
-  collapsible: boolean
   showFileName: boolean
   showLineNumber: boolean
   renderReactElements: boolean
 }
+
+interface EmbeddedPaneOptions {
+  enabled: boolean
+  visible: boolean
+  maximized: boolean
+  collapsible: boolean
+}
+
+type EmbeddedConsoleOptions = ConsoleOptions & EmbeddedPaneOptions
 
 interface PlaygroundOptions {
   enabled: boolean
@@ -263,28 +254,25 @@ export interface Props {
   entry: string
   initialTab: string
   onChange: (files: Record<string, string>) => void
-  platform?: string
-  scale?: number
-  width?: number
-  assetRoot?: string
-  vendorComponents: unknown[]
+  // platform?: string
+  // scale?: number
+  // width?: number
+  // assetRoot?: string
+  // vendorComponents: unknown[]
   externalStyles: Record<string, CSSProperties>
   fullscreen: boolean
   sharedEnvironment: boolean
-  playerStyleSheet?: string
-  playerCSS?: string
-  prelude: string
+  // playerStyleSheet?: string
+  // playerCSS?: string
+  // prelude: string
   responsivePaneSets: ResponsivePaneSet[]
-  consoleOptions: ConsoleOptions
+  consoleOptions: EmbeddedConsoleOptions
   playgroundOptions: PlaygroundOptions
   typescriptOptions: TypeScriptOptions
   workspaces: Props[]
   diff: Record<string, WorkspaceDiff>
-  statusBarHeight: number
-  statusBarColor: string
-  playerTitle?: string
-  transpilerTitle?: string
-  workspacesTitle?: string
+  // statusBarHeight: number
+  // statusBarColor: string
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
 }
@@ -633,7 +621,6 @@ export default class Workspace extends PureComponent<Props, State> {
   renderEditor = (key: number, options: EditorPane) => {
     const {
       files,
-      title,
       externalStyles,
       fullscreen,
       activeStepIndex,
@@ -651,14 +638,14 @@ export default class Workspace extends PureComponent<Props, State> {
       logs,
     } = this.state
 
+    const { title } = options
+
     const fileDiff = diff[activeFile] ? diff[activeFile].ranges : []
 
     const error = compilerError || runtimeError
     const isError = !!error
 
-    const style = options.style
-      ? { ...styles.editorPane, ...options.style }
-      : styles.editorPane
+    const style = mergeStyles(styles.editorPane, options.style)
 
     return (
       <div key={key} style={style}>
@@ -741,18 +728,18 @@ export default class Workspace extends PureComponent<Props, State> {
   }
 
   renderTranspiler = (key: number, options: TranspilerPane) => {
-    const { externalStyles, transpilerTitle } = this.props
+    const { externalStyles } = this.props
     const { activeFile, transpilerCache } = this.state
 
-    const style = options.style
-      ? { ...styles.transpilerPane, ...options.style }
-      : styles.transpilerPane
+    const { title } = options
+
+    const style = mergeStyles(styles.transpilerPane, options.style)
 
     return (
       <div key={key} style={style}>
-        {transpilerTitle && (
+        {title && (
           <Header
-            text={transpilerTitle}
+            text={title}
             headerStyle={externalStyles.transpilerHeader}
             textStyle={externalStyles.transpilerHeaderText}
           />
@@ -770,26 +757,24 @@ export default class Workspace extends PureComponent<Props, State> {
   renderWorkspaces = (key: number, options: WorkspacesPane) => {
     const {
       externalStyles,
-      workspacesTitle,
       workspaces,
       activeStepIndex,
       onChangeActiveStepIndex,
     } = this.props
 
-    const style =
-      externalStyles.workspacesPane || options.style
-        ? {
-            ...styles.workspacesPane,
-            ...externalStyles.workspacesPane,
-            ...options.style,
-          }
-        : styles.workspacesPane
+    const { title } = options
+
+    const style = mergeStyles(
+      styles.workspacesPane,
+      externalStyles.workspacesPane,
+      options.style
+    )
 
     return (
       <div key={key} style={style}>
-        {workspacesTitle && (
+        {title && (
           <Header
-            text={workspacesTitle}
+            text={title}
             headerStyle={externalStyles.workspacesHeader}
             textStyle={externalStyles.workspacesHeaderText}
           />
@@ -818,37 +803,37 @@ export default class Workspace extends PureComponent<Props, State> {
   renderPlayer = (key: number, options: PlayerPane) => {
     const {
       files,
+      externalStyles,
+      consoleOptions,
+      sharedEnvironment,
+    } = this.props
+    const { showLogs, logs } = this.state
+
+    const {
+      title,
       width,
       scale,
       platform,
       assetRoot,
       vendorComponents,
-      externalStyles,
-      playerStyleSheet,
-      playerCSS,
-      playerTitle,
+      styleSheet,
+      css,
       prelude,
-      consoleOptions,
       statusBarHeight,
       statusBarColor,
-      sharedEnvironment,
-    } = this.props
-    const { showLogs, logs } = this.state
+    } = options
 
-    const style =
-      externalStyles.playerPane || options.style
-        ? {
-            ...styles.playerPane,
-            ...externalStyles.playerPane,
-            ...options.style,
-          }
-        : styles.playerPane
+    const style = mergeStyles(
+      styles.playerPane,
+      externalStyles.playerPane,
+      options.style
+    )
 
     return (
       <div key={key} style={style}>
-        {playerTitle && (
+        {title && (
           <Header
-            text={playerTitle}
+            text={title}
             headerStyle={externalStyles.playerHeader}
             textStyle={externalStyles.playerHeaderText}
           />
@@ -864,8 +849,8 @@ export default class Workspace extends PureComponent<Props, State> {
               platform={platform}
               assetRoot={assetRoot}
               vendorComponents={vendorComponents}
-              playerStyleSheet={playerStyleSheet}
-              playerCSS={playerCSS}
+              styleSheet={styleSheet}
+              css={css}
               prelude={prelude}
               statusBarHeight={statusBarHeight}
               statusBarColor={statusBarColor}
@@ -898,6 +883,48 @@ export default class Workspace extends PureComponent<Props, State> {
               </Button>
             </Status>
           )}
+        </div>
+      </div>
+    )
+  }
+
+  renderConsole = (key: number, options: ConsolePane) => {
+    const { logs } = this.state
+
+    const { files, externalStyles } = this.props
+
+    const style =
+      externalStyles.consolePane || options.style
+        ? {
+            ...styles.consolePane,
+            ...externalStyles.consolePane,
+            ...options.style,
+          }
+        : styles.consolePane
+
+    return (
+      <div key={key} style={style}>
+        {options.title && (
+          <Header
+            text={options.title}
+            headerStyle={externalStyles.playerHeader}
+            textStyle={externalStyles.playerHeaderText}
+          />
+        )}
+        <div style={styles.column}>
+          <div style={styles.row}>
+            <Console
+              style={externalStyles.consolePane}
+              rowStyle={externalStyles.consoleRow}
+              maximize={true}
+              showFileName={
+                Object.keys(files).length > 1 && options.showFileName
+              }
+              showLineNumber={options.showLineNumber}
+              logs={logs}
+              renderReactElements={options.renderReactElements}
+            />
+          </div>
         </div>
       </div>
     )
@@ -949,6 +976,8 @@ export default class Workspace extends PureComponent<Props, State> {
         return this.renderWorkspaces(key, paneObject)
       case 'stack':
         return this.renderStack(key, paneObject)
+      case 'console':
+        return this.renderConsole(key, paneObject)
       default:
         return `Unknown pane type: ${paneObject['type']}`
     }

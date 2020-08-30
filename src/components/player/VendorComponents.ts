@@ -19,7 +19,7 @@ const getObjectFromKeyPath = (data: any, keyPath: string): unknown => {
 
 type ExternalComponentDescription = [string, string, string]
 type ModuleComponentDescription = [string, string]
-type ComponentDescription =
+export type ComponentDescription =
   | ModuleComponentDescription
   | ExternalComponentDescription
 

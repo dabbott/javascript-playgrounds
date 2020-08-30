@@ -59,18 +59,19 @@ The `iframe` accepts the following parameters _after the hash_ in the url. You m
 
 - **`code`** - The code to show/run in the player. Defaults to the sample app.
 - **`title`** - An optional title for the player. By default, there is no title.
-- **`width`** - The width of the device. Defaults to `210`.
-- **`scale`** - Zoom the device screen. Defaults to `1`.
-- **`platform`** - One of `ios` or `android`. Defaults to `ios`. Currently this changes the phone image, but may also have an effect on how the code is executed in the future.
 - **`entry`** - The filename of the entry file. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`.
 - **`initialTab`** - The filename of the tab to show by default. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`.
 - **`fullscreen`** - Show a button to enable fullscreen editing. Defaults to `false`. Note that the iframe must have the `allowfullscreen` attribute for this to work.
-- **`assetRoot`** - Specifies the root url for asset `require`s. E.g. to require `http://localhost:8080/images/hello.png`, you could set `assetRoot` to `'http://localhost:8080/'` and write `require('./images/hello.png')` in your code.
-- **`transpilerTitle`** - An optional title for the transpiler output pane. By default, there is no title.
-- **`playerTitle`** - An optional title for the player pane. By default, there is no title.
 - **`workspaceCSS`** - An optional CSS string to apply to the workspace `iframe`.
-- **`playerCSS`** - An optional CSS string to apply to the player's `iframe`.
-- **`playerStyleSheet`** - One of `reset` or `none`. When `reset`, the meyerweb CSS reset is applied to the player's `iframe`. Defaults to `reset`.
+
+#### `player` options
+
+- **`width`** - The width of the device. Defaults to `210`.
+- **`scale`** - Zoom the device screen. Defaults to `1`.
+- **`platform`** - One of `ios` or `android`. Defaults to `ios`. Currently this changes the phone image, but may also have an effect on how the code is executed in the future.
+- **`assetRoot`** - Specifies the root url for asset `require`s. E.g. to require `http://localhost:8080/images/hello.png`, you could set `assetRoot` to `'http://localhost:8080/'` and write `require('./images/hello.png')` in your code.
+- **`css`** - An optional CSS string to apply to the player's `iframe`.
+- **`styleSheet`** - One of `reset` or `none`. When `reset`, the meyerweb CSS reset is applied to the player's `iframe`. Defaults to `reset`.
 
 When using the iframe directly, the following parameters must be JSON encoded _and then also_ URI encoded:
 

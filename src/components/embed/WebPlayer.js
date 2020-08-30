@@ -7,9 +7,6 @@ const WEB_PLAYER_URL = `https://unpkg.com/react-native-web-player@2.0.0-alpha.26
 const paramSchema = {
   // Plain text
   title: 'text',
-  transpilerTitle: 'text',
-  playerTitle: 'text',
-  workspacesTitle: 'text',
   code: 'text',
   entry: 'text',
   initialTab: 'text',
@@ -81,7 +78,6 @@ export default class WebPlayer extends Component {
 
     // Passthrough
     title: PropTypes.string,
-    transpilerTitle: PropTypes.string,
     playerTitle: PropTypes.string,
     code: PropTypes.string,
     entry: PropTypes.string,
