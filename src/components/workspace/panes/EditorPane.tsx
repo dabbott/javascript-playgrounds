@@ -1,7 +1,7 @@
 import React, { CSSProperties, memo, useState } from 'react'
 import type { WorkspaceDiff } from '../../../index'
 import { LogCommand } from '../../../types/Messages'
-import { EditorPaneOptions, Pane } from '../../../utils/Panes'
+import { EditorPaneOptions, PaneOptions } from '../../../utils/Panes'
 import {
   columnStyle,
   mergeStyles,

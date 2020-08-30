@@ -23,7 +23,7 @@ export type PaneBaseOptions = {
 
 export type StackPaneOptions = PaneBaseOptions & {
   type: 'stack'
-  children: Pane[]
+  children: PaneOptions[]
 }
 
 export type EditorPaneOptions = PaneBaseOptions & {
@@ -66,12 +66,10 @@ export type PaneOptions =
   | WorkspacesPaneOptions
   | ConsolePaneOptions
 
-export type PaneShorthand = PaneOptions['type']
+type PaneShorthand = PaneOptions['type']
 
-export type Pane = /* PaneShorthand | */ PaneOptions
-
-export const containsPane = (panes: Pane[], target: string): boolean =>
-  panes.some((pane: Pane) => {
+export const containsPane = (panes: PaneOptions[], target: string): boolean =>
+  panes.some((pane: PaneOptions) => {
     if (pane.type === target) return true
 
     const children = (pane.type === 'stack' && pane.children) || []
@@ -85,14 +83,16 @@ const getNextId = () => `${initialId++}`
 /**
  * Turn panes into objects, and assign a unique id to each.
  */
-export const normalizePane = (pane: string | PaneOptions): PaneOptions => {
+export const normalizePane = (
+  pane: PaneShorthand | PaneOptions
+): PaneOptions => {
   const id = getNextId()
 
   if (typeof pane === 'string') {
     return { id, type: pane } as PaneOptions
   }
 
-  pane.id = getNextId()
+  pane.id = pane.id || getNextId()
 
   if (pane.type === 'stack') {
     return {

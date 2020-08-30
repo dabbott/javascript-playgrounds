@@ -3,74 +3,21 @@ import type * as ts from 'typescript'
 import type { WorkspaceDiff } from '../../index'
 import { ConsoleCommand, LogCommand } from '../../types/Messages'
 import { getErrorDetails } from '../../utils/ErrorMessage'
-import {
-  containsPane,
-  EditorPaneOptions,
-  Pane,
-  StackPaneOptions,
-} from '../../utils/Panes'
-import {
-  columnStyle,
-  mergeStyles,
-  prefixObject,
-  rowStyle,
-} from '../../utils/Styles'
-import { workerRequest } from '../../utils/WorkerRequest'
-import About from './About'
-import Button from './Button'
-import Editor from './Editor'
-import Fullscreen from './Fullscreen'
-import Header from './Header'
-import Overlay from './Overlay'
+import { containsPane, PaneOptions } from '../../utils/Panes'
+import { prefixObject, rowStyle } from '../../utils/Styles'
+import { Tab } from '../../utils/Tab'
 import ConsolePane from './panes/ConsolePane'
+import EditorPane from './panes/EditorPane'
 import PlayerPane from './panes/PlayerPane'
+import StackPane from './panes/StackPane'
 import TranspilerPane, {
   getTranspilerId,
   isTranspilerId,
 } from './panes/TranspilerPane'
 import WorkspacesPane from './panes/WorkspacesPane'
 import PlayerFrame from './PlayerFrame'
-import Status from './Status'
-import TabContainer from './TabContainer'
-import Tabs from './Tabs'
-import { Tab, getTabTitle, getTabChanged, compareTabs } from '../../utils/Tab'
-import StackPane from './panes/StackPane'
-import EditorPane from './panes/EditorPane'
-
-export type BabelWorkerMessage = {
-  filename: string
-} & (
-  | {
-      type: 'code'
-      code: string
-    }
-  | {
-      type: 'error'
-      error: {
-        message: string
-      }
-    }
-)
-
-export type TypeScriptRequest =
-  | {
-      type: 'libs'
-      libs: string[]
-      types: string[]
-    }
-  | {
-      type: 'file'
-      filename: string
-      code: string
-    }
-  | {
-      type: 'quickInfo'
-      filename: string
-      position: number
-    }
-
-const BabelWorker = require('../../babel-worker.js')
-const babelWorker = new BabelWorker()
+import typeScriptRequest from '../../utils/TypeScriptRequest'
+import babelRequest, { BabelResponse } from '../../utils/BabelRequest'
 
 const findPaneSetIndex = (
   responsivePaneSets: ResponsivePaneSet[],
@@ -86,7 +33,7 @@ const styles = prefixObject({
 
 export type ResponsivePaneSet = {
   maxWidth: number
-  panes: Pane[]
+  panes: PaneOptions[]
 }
 
 export type PublicError = {
@@ -237,12 +184,6 @@ export default class Workspace extends PureComponent<Props, State> {
       activeFileTab: fileTabs.find((tab) => tab.title === initialTab),
       paneSetIndex,
     }
-
-    babelWorker.addEventListener('message', this.onBabelWorkerMessage)
-  }
-
-  componentWillUnmount() {
-    babelWorker.removeEventListener('message', this.onBabelWorkerMessage)
   }
 
   componentDidMount() {
@@ -256,31 +197,33 @@ export default class Workspace extends PureComponent<Props, State> {
 
         this.codeCache[filename] = code
 
-        this.runTypeScriptRequest({
-          type: 'libs',
-          libs: typescriptOptions.libs || [],
-          types: typescriptOptions.types || [],
-        })
+        if (this.props.typescriptOptions.enabled) {
+          typeScriptRequest({
+            type: 'libs',
+            libs: typescriptOptions.libs || [],
+            types: typescriptOptions.types || [],
+          })
 
-        this.runTypeScriptRequest({
-          type: 'file',
-          filename,
-          code,
-        })
-
-        if (playerVisible) {
-          babelWorker.postMessage({
+          typeScriptRequest({
+            type: 'file',
             filename,
             code,
-            options: { retainLines: true },
           })
         }
 
+        if (playerVisible) {
+          babelRequest({
+            filename,
+            code,
+            options: { retainLines: true },
+          }).then(this.onBabelResponse)
+        }
+
         if (transpilerVisible) {
-          babelWorker.postMessage({
+          babelRequest({
             filename: getTranspilerId(filename),
             code,
-          })
+          }).then(this.onBabelResponse)
         }
       })
     }
@@ -298,15 +241,14 @@ export default class Workspace extends PureComponent<Props, State> {
     }
   }
 
-  onBabelWorkerMessage = ({ data }: MessageEvent) => {
+  onBabelResponse = (response: BabelResponse) => {
     const { playerCache } = this
     const { transpilerCache } = this.state
-    const babelMessage = JSON.parse(data) as BabelWorkerMessage
 
-    this.updateStatus(babelMessage)
+    this.updateStatus(response)
 
-    if (babelMessage.type === 'code') {
-      const { filename, code } = babelMessage
+    if (response.type === 'code') {
+      const { filename, code } = response
 
       if (isTranspilerId(filename)) {
         this.setState({
@@ -322,7 +264,7 @@ export default class Workspace extends PureComponent<Props, State> {
     }
   }
 
-  updateStatus = (babelMessage: BabelWorkerMessage) => {
+  updateStatus = (babelMessage: BabelResponse) => {
     switch (babelMessage.type) {
       case 'code':
         this.setState({
@@ -338,24 +280,6 @@ export default class Workspace extends PureComponent<Props, State> {
     }
   }
 
-  typeScriptWorker?: Promise<any>
-
-  runTypeScriptRequest = (payload: TypeScriptRequest) => {
-    if (!this.props.typescriptOptions.enabled) {
-      return Promise.resolve()
-    }
-
-    if (!this.typeScriptWorker) {
-      this.typeScriptWorker = import(
-        '../../typescript-worker.js'
-      ).then((worker) => (worker as any).default())
-    }
-
-    return this.typeScriptWorker.then((worker: unknown) =>
-      workerRequest(worker, payload)
-    )
-  }
-
   getTypeScriptInfo = (
     prefixedFilename: string,
     index: number,
@@ -363,51 +287,51 @@ export default class Workspace extends PureComponent<Props, State> {
   ): void => {
     const [, filename] = prefixedFilename.split(':')
 
-    this.runTypeScriptRequest({
-      type: 'quickInfo',
-      filename,
-      position: index,
-    })
-      .then((info?: ts.QuickInfo) => {
-        if (info && info.displayParts && info.displayParts.length > 0) {
-          done(info)
-        }
+    if (this.props.typescriptOptions.enabled) {
+      typeScriptRequest({
+        type: 'quickInfo',
+        filename,
+        position: index,
       })
-      .catch((error: unknown) => {
-        console.log('Error finding type info', error)
-      })
+        .then((info?: ts.QuickInfo) => {
+          if (info && info.displayParts && info.displayParts.length > 0) {
+            done(info)
+          }
+        })
+        .catch((error: unknown) => {
+          console.log('Error finding type info', error)
+        })
+    }
   }
 
   onCodeChange = (code: string) => {
     const { activeFile, transpilerVisible, playerVisible } = this.state
 
-    this.runTypeScriptRequest({
-      type: 'file',
-      filename: activeFile,
-      code,
-    })
-
-    if (playerVisible) {
-      babelWorker.postMessage({
+    if (this.props.typescriptOptions.enabled) {
+      typeScriptRequest({
+        type: 'file',
         filename: activeFile,
         code,
-        options: { retainLines: true },
       })
     }
 
+    if (playerVisible) {
+      babelRequest({
+        filename: activeFile,
+        code,
+        options: { retainLines: true },
+      }).then(this.onBabelResponse)
+    }
+
     if (transpilerVisible) {
-      babelWorker.postMessage({
+      babelRequest({
         filename: getTranspilerId(activeFile),
         code,
-      })
+      }).then(this.onBabelResponse)
     }
 
     this.codeCache[activeFile] = code
     this.props.onChange(this.codeCache)
-  }
-
-  onToggleDetails = (showDetails: boolean) => {
-    this.setState({ showDetails })
   }
 
   onPlayerRun = () => {
@@ -451,7 +375,7 @@ export default class Workspace extends PureComponent<Props, State> {
     })
   }
 
-  renderPane = (options: Pane, key: number) => {
+  renderPane = (options: PaneOptions, key: number) => {
     const {
       files,
       externalStyles,

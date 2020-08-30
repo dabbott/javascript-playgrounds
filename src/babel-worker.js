@@ -1,7 +1,11 @@
 import * as Babel from '@babel/core'
 
 onmessage = function (event) {
-  const { code: value, filename, options } = event.data
+  const {
+    id,
+    payload: { code: value, filename, options },
+  } = event.data
+
   let output
 
   try {
@@ -30,19 +34,25 @@ onmessage = function (event) {
     }).code
 
     output = {
-      filename,
-      type: 'code',
-      code,
+      id,
+      payload: {
+        filename,
+        type: 'code',
+        code,
+      },
     }
   } catch (e) {
     output = {
-      filename,
-      type: 'error',
-      error: {
-        message: e.message.replace('unknown', e.name),
+      id,
+      payload: {
+        filename,
+        type: 'error',
+        error: {
+          message: e.message.replace('unknown', e.name),
+        },
       },
     }
   }
 
-  postMessage(JSON.stringify(output))
+  postMessage(output)
 }

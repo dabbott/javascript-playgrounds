@@ -14,17 +14,17 @@ import {
 } from '../../../utils/Styles'
 import Console from '../Console'
 import Header from '../Header'
-import { StackPaneOptions, Pane } from '../../../utils/Panes'
+import { StackPaneOptions, PaneOptions } from '../../../utils/Panes'
 import TabContainer from '../TabContainer'
 import { Tab, getTabTitle, compareTabs } from '../../../utils/Tab'
 
 interface Props {
   options: StackPaneOptions
   externalStyles: Record<string, CSSProperties>
-  renderPane: (pane: Pane, index: number) => ReactNode
+  renderPane: (pane: PaneOptions, index: number) => ReactNode
 }
 
-type ExtendedTab = Tab & { pane: Pane }
+type ExtendedTab = Tab & { pane: PaneOptions }
 
 export default memo(function StackPane({
   options,
@@ -33,7 +33,7 @@ export default memo(function StackPane({
 }: Props) {
   const { children } = options
 
-  const tabs: (Tab & { pane: Pane })[] = useMemo(
+  const tabs: (Tab & { pane: PaneOptions })[] = useMemo(
     () =>
       children.map((pane, i) => ({
         title: pane.title || pane.type,
