@@ -50,6 +50,15 @@ let {
       prelude: '',
       styleSheet: 'reset',
       vendorComponents: [],
+      console: {
+        enabled: true,
+        visible: false,
+        maximized: false,
+        collapsible: true,
+        showFileName: true,
+        showLineNumber: true,
+        renderReactElements: true,
+      },
     },
     {
       type: 'console',
@@ -59,15 +68,6 @@ let {
   responsivePaneSets = '[]',
   workspaces = JSON.stringify([]),
   workspaceCSS = '',
-  console = JSON.stringify({
-    enabled: true,
-    visible: false,
-    maximized: false,
-    collapsible: true,
-    showFileName: true,
-    showLineNumber: true,
-    renderReactElements: true,
-  }),
   playground = JSON.stringify({
     enabled: false,
     renderReactElements: true,
@@ -85,7 +85,6 @@ const typescriptOptions = Object.assign(
   JSON.parse(typescript)
 )
 
-const consoleOptions = JSON.parse(console)
 const playgroundOptions = JSON.parse(playground)
 
 if (workspaceCSS) {
@@ -189,7 +188,6 @@ class WorkspaceContainer extends Component {
       ],
       workspaces: parsedWorkspaces,
       onChange: setHashString,
-      consoleOptions,
       playgroundOptions,
       typescriptOptions,
       activeStepIndex: activeStepIndex,

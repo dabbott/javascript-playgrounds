@@ -1,6 +1,17 @@
-import React, { PureComponent, CSSProperties, RefObject } from 'react'
+import React, {
+  PureComponent,
+  CSSProperties,
+  RefObject,
+  createRef,
+} from 'react'
 import { getErrorDetails } from '../../utils/ErrorMessage'
-import { prefixObject, mergeStyles, prefix } from '../../utils/Styles'
+import {
+  prefixObject,
+  mergeStyles,
+  prefix,
+  rowStyle,
+  columnStyle,
+} from '../../utils/Styles'
 import About from './About'
 import Button from './Button'
 import Console from './Console'
@@ -18,6 +29,7 @@ import type { WorkspaceDiff } from '../../index'
 import type * as ts from 'typescript'
 import { ConsoleCommand, LogCommand } from '../../types/Messages'
 import { ComponentDescription } from '../player/VendorComponents'
+import PlayerPane from './panes/PlayerPane'
 
 export type BabelWorkerMessage = {
   filename: string
@@ -82,9 +94,9 @@ const containsPane = (panes: Pane[], target: string): boolean =>
     return containsPane(children, target)
   })
 
-const normalizePane = (pane: Pane): PaneObject => {
+const normalizePane = (pane: Pane): PaneOptions => {
   if (typeof pane === 'string') {
-    return { type: pane } as PaneObject
+    return { type: pane } as PaneOptions
   }
 
   return pane
@@ -98,34 +110,11 @@ const findPaneSetIndex = (
     ? responsivePaneSets.length - 1
     : responsivePaneSets.findIndex((paneSet) => paneSet.maxWidth > windowWidth)
 
-const columnStyle: CSSProperties = prefix({
-  flex: '1',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'stretch',
-  minWidth: 0,
-  minHeight: 0,
-  overflow: 'hidden', // Clip box shadows
-  position: 'relative',
-})
-
-const rowStyle: CSSProperties = prefix({
-  flex: '1',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'stretch',
-  minWidth: 0,
-  minHeight: 0,
-  overflow: 'hidden', // Clip box shadows
-  position: 'relative',
-})
-
 const styles = prefixObject({
   container: rowStyle,
   editorPane: columnStyle,
   transpilerPane: columnStyle,
   consolePane: columnStyle,
-  playerPane: mergeStyles(columnStyle, { flex: '0 0 auto' }),
   workspacesPane: mergeStyles(columnStyle, {
     width: 220,
     overflowX: 'hidden',
@@ -165,21 +154,21 @@ const styles = prefixObject({
   },
 })
 
-export type PaneBase = {
+export type PaneBaseOptions = {
   title?: string
   style?: CSSProperties
 }
-export type StackPane = PaneBase & {
+export type StackPaneOptions = PaneBaseOptions & {
   type: 'stack'
   children: Pane[]
 }
-export type EditorPane = PaneBase & {
+export type EditorPaneOptions = PaneBaseOptions & {
   type: 'editor'
 }
-export type TranspilerPane = PaneBase & {
+export type TranspilerPaneOptions = PaneBaseOptions & {
   type: 'transpiler'
 }
-export type PlayerPane = PaneBase & {
+export type PlayerPaneOptions = PaneBaseOptions & {
   type: 'player'
   platform?: string
   scale?: number
@@ -188,26 +177,27 @@ export type PlayerPane = PaneBase & {
   vendorComponents: ComponentDescription[]
   styleSheet?: string
   css?: string
-  prelude: string
-  statusBarHeight: number
-  statusBarColor: string
+  prelude?: string
+  statusBarHeight?: number
+  statusBarColor?: string
+  console?: EmbeddedConsoleOptions
 }
-export type WorkspacesPane = PaneBase & {
+export type WorkspacesPaneOptions = PaneBaseOptions & {
   type: 'workspaces'
 }
-export type ConsolePane = PaneBase &
+export type ConsolePaneOptions = PaneBaseOptions &
   ConsoleOptions & {
     type: 'console'
   }
-export type PaneObject =
-  | StackPane
-  | EditorPane
-  | TranspilerPane
-  | PlayerPane
-  | WorkspacesPane
-  | ConsolePane
-export type PaneShorthand = PaneObject['type']
-export type Pane = PaneShorthand | PaneObject
+export type PaneOptions =
+  | StackPaneOptions
+  | EditorPaneOptions
+  | TranspilerPaneOptions
+  | PlayerPaneOptions
+  | WorkspacesPaneOptions
+  | ConsolePaneOptions
+export type PaneShorthand = PaneOptions['type']
+export type Pane = PaneShorthand | PaneOptions
 export type ResponsivePaneSet = {
   maxWidth: number
   panes: Pane[]
@@ -227,7 +217,6 @@ interface ConsoleOptions {
 }
 
 interface EmbeddedPaneOptions {
-  enabled: boolean
   visible: boolean
   maximized: boolean
   collapsible: boolean
@@ -254,25 +243,14 @@ export interface Props {
   entry: string
   initialTab: string
   onChange: (files: Record<string, string>) => void
-  // platform?: string
-  // scale?: number
-  // width?: number
-  // assetRoot?: string
-  // vendorComponents: unknown[]
   externalStyles: Record<string, CSSProperties>
   fullscreen: boolean
   sharedEnvironment: boolean
-  // playerStyleSheet?: string
-  // playerCSS?: string
-  // prelude: string
   responsivePaneSets: ResponsivePaneSet[]
-  consoleOptions: EmbeddedConsoleOptions
   playgroundOptions: PlaygroundOptions
   typescriptOptions: TypeScriptOptions
   workspaces: Props[]
   diff: Record<string, WorkspaceDiff>
-  // statusBarHeight: number
-  // statusBarColor: string
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
 }
@@ -281,7 +259,6 @@ interface State {
   compilerError?: PublicError
   runtimeError?: PublicError
   showDetails: boolean
-  showLogs: boolean
   logs: LogCommand[]
   activeFile: string
   transpilerCache: Record<string, string>
@@ -311,7 +288,7 @@ export default class Workspace extends PureComponent<Props, State> {
     playerCSS: null,
     prelude: '',
     responsivePaneSets: [],
-    consoleOptions: {},
+    // consoleOptions: {},
     playgroundOptions: {},
     typescriptOptions: {},
     workspaces: [],
@@ -322,7 +299,7 @@ export default class Workspace extends PureComponent<Props, State> {
 
   codeCache: Record<string, string> = {}
   playerCache: Record<string, string> = {}
-  player?: PlayerFrame
+  player = createRef<PlayerFrame>()
 
   constructor(props: Props) {
     super(props)
@@ -330,7 +307,6 @@ export default class Workspace extends PureComponent<Props, State> {
     const {
       initialTab,
       responsivePaneSets,
-      consoleOptions,
       files,
       diff,
       typescriptOptions,
@@ -388,7 +364,6 @@ export default class Workspace extends PureComponent<Props, State> {
       compilerError: undefined,
       runtimeError: undefined,
       showDetails: false,
-      showLogs: consoleOptions.visible,
       logs: [],
       activeFile: initialTab,
       transpilerCache: {},
@@ -453,11 +428,11 @@ export default class Workspace extends PureComponent<Props, State> {
 
     // Run the app once we've transformed each file at least once
     if (
-      player &&
+      player.current &&
       Object.keys(files).every((filename) => playerCache[filename])
     ) {
       this.clearLogs()
-      player.runApplication(playerCache, entry)
+      player.current.runApplication(playerCache, entry)
     }
   }
 
@@ -573,10 +548,6 @@ export default class Workspace extends PureComponent<Props, State> {
     this.setState({ showDetails })
   }
 
-  onToggleLogs = (showLogs: boolean) => {
-    this.setState({ showLogs })
-  }
-
   onPlayerRun = () => {
     this.setState({ runtimeError: undefined })
   }
@@ -588,19 +559,19 @@ export default class Workspace extends PureComponent<Props, State> {
   }
 
   onPlayerConsole = (payload: ConsoleCommand) => {
-    const { consoleOptions, playgroundOptions } = this.props
+    const { playgroundOptions } = this.props
     const { logs } = this.state
 
-    if (consoleOptions.enabled || playgroundOptions.enabled) {
-      switch (payload.command) {
-        case 'log':
-          this.setState({ logs: logs.concat(payload) })
-          break
-        case 'clear':
-          this.clearLogs()
-          break
-      }
+    // if (consoleOptions.enabled || playgroundOptions.enabled) {
+    switch (payload.command) {
+      case 'log':
+        this.setState({ logs: logs.concat(payload) })
+        break
+      case 'clear':
+        this.clearLogs()
+        break
     }
+    // }
   }
 
   clearLogs() {
@@ -618,7 +589,7 @@ export default class Workspace extends PureComponent<Props, State> {
     })
   }
 
-  renderEditor = (key: number, options: EditorPane) => {
+  renderEditor = (key: number, options: EditorPaneOptions) => {
     const {
       files,
       externalStyles,
@@ -727,7 +698,7 @@ export default class Workspace extends PureComponent<Props, State> {
     )
   }
 
-  renderTranspiler = (key: number, options: TranspilerPane) => {
+  renderTranspiler = (key: number, options: TranspilerPaneOptions) => {
     const { externalStyles } = this.props
     const { activeFile, transpilerCache } = this.state
 
@@ -754,7 +725,7 @@ export default class Workspace extends PureComponent<Props, State> {
     )
   }
 
-  renderWorkspaces = (key: number, options: WorkspacesPane) => {
+  renderWorkspaces = (key: number, options: WorkspacesPaneOptions) => {
     const {
       externalStyles,
       workspaces,
@@ -800,95 +771,28 @@ export default class Workspace extends PureComponent<Props, State> {
     )
   }
 
-  renderPlayer = (key: number, options: PlayerPane) => {
-    const {
-      files,
-      externalStyles,
-      consoleOptions,
-      sharedEnvironment,
-    } = this.props
-    const { showLogs, logs } = this.state
-
-    const {
-      title,
-      width,
-      scale,
-      platform,
-      assetRoot,
-      vendorComponents,
-      styleSheet,
-      css,
-      prelude,
-      statusBarHeight,
-      statusBarColor,
-    } = options
-
-    const style = mergeStyles(
-      styles.playerPane,
-      externalStyles.playerPane,
-      options.style
-    )
+  // TODO: Validate only one player allowed for now, OR support multiple refs
+  renderPlayer = (key: number, options: PlayerPaneOptions) => {
+    const { files, externalStyles, sharedEnvironment } = this.props
+    const { logs } = this.state
 
     return (
-      <div key={key} style={style}>
-        {title && (
-          <Header
-            text={title}
-            headerStyle={externalStyles.playerHeader}
-            textStyle={externalStyles.playerHeaderText}
-          />
-        )}
-        <div style={styles.column}>
-          <div style={styles.row}>
-            <PlayerFrame
-              ref={(ref) => {
-                this.player = ref || undefined
-              }}
-              width={width}
-              scale={scale}
-              platform={platform}
-              assetRoot={assetRoot}
-              vendorComponents={vendorComponents}
-              styleSheet={styleSheet}
-              css={css}
-              prelude={prelude}
-              statusBarHeight={statusBarHeight}
-              statusBarColor={statusBarColor}
-              sharedEnvironment={sharedEnvironment}
-              onRun={this.onPlayerRun}
-              onError={this.onPlayerError}
-              onConsole={this.onPlayerConsole}
-            />
-            {consoleOptions.enabled && showLogs && (
-              <Console
-                style={externalStyles.consolePane}
-                rowStyle={externalStyles.consoleRow}
-                maximize={consoleOptions.maximized}
-                showFileName={
-                  Object.keys(files).length > 1 && consoleOptions.showFileName
-                }
-                showLineNumber={consoleOptions.showLineNumber}
-                logs={logs}
-                renderReactElements={consoleOptions.renderReactElements}
-              />
-            )}
-          </div>
-          {consoleOptions.enabled && consoleOptions.collapsible !== false && (
-            <Status
-              text={'Logs' + (showLogs ? '' : ` (${logs.length})`)}
-              isError={false}
-            >
-              <Button active={showLogs} onChange={this.onToggleLogs}>
-                {'Show Logs'}
-              </Button>
-            </Status>
-          )}
-        </div>
-      </div>
+      <PlayerPane
+        ref={this.player}
+        key={key}
+        options={options}
+        externalStyles={externalStyles}
+        sharedEnvironment={sharedEnvironment}
+        files={files}
+        logs={logs}
+        onPlayerRun={this.onPlayerRun}
+        onPlayerError={this.onPlayerError}
+        onPlayerConsole={this.onPlayerConsole}
+      />
     )
   }
 
-  renderConsole = (key: number, options: ConsolePane) => {
+  renderConsole = (key: number, options: ConsolePaneOptions) => {
     const { logs } = this.state
 
     const { files, externalStyles } = this.props
@@ -930,7 +834,7 @@ export default class Workspace extends PureComponent<Props, State> {
     )
   }
 
-  renderStack = (key: number, options: StackPane) => {
+  renderStack = (key: number, options: StackPaneOptions) => {
     const { externalStyles } = this.props
 
     const { children } = options
