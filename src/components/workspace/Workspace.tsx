@@ -15,6 +15,23 @@ import WorkspacesPane from './panes/WorkspacesPane'
 import PlayerFrame from './PlayerFrame'
 import typeScriptRequest from '../../utils/TypeScriptRequest'
 import babelRequest, { BabelResponse } from '../../utils/BabelRequest'
+import * as workspace from '../../reducers/workspace'
+
+const {
+  reducer,
+  actionCreators: {
+    compiled,
+    transpiled,
+    babelCode,
+    babelError,
+    codeChange,
+    openEditorTab,
+    playerRun,
+    playerError,
+    consoleAppend,
+    consoleClear,
+  },
+} = workspace
 
 const findPaneSetIndex = (
   responsivePaneSets: ResponsivePaneSet[],
@@ -71,21 +88,7 @@ export interface Props {
   onChangeActiveStepIndex: (index: number) => void
 }
 
-interface State {
-  compilerError?: PublicError
-  runtimeError?: PublicError
-  showDetails: boolean
-  logs: LogCommand[]
-  activeFile: string
-  transpilerCache: Record<string, string>
-  transpilerVisible: boolean
-  playerVisible: boolean
-  fileTabs: Tab[]
-  activeFileTab?: Tab
-  paneSetIndex: number
-}
-
-export default class Workspace extends PureComponent<Props, State> {
+export default class Workspace extends PureComponent<Props, workspace.State> {
   static defaultProps = {
     title: 'Live Editor',
     files: { ['index.js']: '' },
@@ -105,8 +108,6 @@ export default class Workspace extends PureComponent<Props, State> {
     statusBarColor: 'black',
   }
 
-  codeCache: Record<string, string> = {}
-  playerCache: Record<string, string> = {}
   players: Record<string, PlayerFrame> = {}
 
   constructor(props: Props) {
@@ -168,31 +169,24 @@ export default class Workspace extends PureComponent<Props, State> {
     )
     const panes = responsivePaneSets[paneSetIndex].panes
 
-    this.state = {
-      compilerError: undefined,
-      runtimeError: undefined,
-      showDetails: false,
-      logs: [],
-      activeFile: initialTab,
-      transpilerCache: {},
-      transpilerVisible: containsPane(panes, 'transpiler'),
-      playerVisible: containsPane(panes, 'player'),
+    this.state = workspace.initialState({
+      initialTab,
       fileTabs,
-      activeFileTab: fileTabs.find((tab) => tab.title === initialTab),
       paneSetIndex,
-    }
+      panes,
+    })
   }
 
   componentDidMount() {
     if (typeof navigator !== 'undefined') {
       const { files, typescriptOptions } = this.props
-      const { playerVisible, transpilerVisible } = this.state
+      const { playerVisible, transpilerVisible, codeCache } = this.state
 
       // Cache and compile each file
       Object.keys(files).forEach((filename) => {
         const code = files[filename]
 
-        this.codeCache[filename] = code
+        codeCache[filename] = code
 
         if (this.props.typescriptOptions.enabled) {
           typeScriptRequest({
@@ -223,39 +217,25 @@ export default class Workspace extends PureComponent<Props, State> {
     const { entry, files } = this.props
 
     // Run the app once we've transformed each file at least once
-    if (Object.keys(files).every((filename) => this.playerCache[filename])) {
-      this.clearLogs()
+    if (
+      Object.keys(files).every((filename) => this.state.playerCache[filename])
+    ) {
+      this.setState(reducer(this.state, consoleClear()))
       Object.values(this.players).forEach((player) => {
-        player.runApplication(this.playerCache, entry)
+        player.runApplication(this.state.playerCache, entry)
       })
-    }
-  }
-
-  onBabelResponse = (response: BabelResponse) => {
-    const { playerCache } = this
-
-    this.updateStatus(response)
-
-    if (response.type === 'code') {
-      const { filename, code } = response
-
-      playerCache[filename] = code
-      this.runApplication()
     }
   }
 
   updateStatus = (babelMessage: BabelResponse) => {
     switch (babelMessage.type) {
       case 'code':
-        this.setState({
-          compilerError: undefined,
-          showDetails: false,
-        })
+        this.setState(reducer(this.state, babelCode()))
         break
       case 'error':
-        this.setState({
-          compilerError: getErrorDetails(babelMessage.error.message),
-        })
+        this.setState(
+          reducer(this.state, babelError(babelMessage.error.message))
+        )
         break
     }
   }
@@ -303,8 +283,9 @@ export default class Workspace extends PureComponent<Props, State> {
       this.transpilerRequest(activeFile, code)
     }
 
-    this.codeCache[activeFile] = code
-    this.props.onChange(this.codeCache)
+    this.setState(reducer(this.state, codeChange(activeFile, code)), () => {
+      this.props.onChange(this.state.codeCache)
+    })
   }
 
   compilerRequest = (filename: string, code: string) => {
@@ -316,10 +297,12 @@ export default class Workspace extends PureComponent<Props, State> {
       this.updateStatus(response)
 
       if (response.type === 'code') {
-        const { filename, code } = response
-
-        this.playerCache[filename] = code
-        this.runApplication()
+        this.setState(
+          reducer(this.state, compiled(response.filename, response.code)),
+          () => {
+            this.runApplication()
+          }
+        )
       }
     })
   }
@@ -330,55 +313,38 @@ export default class Workspace extends PureComponent<Props, State> {
       code,
     }).then((response) => {
       if (response.type === 'code') {
-        this.setState({
-          transpilerCache: {
-            ...this.state.transpilerCache,
-            [response.filename]: response.code,
-          },
-        })
+        this.setState(
+          reducer(this.state, transpiled(response.filename, response.code))
+        )
       }
     })
   }
 
   onPlayerRun = () => {
-    this.setState({ runtimeError: undefined })
+    this.setState(reducer(this.state, playerRun()))
   }
 
-  // TODO: Runtime errors should indicate which file they're coming from,
-  // and only cause a line highlight on that file.
   onPlayerError = (message: string) => {
-    this.setState({ runtimeError: getErrorDetails(message) })
+    this.setState(reducer(this.state, playerError(message)))
   }
 
   onPlayerConsole = (payload: ConsoleCommand) => {
     const { playgroundOptions } = this.props
-    const { logs } = this.state
 
     // if (consoleOptions.enabled || playgroundOptions.enabled) {
     switch (payload.command) {
-      case 'log':
-        this.setState({ logs: logs.concat(payload) })
-        break
       case 'clear':
-        this.clearLogs()
-        break
+        this.setState(reducer(this.state, consoleClear()))
+        return
+      case 'log':
+        this.setState(reducer(this.state, consoleAppend(payload)))
+        return
     }
     // }
   }
 
-  clearLogs() {
-    const { logs } = this.state
-
-    if (logs.length === 0) return
-
-    this.setState({ logs: [] })
-  }
-
   onClickTab = (tab: Tab) => {
-    this.setState({
-      activeFile: tab.title,
-      activeFileTab: tab,
-    })
+    this.setState(reducer(this.state, openEditorTab(tab)))
   }
 
   renderPane = (options: PaneOptions, key: number) => {
