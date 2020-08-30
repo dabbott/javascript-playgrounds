@@ -11,7 +11,7 @@ import Console from '../Console'
 import Header from '../Header'
 import PlayerFrame from '../PlayerFrame'
 import Status from '../Status'
-import { PlayerPaneOptions } from '../Workspace'
+import { PlayerPaneOptions } from '../../../utils/Panes'
 
 const styles = prefixObject({
   playerPane: mergeStyles(columnStyle, { flex: '0 0 auto' }),

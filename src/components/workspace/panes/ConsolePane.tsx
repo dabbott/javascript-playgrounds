@@ -8,7 +8,7 @@ import {
 } from '../../../utils/Styles'
 import Console from '../Console'
 import Header from '../Header'
-import { ConsolePaneOptions } from '../Workspace'
+import { ConsolePaneOptions } from '../../../utils/Panes'
 
 const styles = prefixObject({
   consolePane: columnStyle,

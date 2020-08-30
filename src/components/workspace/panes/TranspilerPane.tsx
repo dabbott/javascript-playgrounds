@@ -7,7 +7,7 @@ import {
 } from '../../../utils/Styles'
 import Editor from '../Editor'
 import Header from '../Header'
-import { TranspilerPaneOptions } from '../Workspace'
+import { TranspilerPaneOptions } from '../../../utils/Panes'
 
 // Utilities for determining which babel worker responses are for the player vs
 // the transpiler view, since we encode this information in the filename.

@@ -16,6 +16,7 @@ import { prefix, prefixAndApply } from './utils/Styles'
 import { appendCSS } from './utils/CSS'
 import diff, { DiffRange } from './utils/Diff'
 import defaultLibs from './utils/TypeScriptDefaultLibs'
+import { normalizePane } from './utils/Panes'
 
 const style = prefix({
   flex: '1 1 auto',
@@ -173,6 +174,15 @@ class WorkspaceContainer extends Component {
 
     const parsedWorkspaces = JSON.parse(workspaces)
 
+    const parsedResponsivePaneSets = [
+      ...JSON.parse(responsivePaneSets),
+      { panes: JSON.parse(panes), maxWidth: Infinity },
+    ]
+
+    parsedResponsivePaneSets.forEach((set) => {
+      set.panes = set.panes.map(normalizePane)
+    })
+
     const workspaceProps: WorkspaceProps = {
       title,
       description: '', // Not currently used
@@ -182,10 +192,7 @@ class WorkspaceContainer extends Component {
       externalStyles: JSON.parse(styles),
       sharedEnvironment: sharedEnvironment === 'true',
       fullscreen: fullscreen === 'true' && (screenfull as any).enabled,
-      responsivePaneSets: [
-        ...JSON.parse(responsivePaneSets),
-        { panes: JSON.parse(panes), maxWidth: Infinity },
-      ],
+      responsivePaneSets: parsedResponsivePaneSets,
       workspaces: parsedWorkspaces,
       onChange: setHashString,
       playgroundOptions,
