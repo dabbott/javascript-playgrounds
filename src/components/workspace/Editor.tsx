@@ -30,7 +30,7 @@ const styles = prefixObject({
 
 const docCache: Record<string, CM.Doc> = {}
 
-interface Props {
+export interface Props {
   filename: string
   initialValue: string | null
   value: string | null

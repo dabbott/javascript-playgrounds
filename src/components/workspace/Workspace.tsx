@@ -35,6 +35,7 @@ import TabContainer from './TabContainer'
 import Tabs from './Tabs'
 import { Tab, getTabTitle, getTabChanged, compareTabs } from '../../utils/Tab'
 import StackPane from './panes/StackPane'
+import EditorPane from './panes/EditorPane'
 
 export type BabelWorkerMessage = {
   filename: string
@@ -81,39 +82,6 @@ const findPaneSetIndex = (
 
 const styles = prefixObject({
   container: rowStyle,
-  editorPane: columnStyle,
-  overlayContainer: {
-    position: 'relative',
-    flex: 0,
-    height: 0,
-    alignItems: 'stretch',
-  },
-  overlay: {
-    position: 'absolute',
-    bottom: 0,
-    background: 'rgba(255,255,255,0.95)',
-    zIndex: 100,
-    left: 4,
-    right: 0,
-    borderTop: '1px solid #F8F8F8',
-    display: 'flex',
-    alignItems: 'stretch',
-    overflow: 'auto',
-    maxHeight: 300,
-  },
-  column: columnStyle,
-  row: rowStyle,
-  boldMessage: {
-    fontWeight: 'bold',
-  },
-  codeMessage: {
-    display: 'block',
-    fontFamily: `'source-code-pro', Menlo, 'Courier New', Consolas, monospace`,
-    borderRadius: 4,
-    padding: '4px 8px',
-    backgroundColor: 'rgba(0,0,0,0.02)',
-    border: '1px solid rgba(0,0,0,0.05)',
-  },
 })
 
 export type ResponsivePaneSet = {
@@ -128,13 +96,13 @@ export type PublicError = {
   description: string
 }
 
-interface PlaygroundOptions {
+export interface PlaygroundOptions {
   enabled: boolean
   renderReactElements: boolean
   debounceDuration: number
 }
 
-interface TypeScriptOptions {
+export interface TypeScriptOptions {
   enabled: false
   libs?: string[]
   types?: string[]
@@ -483,115 +451,6 @@ export default class Workspace extends PureComponent<Props, State> {
     })
   }
 
-  renderEditor = (key: number, options: EditorPaneOptions) => {
-    const {
-      files,
-      externalStyles,
-      fullscreen,
-      activeStepIndex,
-      diff,
-      playgroundOptions,
-      typescriptOptions,
-    } = this.props
-    const {
-      compilerError,
-      runtimeError,
-      showDetails,
-      activeFile,
-      activeFileTab,
-      fileTabs,
-      logs,
-    } = this.state
-
-    const { title } = options
-
-    const fileDiff = diff[activeFile] ? diff[activeFile].ranges : []
-
-    const error = compilerError || runtimeError
-    const isError = !!error
-
-    const style = mergeStyles(styles.editorPane, options.style)
-
-    return (
-      <div key={key} style={style}>
-        {title && (
-          <Header
-            text={title}
-            headerStyle={externalStyles.header}
-            textStyle={externalStyles.headerText}
-          >
-            {fullscreen && <Fullscreen textStyle={externalStyles.headerText} />}
-          </Header>
-        )}
-        {fileTabs.length > 1 && (
-          <Tabs
-            tabs={fileTabs}
-            getTitle={getTabTitle}
-            getChanged={getTabChanged}
-            activeTab={activeFileTab}
-            compareTabs={compareTabs}
-            onClickTab={this.onClickTab}
-            tabStyle={externalStyles.tab}
-            textStyle={externalStyles.tabText}
-            activeTextStyle={externalStyles.tabTextActive}
-            changedTextStyle={externalStyles.tabTextChanged}
-          >
-            {fullscreen && !title && (
-              <Fullscreen textStyle={externalStyles.tabText} />
-            )}
-          </Tabs>
-        )}
-        <Editor
-          key={activeFile}
-          initialValue={files[activeFile]}
-          filename={activeStepIndex + ':' + activeFile}
-          onChange={this.onCodeChange}
-          errorLineNumber={error?.lineNumber}
-          showDiff={true}
-          diff={fileDiff}
-          logs={playgroundOptions.enabled ? logs : undefined}
-          playgroundDebounceDuration={playgroundOptions.debounceDuration}
-          playgroundRenderReactElements={playgroundOptions.renderReactElements}
-          getTypeInfo={
-            typescriptOptions.enabled ? this.getTypeScriptInfo : undefined
-          }
-          tooltipStyle={externalStyles.tooltip}
-        />
-        {showDetails && (
-          <div style={styles.overlayContainer}>
-            <div style={styles.overlay}>
-              <Overlay isError={isError}>
-                {isError ? (
-                  <>
-                    <b style={styles.boldMessage}>{error?.description}</b>
-                    <br />
-                    <br />
-                    <code style={styles.codeMessage}>
-                      {error?.errorMessage}
-                    </code>
-                    <br />
-                  </>
-                ) : (
-                  ''
-                )}
-                <About />
-              </Overlay>
-            </div>
-          </div>
-        )}
-        <Status text={!!error ? error.summary : 'No Errors'} isError={isError}>
-          <Button
-            active={showDetails}
-            isError={isError}
-            onChange={this.onToggleDetails}
-          >
-            {'Show Details'}
-          </Button>
-        </Status>
-      </div>
-    )
-  }
-
   renderPane = (options: Pane, key: number) => {
     const {
       files,
@@ -600,12 +459,45 @@ export default class Workspace extends PureComponent<Props, State> {
       workspaces,
       activeStepIndex,
       onChangeActiveStepIndex,
+      fullscreen,
+      diff,
+      playgroundOptions,
+      typescriptOptions,
     } = this.props
-    const { logs, transpilerCache, activeFile } = this.state
+    const {
+      logs,
+      transpilerCache,
+      activeFile,
+      compilerError,
+      runtimeError,
+      activeFileTab,
+      fileTabs,
+    } = this.state
 
     switch (options.type) {
       case 'editor':
-        return this.renderEditor(key, options)
+        return (
+          <EditorPane
+            key={key}
+            options={options}
+            externalStyles={externalStyles}
+            files={files}
+            fullscreen={fullscreen}
+            activeStepIndex={activeStepIndex}
+            diff={diff}
+            playgroundOptions={playgroundOptions}
+            typescriptOptions={typescriptOptions}
+            compilerError={compilerError}
+            runtimeError={runtimeError}
+            activeFile={activeFile}
+            activeFileTab={activeFileTab}
+            fileTabs={fileTabs}
+            logs={logs}
+            onChange={this.onCodeChange}
+            getTypeInfo={this.getTypeScriptInfo}
+            onClickTab={this.onClickTab}
+          />
+        )
       case 'transpiler':
         return (
           <TranspilerPane
