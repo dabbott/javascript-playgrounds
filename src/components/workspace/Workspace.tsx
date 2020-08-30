@@ -33,6 +33,8 @@ import PlayerFrame from './PlayerFrame'
 import Status from './Status'
 import TabContainer from './TabContainer'
 import Tabs from './Tabs'
+import { Tab, getTabTitle, getTabChanged, compareTabs } from '../../utils/Tab'
+import StackPane from './panes/StackPane'
 
 export type BabelWorkerMessage = {
   filename: string
@@ -68,15 +70,6 @@ export type TypeScriptRequest =
 
 const BabelWorker = require('../../babel-worker.js')
 const babelWorker = new BabelWorker()
-
-interface Tab {
-  index: number
-  title: string
-  changed: boolean
-}
-const compareTabs = (a: Tab, b: Tab) => a.index === b.index
-const getTabTitle = (tab: Tab) => tab.title
-const getTabChanged = (tab: Tab) => tab.changed
 
 const findPaneSetIndex = (
   responsivePaneSets: ResponsivePaneSet[],
@@ -599,36 +592,6 @@ export default class Workspace extends PureComponent<Props, State> {
     )
   }
 
-  renderStack = (key: number, options: StackPaneOptions) => {
-    const { externalStyles } = this.props
-
-    const { children } = options
-
-    const tabs: (Tab & { pane: Pane })[] = children.map((pane, i) => ({
-      title: pane.title || pane.type,
-      index: i,
-      pane,
-      changed: false,
-    }))
-
-    return (
-      <TabContainer
-        key={key}
-        tabs={tabs}
-        getTitle={getTabTitle}
-        initialTab={tabs[0]}
-        tabStyle={externalStyles.stackTab || externalStyles.tab}
-        textStyle={externalStyles.stackTabText || externalStyles.tabText}
-        activeTextStyle={
-          externalStyles.stackTabTextActive || externalStyles.tabTextActive
-        }
-        renderHiddenContent={true}
-        compareTabs={compareTabs}
-        renderContent={(tab) => this.renderPane(tab.pane, tab.index)}
-      />
-    )
-  }
-
   renderPane = (options: Pane, key: number) => {
     const {
       files,
@@ -686,7 +649,14 @@ export default class Workspace extends PureComponent<Props, State> {
           />
         )
       case 'stack':
-        return this.renderStack(key, options)
+        return (
+          <StackPane
+            key={key}
+            options={options}
+            externalStyles={externalStyles}
+            renderPane={this.renderPane}
+          />
+        )
       case 'console':
         return (
           <ConsolePane
