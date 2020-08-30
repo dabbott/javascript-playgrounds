@@ -24,6 +24,10 @@ import Status from './Status'
 import TabContainer from './TabContainer'
 import Tabs from './Tabs'
 import WorkspacesList from './WorkspacesList'
+import TranspilerPane, {
+  getTranspilerId,
+  isTranspilerId,
+} from './panes/TranspilerPane'
 
 export type BabelWorkerMessage = {
   filename: string
@@ -59,14 +63,6 @@ export type TypeScriptRequest =
 
 const BabelWorker = require('../../babel-worker.js')
 const babelWorker = new BabelWorker()
-
-// Utilities for determining which babel worker responses are for the player vs
-// the transpiler view, since we encode this information in the filename.
-const transpilerPrefix = '@babel-'
-const getTranspilerId = (filename: string): string =>
-  `${transpilerPrefix}${filename}`
-const isTranspilerId = (filename: string): boolean =>
-  filename.indexOf(transpilerPrefix) === 0
 
 interface Tab {
   index: number
@@ -107,7 +103,6 @@ const findPaneSetIndex = (
 const styles = prefixObject({
   container: rowStyle,
   editorPane: columnStyle,
-  transpilerPane: columnStyle,
   workspacesPane: mergeStyles(columnStyle, {
     width: 220,
     overflowX: 'hidden',
@@ -691,33 +686,6 @@ export default class Workspace extends PureComponent<Props, State> {
     )
   }
 
-  renderTranspiler = (key: number, options: TranspilerPaneOptions) => {
-    const { externalStyles } = this.props
-    const { activeFile, transpilerCache } = this.state
-
-    const { title } = options
-
-    const style = mergeStyles(styles.transpilerPane, options.style)
-
-    return (
-      <div key={key} style={style}>
-        {title && (
-          <Header
-            text={title}
-            headerStyle={externalStyles.transpilerHeader}
-            textStyle={externalStyles.transpilerHeaderText}
-          />
-        )}
-        <Editor
-          key={getTranspilerId(activeFile)}
-          readOnly={true}
-          value={transpilerCache[getTranspilerId(activeFile)]}
-          filename={getTranspilerId(activeFile)}
-        />
-      </div>
-    )
-  }
-
   renderWorkspaces = (key: number, options: WorkspacesPaneOptions) => {
     const {
       externalStyles,
@@ -800,13 +768,21 @@ export default class Workspace extends PureComponent<Props, State> {
     const options = normalizePane(pane)
 
     const { files, externalStyles, sharedEnvironment } = this.props
-    const { logs } = this.state
+    const { logs, transpilerCache, activeFile } = this.state
 
     switch (options.type) {
       case 'editor':
         return this.renderEditor(key, options)
       case 'transpiler':
-        return this.renderTranspiler(key, options)
+        return (
+          <TranspilerPane
+            key={key}
+            options={options}
+            externalStyles={externalStyles}
+            transpilerCache={transpilerCache}
+            activeFile={activeFile}
+          />
+        )
       case 'player':
         // TODO: Validate only one player allowed for now, OR support multiple refs
         return (
