@@ -10,10 +10,7 @@ import ConsolePane from './panes/ConsolePane'
 import EditorPane from './panes/EditorPane'
 import PlayerPane from './panes/PlayerPane'
 import StackPane from './panes/StackPane'
-import TranspilerPane, {
-  getTranspilerId,
-  isTranspilerId,
-} from './panes/TranspilerPane'
+import TranspilerPane from './panes/TranspilerPane'
 import WorkspacesPane from './panes/WorkspacesPane'
 import PlayerFrame from './PlayerFrame'
 import typeScriptRequest from '../../utils/TypeScriptRequest'
@@ -212,18 +209,11 @@ export default class Workspace extends PureComponent<Props, State> {
         }
 
         if (playerVisible) {
-          babelRequest({
-            filename,
-            code,
-            options: { retainLines: true },
-          }).then(this.onBabelResponse)
+          this.compilerRequest(filename, code)
         }
 
         if (transpilerVisible) {
-          babelRequest({
-            filename: getTranspilerId(filename),
-            code,
-          }).then(this.onBabelResponse)
+          this.transpilerRequest(filename, code)
         }
       })
     }
@@ -243,24 +233,14 @@ export default class Workspace extends PureComponent<Props, State> {
 
   onBabelResponse = (response: BabelResponse) => {
     const { playerCache } = this
-    const { transpilerCache } = this.state
 
     this.updateStatus(response)
 
     if (response.type === 'code') {
       const { filename, code } = response
 
-      if (isTranspilerId(filename)) {
-        this.setState({
-          transpilerCache: {
-            ...transpilerCache,
-            [filename]: code,
-          },
-        })
-      } else {
-        playerCache[filename] = code
-        this.runApplication()
-      }
+      playerCache[filename] = code
+      this.runApplication()
     }
   }
 
@@ -316,22 +296,48 @@ export default class Workspace extends PureComponent<Props, State> {
     }
 
     if (playerVisible) {
-      babelRequest({
-        filename: activeFile,
-        code,
-        options: { retainLines: true },
-      }).then(this.onBabelResponse)
+      this.compilerRequest(activeFile, code)
     }
 
     if (transpilerVisible) {
-      babelRequest({
-        filename: getTranspilerId(activeFile),
-        code,
-      }).then(this.onBabelResponse)
+      this.transpilerRequest(activeFile, code)
     }
 
     this.codeCache[activeFile] = code
     this.props.onChange(this.codeCache)
+  }
+
+  compilerRequest = (filename: string, code: string) => {
+    babelRequest({
+      filename,
+      code,
+      options: { retainLines: true },
+    }).then((response: BabelResponse) => {
+      this.updateStatus(response)
+
+      if (response.type === 'code') {
+        const { filename, code } = response
+
+        this.playerCache[filename] = code
+        this.runApplication()
+      }
+    })
+  }
+
+  transpilerRequest = (filename: string, code: string) => {
+    babelRequest({
+      filename,
+      code,
+    }).then((response) => {
+      if (response.type === 'code') {
+        this.setState({
+          transpilerCache: {
+            ...this.state.transpilerCache,
+            [response.filename]: response.code,
+          },
+        })
+      }
+    })
   }
 
   onPlayerRun = () => {

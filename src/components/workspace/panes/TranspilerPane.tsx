@@ -50,10 +50,10 @@ export default memo(function TranspilerPane({
         />
       )}
       <Editor
-        key={getTranspilerId(activeFile)}
+        key={activeFile}
         readOnly={true}
-        value={transpilerCache[getTranspilerId(activeFile)]}
-        filename={getTranspilerId(activeFile)}
+        value={transpilerCache[activeFile]}
+        filename={activeFile}
       />
     </div>
   )
