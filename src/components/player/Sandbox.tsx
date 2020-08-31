@@ -308,6 +308,9 @@ export default class Sandbox extends PureComponent<Props> {
         return
       }
 
+      // Initialize window dimensions (sometimes this doesn't happen automatically?)
+      ReactNative.Dimensions._update()
+
       AppRegistry.runApplication(APP_NAME, {
         rootTag: screenElement,
       })

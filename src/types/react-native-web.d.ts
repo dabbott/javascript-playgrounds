@@ -6,4 +6,7 @@ declare module 'react-native-web' {
       options: { rootTag: HTMLElement }
     ): void
   }
+  export namespace Dimensions {
+    export function _update(): void
+  }
 }
