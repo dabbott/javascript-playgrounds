@@ -26,7 +26,6 @@ import TranspilerPane from './panes/TranspilerPane'
 import WorkspacesPane from './panes/WorkspacesPane'
 import PlayerFrame from './PlayerFrame'
 import useResponsiveBreakpoint from '../../hooks/useResponsiveBreakpoint'
-import { options } from '../../utils/CodeMirror'
 
 const {
   reducer,
@@ -43,14 +42,6 @@ const {
     consoleClear,
   },
 } = workspace
-
-const findPaneSetIndex = (
-  responsivePaneSets: ResponsivePaneSet[],
-  windowWidth?: number
-): number =>
-  windowWidth === undefined
-    ? responsivePaneSets.length - 1
-    : responsivePaneSets.findIndex((paneSet) => paneSet.maxWidth > windowWidth)
 
 const styles = prefixObject({
   container: rowStyle,
