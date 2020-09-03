@@ -2,6 +2,8 @@ const webpack = require('webpack')
 const merge = require('webpack-merge')
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin
 
 const paths = {
   root: path.join(__dirname, '..'),
@@ -97,6 +99,9 @@ const common = merge({
       template: paths.htmlTemplate,
       minify: false,
       chunks: ['player'],
+    }),
+    new BundleAnalyzerPlugin({
+      generateStatsFile: true,
     }),
   ],
 })
