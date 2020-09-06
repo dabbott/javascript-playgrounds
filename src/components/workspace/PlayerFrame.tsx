@@ -3,6 +3,7 @@ import * as ExtendedJSON from '../../utils/ExtendedJSON'
 import { prefixObject } from '../../utils/Styles'
 import Phone from './Phone'
 import { Message, ConsoleCommand } from '../../types/Messages'
+import { encode } from '../../utils/queryString'
 
 const styles = prefixObject({
   iframe: {
@@ -55,7 +56,7 @@ export default class extends PureComponent<Props, State> {
   fileMap?: Record<string, string>
   entry?: string
 
-  state = {
+  state: State = {
     id: null,
   }
 
@@ -134,18 +135,24 @@ export default class extends PureComponent<Props, State> {
 
     if (!id) return null
 
-    const vendorComponentsEncoded = encodeURIComponent(
-      JSON.stringify(vendorComponents)
-    )
-    const cssEncoded = encodeURIComponent(css)
-    const preludeEncoded = encodeURIComponent(prelude)
+    const queryString = encode({
+      id,
+      sharedEnvironment,
+      assetRoot,
+      vendorComponents: JSON.stringify(vendorComponents),
+      styleSheet,
+      css,
+      statusBarColor,
+      statusBarHeight,
+      prelude,
+    })
 
     return (
       <iframe
         style={styles.iframe}
         ref={'iframe'}
         frameBorder={0}
-        src={`player.html#id=${id}&sharedEnvironment=${sharedEnvironment}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}&styleSheet=${styleSheet}&css=${cssEncoded}&statusBarColor=${statusBarColor}&statusBarHeight=${statusBarHeight}&prelude=${preludeEncoded}`}
+        src={`player.html#${queryString}`}
       />
     )
   }
