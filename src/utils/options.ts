@@ -2,9 +2,9 @@ import {
   PlaygroundOptions,
   TypeScriptOptions,
   ResponsivePaneSet,
+  ExternalStyles,
 } from '../components/workspace/Workspace'
 import DefaultCode from '../constants/DefaultCode'
-import { CSSProperties } from 'react'
 import { PaneOptions, PaneShorthand, normalizePane } from './Panes'
 import defaultLibs from '../utils/TypeScriptDefaultLibs'
 
@@ -26,7 +26,7 @@ export interface PublicOptions {
   entry?: string
   initialTab?: string
   css?: string // was workspaceCSS
-  styles: Record<string, CSSProperties>
+  styles?: ExternalStyles
   fullscreen?: boolean
   sharedEnvironment?: boolean
   playground?: PlaygroundOptions

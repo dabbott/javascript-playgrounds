@@ -1,26 +1,12 @@
-import React, {
-  CSSProperties,
-  memo,
-  ReactNode,
-  useCallback,
-  useMemo,
-} from 'react'
-import { LogCommand } from '../../../types/Messages'
-import {
-  columnStyle,
-  mergeStyles,
-  prefixObject,
-  rowStyle,
-} from '../../../utils/Styles'
-import Console from '../Console'
-import Header from '../Header'
+import React, { memo, ReactNode, useCallback, useMemo } from 'react'
 import { StackPaneOptions, PaneOptions } from '../../../utils/Panes'
 import TabContainer from '../TabContainer'
 import { Tab, getTabTitle, compareTabs } from '../../../utils/Tab'
+import { ExternalStyles } from '../Workspace'
 
 interface Props {
   options: StackPaneOptions
-  externalStyles: Record<string, CSSProperties>
+  externalStyles: ExternalStyles
   renderPane: (pane: PaneOptions, index: number) => ReactNode
 }
 

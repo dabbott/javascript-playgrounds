@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { WorkspacesPaneOptions } from '../../../utils/Panes'
-import { memo, CSSProperties } from 'react'
 import WorkspacesList, { Step } from '../WorkspacesList'
 import Header from '../Header'
 import { mergeStyles, prefixObject, columnStyle } from '../../../utils/Styles'
+import { ExternalStyles } from '../Workspace'
 
 const styles = prefixObject({
   workspacesPane: mergeStyles(columnStyle, {
@@ -15,7 +15,7 @@ const styles = prefixObject({
 
 interface Props {
   options: WorkspacesPaneOptions
-  externalStyles: Record<string, CSSProperties>
+  externalStyles: ExternalStyles
   activeStepIndex: number
   workspaces: Step[]
   onChangeActiveStepIndex: (index: number) => void

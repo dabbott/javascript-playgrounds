@@ -8,6 +8,7 @@ import {
 import Editor from '../Editor'
 import Header from '../Header'
 import { TranspilerPaneOptions } from '../../../utils/Panes'
+import { ExternalStyles } from '../Workspace'
 
 const styles = prefixObject({
   transpilerPane: columnStyle,
@@ -17,7 +18,7 @@ const styles = prefixObject({
 
 interface Props {
   options: TranspilerPaneOptions
-  externalStyles: Record<string, CSSProperties>
+  externalStyles: ExternalStyles
   activeFile: string
   transpilerCache: Record<string, string>
 }

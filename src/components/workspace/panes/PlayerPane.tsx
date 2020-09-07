@@ -12,6 +12,7 @@ import Header from '../Header'
 import PlayerFrame from '../PlayerFrame'
 import Status from '../Status'
 import { PlayerPaneOptions } from '../../../utils/Panes'
+import { ExternalStyles } from '../Workspace'
 
 const styles = prefixObject({
   playerPane: mergeStyles(columnStyle, { flex: '0 0 auto' }),
@@ -21,7 +22,7 @@ const styles = prefixObject({
 
 export interface Props {
   options: PlayerPaneOptions
-  externalStyles: Record<string, CSSProperties>
+  externalStyles: ExternalStyles
   sharedEnvironment: boolean
   files: Record<string, string>
   logs: LogCommand[]

@@ -72,13 +72,47 @@ export interface TypeScriptOptions {
   types?: string[]
 }
 
+export interface ExternalStyles {
+  consolePane?: CSSProperties
+  consoleRow?: CSSProperties
+  header?: CSSProperties
+  headerText?: CSSProperties
+  playerHeader?: CSSProperties
+  playerHeaderText?: CSSProperties
+  playerPane?: CSSProperties
+  stackTab?: CSSProperties
+  stackTabText?: CSSProperties
+  stackTabTextActive?: CSSProperties
+  tab?: CSSProperties
+  tabText?: CSSProperties
+  tabTextActive?: CSSProperties
+  tabTextChanged?: CSSProperties
+  tooltip?: CSSProperties
+  transpilerHeader?: CSSProperties
+  transpilerHeaderText?: CSSProperties
+  workspacesButtonContainer?: CSSProperties
+  workspacesButtonText?: CSSProperties
+  workspacesButtonWrapper?: CSSProperties
+  workspacesDescription?: CSSProperties
+  workspacesDescriptionText?: CSSProperties
+  workspacesDivider?: CSSProperties
+  workspacesHeader?: CSSProperties
+  workspacesHeaderText?: CSSProperties
+  workspacesList?: CSSProperties
+  workspacesPane?: CSSProperties
+  workspacesRow?: CSSProperties
+  workspacesRowActive?: CSSProperties
+  workspacesRowTitle?: CSSProperties
+  workspacesRowTitleActive?: CSSProperties
+}
+
 export interface Props {
   title: string
   files: Record<string, string>
   entry: string
   initialTab: string
   onChange: (files: Record<string, string>) => void
-  externalStyles: Record<string, CSSProperties>
+  externalStyles: ExternalStyles
   fullscreen: boolean
   sharedEnvironment: boolean
   responsivePaneSets: ResponsivePaneSet[]
@@ -95,7 +129,7 @@ type WorkspacePaneProps = {
 
   // Props
   files: Record<string, string>
-  externalStyles: Record<string, CSSProperties>
+  externalStyles: ExternalStyles
   fullscreen: boolean
   sharedEnvironment: boolean
   playgroundOptions: PlaygroundOptions

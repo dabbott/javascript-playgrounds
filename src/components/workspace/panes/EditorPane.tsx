@@ -1,4 +1,4 @@
-import React, { CSSProperties, memo, useState } from 'react'
+import React, { memo, useState } from 'react'
 import { LogCommand } from '../../../types/Messages'
 import { EditorPaneOptions } from '../../../utils/Panes'
 import { columnStyle, mergeStyles, prefixObject } from '../../../utils/Styles'
@@ -16,7 +16,12 @@ import Header from '../Header'
 import Overlay from '../Overlay'
 import Status from '../Status'
 import Tabs from '../Tabs'
-import { PlaygroundOptions, PublicError, TypeScriptOptions } from '../Workspace'
+import {
+  PlaygroundOptions,
+  PublicError,
+  TypeScriptOptions,
+  ExternalStyles,
+} from '../Workspace'
 import type { WorkspaceDiff } from '../App'
 
 const styles = prefixObject({
@@ -55,7 +60,7 @@ const styles = prefixObject({
 
 interface Props {
   options: EditorPaneOptions
-  externalStyles: Record<string, CSSProperties>
+  externalStyles: ExternalStyles
   files: Record<string, string>
   logs: LogCommand[]
   fullscreen: boolean

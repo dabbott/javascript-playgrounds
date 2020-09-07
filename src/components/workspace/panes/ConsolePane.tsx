@@ -9,6 +9,7 @@ import {
 import Console from '../Console'
 import Header from '../Header'
 import { ConsolePaneOptions } from '../../../utils/Panes'
+import { ExternalStyles } from '../Workspace'
 
 const styles = prefixObject({
   consolePane: columnStyle,
@@ -18,7 +19,7 @@ const styles = prefixObject({
 
 interface Props {
   options: ConsolePaneOptions
-  externalStyles: Record<string, CSSProperties>
+  externalStyles: ExternalStyles
   files: Record<string, string>
   logs: LogCommand[]
 }
