@@ -22,7 +22,7 @@ if (css) {
   appendCSS(css)
 }
 
-const mount = document.getElementById('react-root') as HTMLDivElement
+const mount = document.getElementById('player-root') as HTMLDivElement
 
 // Set mount node to flex in a vendor-prefixed way
 prefixAndApply({ display: 'flex' }, mount)
