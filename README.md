@@ -100,11 +100,12 @@ The web player accepts the following props/parameters.
 
 Each pane supports pane-specific options. They all support:
 
-| Title       | Description                                                                                                   | Default     |
-| ----------- | ------------------------------------------------------------------------------------------------------------- | ----------- |
-| **`style`** | The inline styles for this specific pane, merged with those passed in the top-level `styles` object if given. | `undefined` |
+| Title       | Description                                                                                                               | Default     |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **`style`** | The inline styles for this specific pane, merged with those passed in the top-level `styles` object if given.             | `undefined` |
+| **`title`** | An optional title for this pane. If used on an `'editor'` pane, this will override a top-level `title`, if one was given. | `''`        |
 
-#### For `player` pane
+#### The `player` pane
 
 Display the running app, optionally with the image of a phone around it.
 
@@ -130,7 +131,7 @@ Display the running app, optionally with the image of a phone around it.
 - To load a CommonJS `require`-style module, the `name` is the `require(name)` name, and the second is the source url. E.g. to load moment.js: set `modules` to the value `[{ name: 'moment', url: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js' }]`
 - To load a component as a property on `window`, also pass a `globalName`, which will be the window property name (e.g. `window.moment`). E.g. to load moment.js this way: set `modules` to the value `[{ name: 'moment', globalName: 'moment', url: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js' }]`
 
-#### For `console` pane
+#### The `console` pane
 
 Show the output `console.log`, similar to the Chrome inspector. This can be a separate pane, or embedded in the player pane.
 
@@ -140,7 +141,7 @@ Show the output `console.log`, similar to the Chrome inspector. This can be a se
 | **`showLineNumber`**      | Show the line number of the `console.log`.                 | `true`  |
 | **`renderReactElements`** | Render React elements, instead of displaying element JSON. | `false` |
 
-#### For `stack` pane
+#### The `stack` pane
 
 A nested stack of panes.
 
@@ -148,17 +149,15 @@ A nested stack of panes.
 | -------------- | ------------------------------------------------------------- | ------- |
 | **`children`** | An array of panes, just like the top level `panes` parameter. | `[]`    |
 
-#### For `editor` pane
-
-| Title       | Description                                                                                                                | Default |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------- | ------- |
-| **`title`** | An optional title for the editor. By default, there is no title. This will override a top-level `title`, if one was given. | `''`    |
-
-#### For `transpiler` pane
+#### The `editor` pane
 
 None at the moment.
 
-#### For `workspaces` pane
+#### The `transpiler` pane
+
+None at the moment.
+
+#### The `workspaces` pane
 
 None at the moment.
 
