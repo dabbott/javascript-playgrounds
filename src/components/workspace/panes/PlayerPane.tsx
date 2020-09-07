@@ -51,7 +51,7 @@ const PlayerPane = memo(
       scale,
       platform,
       assetRoot,
-      vendorComponents,
+      modules,
       styleSheet,
       css,
       prelude,
@@ -85,7 +85,7 @@ const PlayerPane = memo(
               scale={scale}
               platform={platform}
               assetRoot={assetRoot}
-              vendorComponents={vendorComponents}
+              vendorComponents={modules}
               styleSheet={styleSheet}
               css={css}
               prelude={prelude}

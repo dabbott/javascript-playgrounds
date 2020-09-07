@@ -1,4 +1,4 @@
-export default `import React, { Component } from 'react'
+export default `import React from 'react'
 import {
   AppRegistry,
   StyleSheet,
@@ -6,16 +6,14 @@ import {
   View,
 } from 'react-native'
 
-class App extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-      </View>
-    )
-  }
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.welcome}>
+        Welcome to React Native!
+      </Text>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -31,6 +29,4 @@ const styles = StyleSheet.create({
     margin: 10,
   },
 })
-
-AppRegistry.registerComponent('App', () => App)
 `

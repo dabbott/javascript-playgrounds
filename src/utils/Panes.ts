@@ -1,5 +1,5 @@
 import { CSSProperties } from 'react'
-import { ComponentDescription } from '../components/player/VendorComponents'
+import { ExternalModule } from '../components/player/VendorComponents'
 
 export interface ConsoleOptions {
   showFileName: boolean
@@ -40,7 +40,7 @@ export type PlayerPaneOptions = PaneBaseOptions & {
   scale?: number
   width?: number
   assetRoot?: string
-  vendorComponents: ComponentDescription[]
+  modules: ExternalModule[]
   styleSheet?: string
   css?: string
   prelude?: string
@@ -84,22 +84,29 @@ const getNextId = () => `${initialId++}`
  * Turn panes into objects, and assign a unique id to each.
  */
 export const normalizePane = (
-  pane: PaneShorthand | PaneOptions
+  pane: PaneShorthand | PaneOptions,
+  title: string
 ): PaneOptions => {
   const id = getNextId()
 
-  if (typeof pane === 'string') {
-    return { id, type: pane } as PaneOptions
-  }
+  let options =
+    typeof pane === 'string' ? ({ type: pane } as PaneOptions) : pane
 
-  pane.id = pane.id || getNextId()
+  options.id = options.id || getNextId()
 
-  if (pane.type === 'stack') {
+  if (options.type === 'stack') {
     return {
-      ...pane,
-      children: pane.children.map(normalizePane),
+      ...options,
+      children: options.children.map((child) => normalizePane(child, title)),
     }
   }
 
-  return pane
+  if (options.type === 'editor' && title && !options.title) {
+    return {
+      ...options,
+      title,
+    }
+  }
+
+  return options
 }

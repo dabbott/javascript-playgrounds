@@ -17,11 +17,13 @@ const getObjectFromKeyPath = (data: any, keyPath: string): unknown => {
     .reduce((prev: any, curr: string) => prev[curr], data)
 }
 
-type ExternalComponentDescription = [string, string, string]
-type ModuleComponentDescription = [string, string]
-export type ComponentDescription =
-  | ModuleComponentDescription
-  | ExternalComponentDescription
+export type ExternalModuleShorthand = string
+export type ExternalModuleDescription = {
+  name: string
+  url: string
+  globalName?: string
+}
+export type ExternalModule = ExternalModuleShorthand | ExternalModuleDescription
 
 // Currently there are two kinds of components:
 // - "externals", which use register/get. These store the *actual value*
@@ -53,9 +55,9 @@ export default class VendorComponents {
     return requires[name]
   }
 
-  static loadModules(modules: ModuleComponentDescription[]) {
+  static loadModules(modules: ExternalModuleDescription[]) {
     return Promise.all(
-      modules.map(async ([name, url]) => {
+      modules.map(async ({ name, url }) => {
         const text = await Networking.get(url)
 
         VendorComponents.define(name, text)
@@ -63,21 +65,23 @@ export default class VendorComponents {
     )
   }
 
-  static loadExternals(externals: ExternalComponentDescription[]) {
+  static loadExternals(
+    externals: (ExternalModuleDescription & { globalName: string })[]
+  ) {
     return new Promise((resolve) => {
       if (externals.length === 0) {
         resolve()
         return
       }
 
-      const urls = externals.map((vc) => vc[2])
+      const urls = externals.map((vc) => vc.url)
 
       $scriptjs(urls, () => {
-        externals.forEach(([requireName, windowName]) => {
+        externals.forEach(({ name, globalName }) => {
           // Inject into vendor components
           VendorComponents.register(
-            requireName,
-            getObjectFromKeyPath(window, windowName)
+            name,
+            getObjectFromKeyPath(window, globalName)
           )
         })
         resolve()
@@ -86,7 +90,7 @@ export default class VendorComponents {
   }
 
   // Load components from urls
-  static load(components: ComponentDescription[], callback: () => void) {
+  static load(components: ExternalModule[], callback: () => void) {
     // Necessary for dependency mapping
     window.React = React
     window.ReactNative = ReactNative
@@ -98,15 +102,22 @@ export default class VendorComponents {
     // For backwards compatibility (should only be react-native-animatable example)
     ;(React as any).PropTypes = PropTypes
 
+    const resolved = components.map((component) =>
+      typeof component === 'string'
+        ? {
+            name: component,
+            url: `https://unpkg.com/${component}`,
+          }
+        : component
+    )
+
     // Format is an array of 2-element arrays [[ require-name, url ]]
-    const modules = components.filter(
-      (vc) => vc.length === 2
-    ) as ModuleComponentDescription[]
+    const modules = resolved.filter((vc) => !vc.globalName)
 
     // Format is an array of 3-element arrays [[ require-name, window-name, url ]]
-    const externals = components.filter(
-      (vc) => vc.length === 3
-    ) as ExternalComponentDescription[]
+    const externals = resolved.filter(
+      (vc) => !!vc.globalName
+    ) as (ExternalModuleDescription & { globalName: string })[]
 
     Promise.all([
       this.loadModules(modules),

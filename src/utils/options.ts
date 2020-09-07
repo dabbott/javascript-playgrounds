@@ -61,7 +61,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     styles = {},
     fullscreen = false,
     sharedEnvironment = false,
-    panes = ['editor', 'player', 'console'],
+    panes = ['editor', 'player'],
     responsivePaneSets = [],
     workspaces = [],
     playground = {
@@ -81,12 +81,8 @@ export function normalize(options: PublicOptions): InternalOptions {
     typescript
   )
 
-  if (typescriptOptions.enabled && !(entry || initialTab)) {
-    entry = 'index.tsx'
-    initialTab = 'index.tsx'
-  } else {
-    entry = 'index.js'
-    initialTab = 'index.js'
+  if (!entry) {
+    entry = typescriptOptions.enabled ? 'index.tsx' : 'index.js'
   }
 
   if (Object.keys(files).length > 0) {
@@ -100,7 +96,7 @@ export function normalize(options: PublicOptions): InternalOptions {
   }
 
   // If initial tab is invalid or not given, use the entry file
-  if (!files.hasOwnProperty(initialTab)) {
+  if (!initialTab || !files.hasOwnProperty(initialTab)) {
     initialTab = entry
   }
 
@@ -113,10 +109,10 @@ export function normalize(options: PublicOptions): InternalOptions {
     styles,
     fullscreen,
     sharedEnvironment,
-    panes: panes.map(normalizePane),
+    panes: panes.map((pane) => normalizePane(pane, title)),
     responsivePaneSets: responsivePaneSets.map((set) => ({
       ...set,
-      panes: set.panes.map(normalizePane),
+      panes: set.panes.map((pane) => normalizePane(pane, title)),
     })),
     workspaces,
     playground,
