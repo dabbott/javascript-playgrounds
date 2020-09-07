@@ -3,6 +3,8 @@ const webpack = require('webpack')
 
 const DIRECTORY = path.dirname(__dirname)
 
+const { version } = require('../package.json')
+
 module.exports = {
   mode: 'production',
   entry: path.join(DIRECTORY, 'src', 'components', 'embed', 'WebPlayer.tsx'),
@@ -39,6 +41,7 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
+      VERSION: JSON.stringify(version),
     }),
   ],
 }
