@@ -37,7 +37,7 @@ interface State {
 export default class extends PureComponent<Props, State> {
   static defaultProps = {
     platform: 'ios',
-    width: 300,
+    width: 210,
     scale: 1,
     assetRoot: '',
     statusBarHeight: 0,
