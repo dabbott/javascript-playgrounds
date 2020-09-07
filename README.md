@@ -45,8 +45,6 @@ This component is a simple wrapper around the `iframe` that handles encoding par
 - **`className`** - The className of the `div` which wraps the `iframe`.
 - **`baseURL`** - Optionally, specify a custom url to load the player from. This url should not include a hash. Defaults to the `unpkg.com` url as described below.
 
-A `umd` build of this React component is available in the `dist` directory.
-
 #### As an `iframe`
 
 If you're not using React, include the web player in an `iframe`.
@@ -63,7 +61,8 @@ If you're not using React, include the web player in an `iframe`.
 Configuration parameters should be passed as part of the hash string, after `#data=`. They should be JSON-encoded _and then_ URI-encoded:
 
 ```JavaScript
-const hashString = '#data=' + encodeURIComponent(JSON.stringify({ code: `console.log('Hello, world!`) }))
+const parameters = { code: `console.log('Hello, world!')` }
+const hashString = '#data=' + encodeURIComponent(JSON.stringify(parameters))
 ```
 
 > When used as an `iframe`, the easiest way to set the `code` parameter is to edit the code in the web player and copy and paste the url when you're done (the url updates automatically as you type).
@@ -83,17 +82,23 @@ The web player accepts the following props/parameters.
 - **`fullscreen`** - Show a button to enable fullscreen editing (in most configurations of panes). Defaults to `false`. Note that the iframe must have the `allowfullscreen` attribute for this to work.
 - **`playground`** - Settings for playgrounds (inline widgets that display runtime values)
   - **`enabled`** - Turn on playgrounds? Defaults to `false`
-  - **`renderReactElements`** - Render React elements? If `false`, will print the React element object `{ type: ..., props: ..., key: ... }`, rather than render it. Defaults to `true`
+  - **`renderReactElements`** - Render React elements? If `false`, will print the React element object, e.g. `{ type, props, key }`, rather than render it. Defaults to `true`
   - **`debounceDuration`** - How frequently widgets update. A little delay helps keep the UI feeling smoother. Defaults to `200` milliseconds.
 - **`typescript`** - TypeScript settings
   - **`enabled`** - Turn on TypeScript hover tooltip info? Defaults to `false`
   - **`libs`** - An array of default libraries to include, e.g. `'dom'` and `'es2015'`. We don't include some newer/esoteric ones by default, to reduce download size.
-  - **`types`** - An array of additional type files to download. Each should be an object `{ name: ..., url: ... }`.
+  - **`types`** - An array of additional type files to download. Each should be an object `{ name, url }`.
 - **`workspaces`** - Add a tutorial-like sequence of sets of files, highlighting changes between each set. Each object in this array can contain: `{ title, description, workspace: { title, files, entry, initialTab } }`. Properties in the `workspace` object will override those given as top level parameters.
 - **`panes`** - An array of UI panes to display. To display a pane without options, use a string. Otherwise, use an object with a `type` property. The available panes are: `'stack'`, `'editor'`, `'transpiler'`, `'player'`, `'workspaces'`, `'console'`. The default value is: `['editor', 'player']`. Note that there _must be_ a `player` pane for any code to run. For pane options, see below.
 - **`responsivePaneSets`** - An array of `{ maxWidth, panes }` objects to show at different responsive breakpoints. The iframe will use the first set where the `maxWidth` is greater than the current window width. The top-level `panes` parameter has `maxWidth: Infinity` so that it's used by default if there's no matching set of panes.
 
-#### `player` options
+### Pane options
+
+Each pane supports pane-specific options. They all support:
+
+- **`style`** - The inline styles for this specific pane, merged with those passed in the top-level `styles` object if given.
+
+#### For `player` pane
 
 Display the running app, optionally with the image of a phone around it.
 
@@ -114,7 +119,7 @@ Display the running app, optionally with the image of a phone around it.
   - **maximized**: Show the console over the entire player? Defaults to `false`.
   - **collapsible**: Allow collapsing the console via a toggle button. Defaults to `true`.
 
-#### `console` options
+#### For `console` pane
 
 Show the output `console.log`, similar to the Chrome inspector. This can be a separate pane, or embedded in the player pane.
 
@@ -122,21 +127,21 @@ Show the output `console.log`, similar to the Chrome inspector. This can be a se
 - **showLineNumber**: Defaults to `true`
 - **renderReactElements**: Defaults to `false`
 
-#### `stack` options
+#### For `stack` pane
 
 A nested stack of panes.
 
 - **`children`** - An array of panes, just like the top level `panes` parameter.
 
-#### `editor` options
+#### For `editor` pane
 
 - **`title`** - An optional title for the editor. By default, there is no title. This will override a top-level `title`, if one was given.
 
-#### `transpiler` options
+#### For `transpiler` pane
 
 None at the moment.
 
-#### `workspaces` options
+#### For `workspaces` pane
 
 None at the moment.
 
