@@ -66,7 +66,7 @@ export type PaneOptions =
   | WorkspacesPaneOptions
   | ConsolePaneOptions
 
-type PaneShorthand = PaneOptions['type']
+export type PaneShorthand = PaneOptions['type']
 
 export const containsPane = (panes: PaneOptions[], target: string): boolean =>
   panes.some((pane: PaneOptions) => {

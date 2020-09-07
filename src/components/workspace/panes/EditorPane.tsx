@@ -1,5 +1,4 @@
 import React, { CSSProperties, memo, useState } from 'react'
-import type { WorkspaceDiff } from '../../../index'
 import { LogCommand } from '../../../types/Messages'
 import { EditorPaneOptions } from '../../../utils/Panes'
 import { columnStyle, mergeStyles, prefixObject } from '../../../utils/Styles'
@@ -18,6 +17,7 @@ import Overlay from '../Overlay'
 import Status from '../Status'
 import Tabs from '../Tabs'
 import { PlaygroundOptions, PublicError, TypeScriptOptions } from '../Workspace'
+import type { WorkspaceDiff } from '../App'
 
 const styles = prefixObject({
   editorPane: columnStyle,

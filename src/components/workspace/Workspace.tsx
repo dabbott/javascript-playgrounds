@@ -9,7 +9,6 @@ import React, {
   memo,
 } from 'react'
 import type * as ts from 'typescript'
-import type { WorkspaceDiff } from '../../index'
 import * as workspace from '../../reducers/workspace'
 import { ConsoleCommand, LogCommand } from '../../types/Messages'
 import babelRequest, { BabelResponse } from '../../utils/BabelRequest'
@@ -26,6 +25,8 @@ import TranspilerPane from './panes/TranspilerPane'
 import WorkspacesPane from './panes/WorkspacesPane'
 import PlayerFrame from './PlayerFrame'
 import useResponsiveBreakpoint from '../../hooks/useResponsiveBreakpoint'
+import { WorkspaceStep } from '../../utils/options'
+import { WorkspaceDiff } from './App'
 
 const {
   reducer,
@@ -73,7 +74,6 @@ export interface TypeScriptOptions {
 
 export interface Props {
   title: string
-  description: string
   files: Record<string, string>
   entry: string
   initialTab: string
@@ -84,7 +84,7 @@ export interface Props {
   responsivePaneSets: ResponsivePaneSet[]
   playgroundOptions: PlaygroundOptions
   typescriptOptions: TypeScriptOptions
-  workspaces: Props[]
+  workspaces: WorkspaceStep[]
   diff: Record<string, WorkspaceDiff>
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
@@ -100,7 +100,7 @@ type WorkspacePaneProps = {
   sharedEnvironment: boolean
   playgroundOptions: PlaygroundOptions
   typescriptOptions: TypeScriptOptions
-  workspaces: Props[]
+  workspaces: WorkspaceStep[]
   diff: Record<string, WorkspaceDiff>
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
