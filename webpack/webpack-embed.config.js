@@ -5,7 +5,7 @@ const DIRECTORY = path.dirname(__dirname)
 
 module.exports = {
   mode: 'production',
-  entry: path.join(DIRECTORY, 'src', 'components', 'embed', 'WebPlayer.js'),
+  entry: path.join(DIRECTORY, 'src', 'components', 'embed', 'WebPlayer.tsx'),
   output: {
     path: path.join(DIRECTORY, 'dist'),
     filename: 'react-native-web-player.js',
@@ -16,16 +16,9 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js/,
+        test: /\.tsx?$/,
+        use: ['ts-loader'],
         exclude: /node_modules/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: {
-              cacheDirectory: true,
-            },
-          },
-        ],
       },
     ],
   },
