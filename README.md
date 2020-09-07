@@ -102,40 +102,51 @@ Each pane supports pane-specific options. They all support:
 
 Display the running app, optionally with the image of a phone around it.
 
-- **`platform`** - One of `ios`, `android`, or `web`. Defaults to `ios`. When `web`, no phone image is displayed.
-- **`width`** - The width of the device. Defaults to `210px`.
-- **`scale`** - Zoom the device screen. Defaults to `1`. This has no effect if the platform is `web`.
-- **`assetRoot`** - Specifies the root url for asset `require`s. E.g. to require `http://localhost:8080/images/hello.png`, you could set `assetRoot` to `'http://localhost:8080/'` and write `require('./images/hello.png')` in your code.
-- **`css`** - An optional CSS string to apply within the player's `iframe`.
-- **`styleSheet`** - One of `reset` or `none`. When `reset`, the meyerweb CSS reset is applied to the player's `iframe`. Defaults to `reset`.
-- **`statusBarHeight`** - Display a rectangle at the top of the phone screen, mimicking a status bar.
-- **`statusBarColor`** - The color of the fake status bar.
-- **`prelude`** - JavaScript code that runs before the entry file.
-- **`modules`** - An array of external modules to make available to the sandbox. Each object in the array should be an object containing a `name` and `url`. As a shorthand, pass just a string name to load a module from unpkg (`https://unpkg.com/${name}`)
-  - To load a CommonJS `require`-style module, the `name` is the `require(name)` name, and the second is the source url. E.g. to load moment.js: set `modules` to the value `[{ name: 'moment', url: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js' }]`
-  - To load a component as a property on `window`, also pass a `globalName`, which will be the window property name (e.g. `window.moment`). E.g. to load moment.js this way: set `modules` to the value `[{ name: 'moment', globalName: 'moment', url: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js' }]`
-- **`console`** - Display an embedded console in this pane. See the `console` options below. Additionally, the embedded version of the console has the properties:
-  - **`visible`** - Show the console? Defaults to `false`.
-  - **`maximized`** - Show the console over the entire player? Defaults to `false`.
-  - **`collapsible`** - Allow collapsing the console via a toggle button. Defaults to `true`.
+| Title                     | Description                                                                                                                                                                                                                                                 | Default   |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| **`platform`**            | One of `ios`, `android`, or `web`. When `web`, no phone image is displayed.                                                                                                                                                                                 | `'ios'`   |
+| **`width`**               | The width of the device.                                                                                                                                                                                                                                    | `210px`   |
+| **`scale`**               | Zoom the device screen. This has no effect if the platform is `web`.                                                                                                                                                                                        | `1`       |
+| **`assetRoot`**           | Specifies the root url for asset `require`s. E.g. to require `http://localhost:8080/images/hello.png`, you could set `assetRoot` to `'http://localhost:8080/'` and write `require('./images/hello.png')` in your code.                                      | `''`      |
+| **`css`**                 | An optional CSS string to apply within the player's `iframe`.                                                                                                                                                                                               | `''`      |
+| **`styleSheet`**          | One of `reset` or `none`. When `reset`, the meyerweb CSS reset is applied to the player's `iframe`.                                                                                                                                                         | `'reset'` |
+| **`statusBarHeight`**     | Display a rectangle at the top of the phone screen, mimicking a status bar.                                                                                                                                                                                 | `0px`     |
+| **`statusBarColor`**      | The color of the fake status bar.                                                                                                                                                                                                                           | `'black'` |
+| **`prelude`**             | JavaScript code that runs before the entry file.                                                                                                                                                                                                            | `''`      |
+| **`modules`**             | An array of external modules to make available to the sandbox. Each object in the array should be an object containing a `name` and `url`. As a shorthand, pass a string name to load a module from unpkg (`https://unpkg.com/${name}`). More detail below. | `[]`      |
+| **`console`**             | Display an embedded console in this pane. See the `console` options below. Additionally, the embedded version of the console has the following properties...                                                                                                | `{}`      |
+| **`console.visible`**     | Show the console?                                                                                                                                                                                                                                           | `false`   |
+| **`console.maximized`**   | Show the console over the entire player?                                                                                                                                                                                                                    | `false`   |
+| **`console.collapsible`** | Allow collapsing the console via a toggle button.                                                                                                                                                                                                           | `true`    |
+
+##### Examples of loading modules:
+
+- To load a CommonJS `require`-style module, the `name` is the `require(name)` name, and the second is the source url. E.g. to load moment.js: set `modules` to the value `[{ name: 'moment', url: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js' }]`
+- To load a component as a property on `window`, also pass a `globalName`, which will be the window property name (e.g. `window.moment`). E.g. to load moment.js this way: set `modules` to the value `[{ name: 'moment', globalName: 'moment', url: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js' }]` | Ok |
 
 #### For `console` pane
 
 Show the output `console.log`, similar to the Chrome inspector. This can be a separate pane, or embedded in the player pane.
 
-- **`showFileName`** - Defaults to `false`
-- **`showLineNumber`** - Defaults to `true`
-- **`renderReactElements`** - Defaults to `false`
+| Title                     | Description                                                | Default |
+| ------------------------- | ---------------------------------------------------------- | ------- |
+| **`showFileName`**        | Show the file name containing the `console.log`.           | `false` |
+| **`showLineNumber`**      | Show the line number of the `console.log`.                 | `true`  |
+| **`renderReactElements`** | Render React elements, instead of displaying element JSON. | `false` |
 
 #### For `stack` pane
 
 A nested stack of panes.
 
-- **`children`** - An array of panes, just like the top level `panes` parameter.
+| Title          | Description                                                   | Default |
+| -------------- | ------------------------------------------------------------- | ------- |
+| **`children`** | An array of panes, just like the top level `panes` parameter. | `[]`    |
 
 #### For `editor` pane
 
-- **`title`** - An optional title for the editor. By default, there is no title. This will override a top-level `title`, if one was given.
+| Title       | Description                                                                                                                | Default |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------- | ------- |
+| **`title`** | An optional title for the editor. By default, there is no title. This will override a top-level `title`, if one was given. | `''`    |
 
 #### For `transpiler` pane
 
