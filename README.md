@@ -114,18 +114,18 @@ Display the running app, optionally with the image of a phone around it.
 - **`modules`** - An array of external modules to make available to the sandbox. Each object in the array should be an object containing a `name` and `url`. As a shorthand, pass just a string name to load a module from unpkg (`https://unpkg.com/${name}`)
   - To load a CommonJS `require`-style module, the `name` is the `require(name)` name, and the second is the source url. E.g. to load moment.js: set `modules` to the value `[{ name: 'moment', url: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js' }]`
   - To load a component as a property on `window`, also pass a `globalName`, which will be the window property name (e.g. `window.moment`). E.g. to load moment.js this way: set `modules` to the value `[{ name: 'moment', globalName: 'moment', url: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js' }]`
-- **console** - Display an embedded console in this pane. See the `console` options below. Additionally, the embedded version of the console has the properties:
-  - **visible**: Show the console? Defaults to `false`.
-  - **maximized**: Show the console over the entire player? Defaults to `false`.
-  - **collapsible**: Allow collapsing the console via a toggle button. Defaults to `true`.
+- **`console`** - Display an embedded console in this pane. See the `console` options below. Additionally, the embedded version of the console has the properties:
+  - **`visible`** - Show the console? Defaults to `false`.
+  - **`maximized`** - Show the console over the entire player? Defaults to `false`.
+  - **`collapsible`** - Allow collapsing the console via a toggle button. Defaults to `true`.
 
 #### For `console` pane
 
 Show the output `console.log`, similar to the Chrome inspector. This can be a separate pane, or embedded in the player pane.
 
-- **showFileName**: Defaults to `false`
-- **showLineNumber**: Defaults to `true`
-- **renderReactElements**: Defaults to `false`
+- **`showFileName`** - Defaults to `false`
+- **`showLineNumber`** - Defaults to `true`
+- **`renderReactElements`** - Defaults to `false`
 
 #### For `stack` pane
 
