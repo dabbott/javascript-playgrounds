@@ -41,9 +41,11 @@ export default function App() {
 
 This component is a simple wrapper around the `iframe` that handles encoding parameters for you. While it passes most props along to the `iframe`, it has a few extra props:
 
-- **`style`** - The style of the `div` which wraps the `iframe` (the iframe has `100%` width and height).
-- **`className`** - The className of the `div` which wraps the `iframe`.
-- **`baseURL`** - Optionally, specify a custom url to load the player from. This url should not include a hash. Defaults to the `unpkg.com` url as described below.
+| Title           | Description                                                                                   | Default                           |
+| --------------- | --------------------------------------------------------------------------------------------- | --------------------------------- |
+| **`style`**     | The style of the `div` which wraps the `iframe` (the iframe has `100%` width and height).     | `undefined`                       |
+| **`className`** | The className of the `div` which wraps the `iframe`                                           | `undefined`                       |
+| **`baseURL`**   | Optionally, specify a custom url to load the player from. This url should not include a hash. | `unpkg.com` (see [unpkg](#unpkg)) |
 
 #### As an `iframe`
 
@@ -71,32 +73,36 @@ const hashString = '#data=' + encodeURIComponent(JSON.stringify(parameters))
 
 The web player accepts the following props/parameters.
 
-- **`title`** - An optional title for the editor pane. By default, there is no title.
-- **`code`** - The code to show/run in the player. Defaults to the sample app.
-- **`files`** - A map of `{ [filename]: code }`. This will take precedence over `code` if given.
-- **`entry`** - The filename of the file that runs first. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`, or `index.tsx` if TypeScript is enabled.
-- **`initialTab`** - The filename of the tab to show by default. This is only relevant when showing multiple files with the `files` parameter. Defaults to the value of `entry`.
-- **`css`** - An optional CSS string to apply within the workspace `iframe`.
-- **`styles`** - An map of inline style objects, applied to various elements to customize the style of the UI. Example: `{ header: { backgroundColor: 'red' } }`
-- **`sharedEnvironment`** - This affects how the iframes share data with one another, mainly for the "playgrounds" feature. When `true`, iframes will pass JavaScript objects back and forth, while when `false`, they'll pass serialized JSON. Defaults to `false`.
-- **`fullscreen`** - Show a button to enable fullscreen editing (in most configurations of panes). Defaults to `false`. Note that the iframe must have the `allowfullscreen` attribute for this to work.
-- **`playground`** - Settings for playgrounds (inline widgets that display runtime values)
-  - **`enabled`** - Turn on playgrounds? Defaults to `false`
-  - **`renderReactElements`** - Render React elements? If `false`, will print the React element object, e.g. `{ type, props, key }`, rather than render it. Defaults to `true`
-  - **`debounceDuration`** - How frequently widgets update. A little delay helps keep the UI feeling smoother. Defaults to `200` milliseconds.
-- **`typescript`** - TypeScript settings
-  - **`enabled`** - Turn on TypeScript hover tooltip info? Defaults to `false`
-  - **`libs`** - An array of default libraries to include, e.g. `'dom'` and `'es2015'`. We don't include some newer/esoteric ones by default, to reduce download size.
-  - **`types`** - An array of additional type files to download. Each should be an object `{ name, url }`.
-- **`workspaces`** - Add a tutorial-like sequence of sets of files, highlighting changes between each set. Each object in this array can contain: `{ title, description, workspace: { title, files, entry, initialTab } }`. Properties in the `workspace` object will override those given as top level parameters.
-- **`panes`** - An array of UI panes to display. To display a pane without options, use a string. Otherwise, use an object with a `type` property. The available panes are: `'stack'`, `'editor'`, `'transpiler'`, `'player'`, `'workspaces'`, `'console'`. The default value is: `['editor', 'player']`. Note that there _must be_ a `player` pane for any code to run. For pane options, see below.
-- **`responsivePaneSets`** - An array of `{ maxWidth, panes }` objects to show at different responsive breakpoints. The iframe will use the first set where the `maxWidth` is greater than the current window width. The top-level `panes` parameter has `maxWidth: Infinity` so that it's used by default if there's no matching set of panes.
+| Title                                | Description                                                                                                                                                                                                                                                                                                                             | Default                      |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| **`title`**                          | An optional title for the editor pane.                                                                                                                                                                                                                                                                                                  | `''`                         |
+| **`code`**                           | The code to show/run in the player.                                                                                                                                                                                                                                                                                                     | The sample app               |
+| **`files`**                          | A map of `{ [filename]: code }`. This will take precedence over `code` if given.                                                                                                                                                                                                                                                        | `undefined`                  |
+| **`entry`**                          | The filename of the file that runs first. This is only relevant when showing multiple files with the `files` parameter. Defaults to `index.js`, or `index.tsx` if TypeScript is enabled.                                                                                                                                                | `'index.js'` or `'index.ts'` |
+| **`initialTab`**                     | The filename of the tab to show by default. This is only relevant when showing multiple files with the `files` parameter. Defaults to the value of `entry`.                                                                                                                                                                             | `entry`                      |
+| **`css`**                            | An optional CSS string to apply within the workspace `iframe`.                                                                                                                                                                                                                                                                          | `''`                         |
+| **`styles`**                         | An map of inline style objects, applied to various elements to customize the style of the UI. Example: `{ header: { backgroundColor: 'red' } }`                                                                                                                                                                                         | `{}`                         |
+| **`sharedEnvironment`**              | This affects how the iframes share data with one another, mainly for the "playgrounds" feature. When `true`, iframes will pass JavaScript objects back and forth, while when `false`, they'll pass serialized JSON.                                                                                                                     | `false`                      |
+| **`fullscreen`**                     | Show a button to enable fullscreen editing (in most configurations of panes). Note that the iframe must have the `allowfullscreen` attribute for this to work.                                                                                                                                                                          | `false`                      |
+| **`playground`**                     | Settings for playgrounds (inline widgets that display runtime values)                                                                                                                                                                                                                                                                   | `{}`                         |
+| **`playground.enabled`**             | Turn on playgrounds?                                                                                                                                                                                                                                                                                                                    | `false`                      |
+| **`playground.renderReactElements`** | Render React elements? If `false`, will print the React element object, e.g. `{ type, props, key }`, rather than render it.                                                                                                                                                                                                             | `true`                       |
+| **`playground.debounceDuration`**    | How frequently widgets update. A little delay helps keep the UI feeling smoother.                                                                                                                                                                                                                                                       | `200` (milliseconds)         |
+| **`typescript`**                     | TypeScript settings                                                                                                                                                                                                                                                                                                                     | `{}`                         |
+| **`typescript.enabled`**             | Turn on TypeScript hover tooltip info? Defaults to `false`                                                                                                                                                                                                                                                                              | `false`                      |
+| **`typescript.libs`**                | An array of default libraries to include, e.g. `'dom'` and `'es2015'`. We don't include some newer/esoteric ones by default, to reduce download size.                                                                                                                                                                                   | See source code              |
+| **`typescript.types`**               | An array of additional type files to download. Each should be an object `{ name, url }`.                                                                                                                                                                                                                                                | `[]`                         |
+| **`workspaces`**                     | Add a tutorial-like sequence of sets of files, highlighting changes between each set. Each object in this array can contain: `{ title, description, workspace: { title, files, entry, initialTab } }`. Properties in the `workspace` object will override those given as top level parameters.                                          | `[]`                         |
+| **`panes`**                          | An array of UI panes to display. To display a pane without options, use a string. Otherwise, use an object with a `type` property. The available panes are: `'stack'`, `'editor'`, `'transpiler'`, `'player'`, `'workspaces'`, `'console'`. Note that there _must be_ a `player` pane for any code to run. For pane options, see below. | `['editor', 'player']`       |
+| **`responsivePaneSets`**             | An array of `{ maxWidth, panes }` objects to show at different responsive breakpoints. The iframe will use the first set where the `maxWidth` is greater than the current window width. The top-level `panes` parameter has `maxWidth: Infinity` so that it's used by default if there's no matching set of panes.                      | `[]`                         |
 
 ### Pane options
 
 Each pane supports pane-specific options. They all support:
 
-- **`style`** - The inline styles for this specific pane, merged with those passed in the top-level `styles` object if given.
+| Title       | Description                                                                                                   | Default     |
+| ----------- | ------------------------------------------------------------------------------------------------------------- | ----------- |
+| **`style`** | The inline styles for this specific pane, merged with those passed in the top-level `styles` object if given. | `undefined` |
 
 #### For `player` pane
 
