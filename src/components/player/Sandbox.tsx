@@ -26,7 +26,6 @@ declare global {
     _consoleProxy: typeof console
     regeneratorRuntime: unknown
     _requireCache: Record<string, unknown>
-    _didRegisterComponent: boolean
     _require: (name: string) => unknown
     __message: (message: Message) => void
   }
@@ -41,14 +40,7 @@ window._consoleProxy = consoleProxy
 // Make regeneratorRuntime globally available for async/await
 window.regeneratorRuntime = require('regenerator-runtime')
 
-const APP_NAME = 'App'
-
-// Override registerComponent in order to ignore the name used
-const registerComponent = AppRegistry.registerComponent.bind(AppRegistry)
-AppRegistry.registerComponent = (name: string, f: () => void) => {
-  registerComponent(APP_NAME, f)
-  window._didRegisterComponent = true
-}
+const DEFAULT_APP_NAME = 'Main Export'
 
 const prefix = `
 var exports = {};
@@ -257,7 +249,7 @@ export default class Sandbox extends PureComponent<Props> {
 
     if (!screenElement) return
 
-    if (window._didRegisterComponent) {
+    if (AppRegistry.getAppKeys().length > 0) {
       this.resetApplication()
     }
 
@@ -266,7 +258,6 @@ export default class Sandbox extends PureComponent<Props> {
     try {
       window._require = this.require.bind(this, fileMap, entry)
       window._requireCache = {}
-      window._didRegisterComponent = false
 
       consoleProxy._rnwp_log = consoleLogRNWP.bind(
         consoleProxy,
@@ -291,7 +282,11 @@ export default class Sandbox extends PureComponent<Props> {
       this.evaluate(entry, fileMap[entry])
 
       // Attempt to register the default export of the entry file
-      if (!window._didRegisterComponent) {
+      if (
+        AppRegistry.getAppKeys().length === 0 ||
+        (AppRegistry.getAppKeys().length === 1 &&
+          AppRegistry.getAppKeys()[0] === DEFAULT_APP_NAME)
+      ) {
         const EntryComponent = window._requireCache[entry]
 
         if (
@@ -299,19 +294,22 @@ export default class Sandbox extends PureComponent<Props> {
           typeof EntryComponent === 'object' &&
           hasProperty(EntryComponent, 'default')
         ) {
-          AppRegistry.registerComponent(APP_NAME, () => EntryComponent.default)
+          AppRegistry.registerComponent(
+            DEFAULT_APP_NAME,
+            () => EntryComponent.default
+          )
         }
       }
 
+      const appKeys = AppRegistry.getAppKeys()
+
       // If no component was registered, bail out
-      if (!window._didRegisterComponent) {
-        return
-      }
+      if (appKeys.length === 0) return
 
       // Initialize window dimensions (sometimes this doesn't happen automatically?)
       ReactNative.Dimensions._update()
 
-      AppRegistry.runApplication(APP_NAME, {
+      AppRegistry.runApplication(appKeys[0], {
         rootTag: screenElement,
       })
 
