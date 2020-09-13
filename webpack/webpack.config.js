@@ -56,7 +56,7 @@ const common = merge({
       {
         test: /-worker\.js/,
         loader: 'worker-loader',
-        options: { name: '[name]-bundle.js' },
+        options: { filename: '[name]-bundle.js', esModule: false },
       },
       {
         test: /\.svg$/i,
