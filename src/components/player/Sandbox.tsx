@@ -15,6 +15,8 @@ import VendorComponents from './VendorComponents'
 import * as ExtendedJSON from '../../utils/ExtendedJSON'
 import { Message } from '../../types/Messages'
 import type { IEnvironment } from '../../environments/IEnvironment'
+import formatError from '../../utils/formatError'
+import { initializeCommunication } from '../../utils/playerCommunication'
 
 declare global {
   interface Window {
@@ -84,69 +86,25 @@ export default class Sandbox extends PureComponent<Props> {
     sharedEnvironment: true,
   }
 
+  constructor(props: Props) {
+    super(props)
+
+    const { sendError, sendReady } = initializeCommunication({
+      id: this.props.id,
+      sharedEnvironment: this.props.sharedEnvironment,
+      prefixLineCount,
+      runApplication: this.runApplication,
+    })
+
+    this.sendError = sendError
+    this.sendReady = sendReady
+  }
+
+  sendError: (message: string) => void
+  sendReady: () => void
+
   componentDidMount() {
-    window.onmessage = (e: MessageEvent) => {
-      if (!e.data || e.data.source !== 'rnwp') return
-
-      this.runApplication(e.data)
-    }
-
-    window.onerror = (
-      message: Event | string,
-      source?: string,
-      line?: number
-    ) => {
-      const editorLine = (line || 0) - prefixLineCount
-      this.throwError(`${message} (${editorLine})`)
-      return true
-    }
-
-    parent.postMessage(
-      JSON.stringify({
-        id: this.props.id,
-        type: 'ready',
-      }),
-      '*'
-    )
-  }
-
-  buildErrorMessage(e: Error) {
-    let message = `${e.name}: ${e.message}`
-    let line = null
-
-    // Safari
-    if ((e as any).line != null) {
-      line = (e as any).line
-
-      // FF
-    } else if ((e as any).lineNumber != null) {
-      line = (e as any).lineNumber
-
-      // Chrome
-    } else if (e.stack) {
-      const matched = e.stack.match(/<anonymous>:(\d+)/)
-      if (matched) {
-        line = parseInt(matched[1])
-      }
-    }
-
-    if (typeof line === 'number') {
-      line -= prefixLineCount
-      message = `${message} (${line})`
-    }
-
-    return message
-  }
-
-  throwError(message: string) {
-    parent.postMessage(
-      JSON.stringify({
-        id: this.props.id,
-        type: 'error',
-        payload: message,
-      }),
-      '*'
-    )
+    this.sendReady()
   }
 
   require = (fileMap: Record<string, string>, entry: string, name: string) => {
@@ -203,37 +161,13 @@ export default class Sandbox extends PureComponent<Props> {
     }
   }
 
-  sendMessage = (message: Message) => {
-    const { sharedEnvironment } = this.props
-
-    if (sharedEnvironment) {
-      if (message.type === 'console' && message.payload.command === 'log') {
-        message.payload.data = message.payload.data.map((log) => {
-          if (isValidElement(log as any)) {
-            return {
-              __is_react_element: true,
-              element: log,
-              ReactDOM,
-            }
-          } else {
-            return log
-          }
-        })
-      }
-
-      parent.__message(message)
-    } else {
-      parent.postMessage(ExtendedJSON.stringify(message), '*')
-    }
-  }
-
-  runApplication({
+  runApplication = ({
     fileMap,
     entry,
   }: {
     fileMap: Record<string, string>
     entry: string
-  }) {
+  }) => {
     const { environment } = this.props
 
     const host = this.root.current
@@ -248,22 +182,6 @@ export default class Sandbox extends PureComponent<Props> {
       window._require = this.require.bind(this, fileMap, entry)
       window._requireCache = {}
 
-      consoleProxy._rnwp_log = consoleLogRNWP.bind(
-        consoleProxy,
-        this.sendMessage,
-        this.props.id
-      )
-      consoleProxy.log = consoleLog.bind(
-        consoleProxy,
-        this.sendMessage,
-        this.props.id
-      )
-      consoleProxy.clear = consoleClear.bind(
-        consoleProxy,
-        this.sendMessage,
-        this.props.id
-      )
-
       if (this.props.prelude.length > 0) {
         eval(this.props.prelude)
       }
@@ -272,8 +190,8 @@ export default class Sandbox extends PureComponent<Props> {
 
       environment.afterEvaluate({ entry, host })
     } catch (e) {
-      const message = this.buildErrorMessage(e)
-      this.throwError(message)
+      const message = formatError(e, prefixLineCount)
+      this.sendError(message)
       this.props.onError(e)
     }
   }
