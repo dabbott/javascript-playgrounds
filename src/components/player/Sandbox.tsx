@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React, {
   PureComponent,
   isValidElement,
@@ -6,7 +5,6 @@ import React, {
   CSSProperties,
 } from 'react'
 import ReactDOM from 'react-dom'
-import * as ReactNative from 'react-native-web'
 import { prefixObject } from '../../utils/Styles'
 import consoleProxy, {
   consoleClear,
@@ -15,12 +13,11 @@ import consoleProxy, {
 } from './ConsoleProxy'
 import VendorComponents from './VendorComponents'
 import * as ExtendedJSON from '../../utils/ExtendedJSON'
-import hasProperty from '../../utils/hasProperty'
 import { Message } from '../../types/Messages'
+import type { IEnvironment } from '../../environments/IEnvironment'
 
 declare global {
   interface Window {
-    ReactNative: unknown
     PropTypes: unknown
     _VendorComponents: typeof VendorComponents
     _consoleProxy: typeof console
@@ -33,14 +30,10 @@ declare global {
 
 window._VendorComponents = VendorComponents
 
-const AppRegistry = ReactNative.AppRegistry
-
 window._consoleProxy = consoleProxy
 
 // Make regeneratorRuntime globally available for async/await
 window.regeneratorRuntime = require('regenerator-runtime')
-
-const DEFAULT_APP_NAME = 'Main Export'
 
 const prefix = `
 var exports = {};
@@ -77,6 +70,7 @@ interface Props {
   sharedEnvironment: boolean
   onRun: () => {}
   onError: (error: Error) => {}
+  environment: IEnvironment
 }
 
 export default class Sandbox extends PureComponent<Props> {
@@ -157,19 +151,14 @@ export default class Sandbox extends PureComponent<Props> {
 
   require = (fileMap: Record<string, string>, entry: string, name: string) => {
     const { _requireCache } = window
-    let { assetRoot } = this.props
+    let { environment, assetRoot } = this.props
 
-    if (name === 'react-native') {
-      return ReactNative
-    } else if (name === 'react-dom') {
-      return ReactDOM
-    } else if (name === 'react') {
-      return React
-    } else if (name === 'prop-types') {
-      return PropTypes
+    if (environment.hasModule(name)) {
+      return environment.requireModule(name)
+    }
 
-      // If name begins with . or ..
-    } else if (name.match(/^\.{1,2}\//)) {
+    // If name begins with . or ..
+    if (name.match(/^\.{1,2}\//)) {
       // Check if we're referencing another tab
       const filename = Object.keys(fileMap).find(
         (x) => `${name}.js` === `./${x}`
@@ -245,13 +234,13 @@ export default class Sandbox extends PureComponent<Props> {
     fileMap: Record<string, string>
     entry: string
   }) {
-    const screenElement = this.root.current
+    const { environment } = this.props
 
-    if (!screenElement) return
+    const host = this.root.current
 
-    if (AppRegistry.getAppKeys().length > 0) {
-      this.resetApplication()
-    }
+    if (!host) return
+
+    environment.beforeEvaluate({ host })
 
     this.props.onRun()
 
@@ -281,55 +270,11 @@ export default class Sandbox extends PureComponent<Props> {
 
       this.evaluate(entry, fileMap[entry])
 
-      // Attempt to register the default export of the entry file
-      if (
-        AppRegistry.getAppKeys().length === 0 ||
-        (AppRegistry.getAppKeys().length === 1 &&
-          AppRegistry.getAppKeys()[0] === DEFAULT_APP_NAME)
-      ) {
-        const EntryComponent = window._requireCache[entry]
-
-        if (
-          EntryComponent &&
-          typeof EntryComponent === 'object' &&
-          hasProperty(EntryComponent, 'default')
-        ) {
-          AppRegistry.registerComponent(
-            DEFAULT_APP_NAME,
-            () => EntryComponent.default
-          )
-        }
-      }
-
-      const appKeys = AppRegistry.getAppKeys()
-
-      // If no component was registered, bail out
-      if (appKeys.length === 0) return
-
-      // Initialize window dimensions (sometimes this doesn't happen automatically?)
-      ReactNative.Dimensions._update()
-
-      AppRegistry.runApplication(appKeys[0], {
-        rootTag: screenElement,
-      })
-
-      // After rendering, add {overflow: hidden} to prevent scrollbars
-      if (screenElement.firstElementChild) {
-        ;(screenElement.firstElementChild as HTMLElement).style.overflow =
-          'hidden'
-      }
+      environment.afterEvaluate({ entry, host })
     } catch (e) {
       const message = this.buildErrorMessage(e)
       this.throwError(message)
       this.props.onError(e)
-    }
-  }
-
-  resetApplication() {
-    const screenElement = this.root.current
-
-    if (screenElement) {
-      ReactDOM.unmountComponentAtNode(screenElement)
     }
   }
 
@@ -339,7 +284,7 @@ export default class Sandbox extends PureComponent<Props> {
     eval(wrapped)
   }
 
-  root = React.createRef<HTMLDivElement>()
+  root = createRef<HTMLDivElement>()
 
   render() {
     const { statusBarHeight, statusBarColor } = this.props

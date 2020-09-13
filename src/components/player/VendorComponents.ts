@@ -1,8 +1,4 @@
 import $scriptjs from 'scriptjs'
-import React from 'react'
-import ReactDOM from 'react-dom'
-import * as ReactNative from 'react-native-web'
-import PropTypes from 'prop-types'
 
 import * as Networking from '../../utils/Networking'
 
@@ -91,17 +87,6 @@ export default class VendorComponents {
 
   // Load components from urls
   static load(components: ExternalModule[], callback: () => void) {
-    // Necessary for dependency mapping
-    window.React = React
-    window.ReactNative = ReactNative
-    // Add default export, although it's uncommon
-    ;(window.ReactNative as any).default = ReactNative
-    window.ReactDOM = ReactDOM
-    window.PropTypes = PropTypes
-
-    // For backwards compatibility (should only be react-native-animatable example)
-    ;(React as any).PropTypes = PropTypes
-
     const resolved = components.map((component) =>
       typeof component === 'string'
         ? {

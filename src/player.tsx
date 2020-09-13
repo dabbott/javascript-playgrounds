@@ -6,6 +6,7 @@ import { getHashString } from './utils/HashString'
 import { prefix, prefixAndApply } from './utils/Styles'
 import { appendCSS } from './utils/CSS'
 import VendorComponents from './components/player/VendorComponents'
+import type { IEnvironment } from './environments/IEnvironment'
 
 const style = prefix({
   display: 'flex',
@@ -37,25 +38,33 @@ if (css) {
   appendCSS(css)
 }
 
-const root = (
-  <div style={style}>
-    <Sandbox
-      id={id}
-      assetRoot={assetRoot}
-      prelude={prelude}
-      statusBarHeight={parseFloat(statusBarHeight)}
-      statusBarColor={statusBarColor}
-      sharedEnvironment={sharedEnvironment === 'true'}
-    />
-  </div>
-)
-
 const mount = document.getElementById('player-root') as HTMLDivElement
 
 // Set mount node to flex in a vendor-prefixed way
 prefixAndApply({ display: 'flex' }, mount)
 
-// if we have vendor components, we need to pre-load those
-// otherwise, we can just render normally
-const components = JSON.parse(vendorComponents)
-VendorComponents.load(components, () => ReactDOM.render(root, mount))
+const modules = JSON.parse(vendorComponents)
+
+import('./environments/react-native-environment')
+  .then((module) => module.default)
+  .then((environment: IEnvironment) => {
+    return environment.initialize().then(() => {
+      VendorComponents.load(modules, () => {
+        const root = (
+          <div style={style}>
+            <Sandbox
+              environment={environment}
+              id={id}
+              assetRoot={assetRoot}
+              prelude={prelude}
+              statusBarHeight={parseFloat(statusBarHeight)}
+              statusBarColor={statusBarColor}
+              sharedEnvironment={sharedEnvironment === 'true'}
+            />
+          </div>
+        )
+
+        ReactDOM.render(root, mount)
+      })
+    })
+  })
