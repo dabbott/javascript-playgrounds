@@ -7,6 +7,7 @@ import consoleProxy, {
   consoleLog,
   consoleLogRNWP,
 } from '../components/player/ConsoleProxy'
+import type { EvaluationContext } from '../components/player/Sandbox'
 
 export function initializeCommunication({
   id,
@@ -17,7 +18,7 @@ export function initializeCommunication({
   id: string
   sharedEnvironment: boolean
   prefixLineCount: number
-  runApplication: (data: any) => void
+  runApplication: (context: EvaluationContext) => void
 }) {
   function post(message: Message) {
     parent.postMessage(ExtendedJSON.stringify(message), '*')
@@ -42,7 +43,13 @@ export function initializeCommunication({
 
   window.onmessage = (e: MessageEvent) => {
     if (!e.data || e.data.source !== 'rnwp') return
-    runApplication(e.data)
+
+    const { entry, fileMap } = e.data as {
+      entry: string
+      fileMap: Record<string, string>
+    }
+
+    runApplication({ entry, fileMap, requireCache: {} })
   }
 
   window.onerror = (message: Event | string, _?: string, line?: number) => {

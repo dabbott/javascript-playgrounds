@@ -40,7 +40,7 @@ const Environment: IEnvironment = {
     }
   },
 
-  afterEvaluate({ entry, host }: { entry: string; host: HTMLDivElement }) {
+  afterEvaluate({ context, host }) {
     const { AppRegistry, Dimensions } = ReactNative
 
     // Attempt to register the default export of the entry file
@@ -49,7 +49,7 @@ const Environment: IEnvironment = {
       (AppRegistry.getAppKeys().length === 1 &&
         AppRegistry.getAppKeys()[0] === DEFAULT_APP_NAME)
     ) {
-      const EntryComponent = window._requireCache[entry]
+      const EntryComponent = context.requireCache[context.entry]
 
       if (
         EntryComponent &&

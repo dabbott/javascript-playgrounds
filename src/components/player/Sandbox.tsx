@@ -1,57 +1,27 @@
-import React, {
-  PureComponent,
-  isValidElement,
-  createRef,
-  CSSProperties,
-} from 'react'
-import ReactDOM from 'react-dom'
-import { prefixObject } from '../../utils/Styles'
-import consoleProxy, {
-  consoleClear,
-  consoleLog,
-  consoleLogRNWP,
-} from './ConsoleProxy'
-import VendorComponents from './VendorComponents'
-import * as ExtendedJSON from '../../utils/ExtendedJSON'
-import { Message } from '../../types/Messages'
+import React, { createRef, CSSProperties, PureComponent } from 'react'
 import type { IEnvironment } from '../../environments/IEnvironment'
+import { Message } from '../../types/Messages'
 import formatError from '../../utils/formatError'
 import { initializeCommunication } from '../../utils/playerCommunication'
+import { prefixObject } from '../../utils/Styles'
+import consoleProxy from './ConsoleProxy'
+import VendorComponents from './VendorComponents'
 
 declare global {
   interface Window {
-    PropTypes: unknown
-    _VendorComponents: typeof VendorComponents
-    _consoleProxy: typeof console
     regeneratorRuntime: unknown
-    _requireCache: Record<string, unknown>
-    _require: (name: string) => unknown
     __message: (message: Message) => void
   }
 }
 
-window._VendorComponents = VendorComponents
-
-window._consoleProxy = consoleProxy
+export type EvaluationContext = {
+  fileMap: Record<string, string>
+  entry: string
+  requireCache: Record<string, unknown>
+}
 
 // Make regeneratorRuntime globally available for async/await
 window.regeneratorRuntime = require('regenerator-runtime')
-
-const prefix = `
-var exports = {};
-var module = {exports: exports};
-var console = window._consoleProxy;
-
-(function(module, exports, require) {
-`
-
-const getSuffix = (filename: string) => `
-})(module, exports, window._require);
-window._requireCache['${filename}'] = module.exports;
-;
-`
-
-const prefixLineCount = prefix.split('\n').length - 1
 
 const styles = prefixObject({
   root: {
@@ -74,6 +44,12 @@ interface Props {
   onError: (error: Error) => {}
   environment: IEnvironment
 }
+
+/**
+ * An arbitrary offset to error message line numbers that gets things to line up
+ * with the code editor
+ */
+const prefixLineCount = 2
 
 export default class Sandbox extends PureComponent<Props> {
   static defaultProps = {
@@ -107,8 +83,8 @@ export default class Sandbox extends PureComponent<Props> {
     this.sendReady()
   }
 
-  require = (fileMap: Record<string, string>, entry: string, name: string) => {
-    const { _requireCache } = window
+  require = (context: EvaluationContext, name: string) => {
+    const { fileMap, entry, requireCache } = context
     let { environment, assetRoot } = this.props
 
     if (environment.hasModule(name)) {
@@ -129,11 +105,11 @@ export default class Sandbox extends PureComponent<Props> {
           )
         }
 
-        if (!_requireCache[filename]) {
-          this.evaluate(filename, fileMap[filename])
+        if (requireCache.hasOwnProperty(filename)) {
+          this.evaluate(filename, fileMap[filename], context)
         }
 
-        return _requireCache[filename]
+        return requireCache[filename]
       }
 
       // Resolve local asset paths
@@ -150,25 +126,20 @@ export default class Sandbox extends PureComponent<Props> {
     } else if (VendorComponents.require(name)) {
       const code = VendorComponents.require(name)
 
-      if (!_requireCache[name]) {
-        this.evaluate(name, code)
+      if (requireCache.hasOwnProperty(name)) {
+        this.evaluate(name, code, context)
       }
 
-      return _requireCache[name]
+      return requireCache[name]
     } else {
       console.error(`Failed to resolve module ${name}`)
       return {}
     }
   }
 
-  runApplication = ({
-    fileMap,
-    entry,
-  }: {
-    fileMap: Record<string, string>
-    entry: string
-  }) => {
-    const { environment } = this.props
+  runApplication = (context: EvaluationContext) => {
+    const { entry, fileMap } = context
+    const { environment, prelude, onError, onRun } = this.props
 
     const host = this.root.current
 
@@ -176,30 +147,46 @@ export default class Sandbox extends PureComponent<Props> {
 
     environment.beforeEvaluate({ host })
 
-    this.props.onRun()
+    onRun()
 
     try {
-      window._require = this.require.bind(this, fileMap, entry)
-      window._requireCache = {}
-
-      if (this.props.prelude.length > 0) {
-        eval(this.props.prelude)
+      if (prelude.length > 0) {
+        eval(prelude)
       }
 
-      this.evaluate(entry, fileMap[entry])
+      this.evaluate(entry, fileMap[entry], context)
 
-      environment.afterEvaluate({ entry, host })
+      environment.afterEvaluate({ context, host })
     } catch (e) {
       const message = formatError(e, prefixLineCount)
       this.sendError(message)
-      this.props.onError(e)
+      onError(e)
     }
   }
 
-  evaluate(filename: string, code: string) {
-    const wrapped = prefix + code + getSuffix(filename)
+  /**
+   * @param moduleName The file or module to evaluate (e.g. "index.js" or "moment")
+   * @param code
+   * @param fileMap
+   * @param entry
+   */
+  evaluate(moduleName: string, code: string, context: EvaluationContext) {
+    const f = new Function(
+      'exports',
+      'require',
+      'module',
+      'console',
+      '_VendorComponents', // Temporarily exposed, but consider this private
+      code
+    )
 
-    eval(wrapped)
+    const exports = {}
+    const module = { exports }
+    const requireModule = (name: string) => this.require(context, name)
+
+    f(exports, requireModule, module, consoleProxy, VendorComponents)
+
+    context.requireCache[moduleName] = module.exports
   }
 
   root = createRef<HTMLDivElement>()
