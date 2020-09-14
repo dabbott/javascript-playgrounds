@@ -14,17 +14,18 @@ const styles = prefixObject({
 })
 
 interface Props {
+  title: string
   textStyle?: CSSProperties
 }
 
 const toggleFullscreen = () => (screenfull as any).toggle()
 
-export default memo(function Fullscreen({ textStyle }: Props) {
+export default memo(function Fullscreen({ textStyle, title }: Props) {
   const computedTextStyle = mergeStyles(styles.text, textStyle)
 
   return (
     <div style={computedTextStyle} onClick={toggleFullscreen}>
-      Fullscreen
+      {title}
     </div>
   )
 })

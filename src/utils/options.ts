@@ -19,6 +19,16 @@ export interface WorkspaceStep {
   }
 }
 
+const userInterfaceStrings = {
+  loading: 'Loading dependencies...',
+  about: `The source code for this sandbox is available [here on GitHub](https://github.com/dabbott/react-native-web-player)`,
+  noErrors: 'No Errors',
+  showDetails: 'Show Details',
+  fullscreen: 'Fullscreen',
+}
+
+export type UserInterfaceStrings = typeof userInterfaceStrings
+
 export interface PublicOptions {
   preset?: string
   title?: string
@@ -26,7 +36,7 @@ export interface PublicOptions {
   files?: Record<string, string>
   entry?: string
   initialTab?: string
-  loadingMessage?: string
+  strings?: UserInterfaceStrings
   css?: string // was workspaceCSS
   styles?: ExternalStyles
   fullscreen?: boolean
@@ -60,7 +70,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     files = {},
     entry,
     initialTab,
-    loadingMessage = 'Loading dependencies...',
+    strings: rawStrings,
     css = '', // was workspaceCSS
     styles = {},
     fullscreen = false,
@@ -110,9 +120,9 @@ export function normalize(options: PublicOptions): InternalOptions {
     files,
     entry,
     initialTab,
-    loadingMessage,
     css,
     styles,
+    strings: Object.assign({}, userInterfaceStrings, rawStrings),
     fullscreen,
     sharedEnvironment,
     panes: panes.map((pane) => normalizePane(pane, title)),

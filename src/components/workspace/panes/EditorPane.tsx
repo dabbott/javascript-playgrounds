@@ -23,6 +23,7 @@ import {
   ExternalStyles,
 } from '../Workspace'
 import type { WorkspaceDiff } from '../App'
+import { UserInterfaceStrings } from '../../../utils/options'
 
 const styles = prefixObject({
   editorPane: columnStyle,
@@ -63,7 +64,7 @@ interface Props {
   externalStyles: ExternalStyles
   ready: boolean
   files: Record<string, string>
-  loadingMessage: string
+  strings: UserInterfaceStrings
   logs: LogCommand[]
   fullscreen: boolean
   activeStepIndex: number
@@ -84,7 +85,7 @@ export default memo(function EditorPane({
   files,
   externalStyles,
   ready,
-  loadingMessage,
+  strings,
   fullscreen,
   activeStepIndex,
   diff,
@@ -120,7 +121,12 @@ export default memo(function EditorPane({
           headerStyle={externalStyles.header}
           textStyle={externalStyles.headerText}
         >
-          {fullscreen && <Fullscreen textStyle={externalStyles.headerText} />}
+          {fullscreen && (
+            <Fullscreen
+              title={strings.fullscreen}
+              textStyle={externalStyles.headerText}
+            />
+          )}
         </Header>
       )}
       {fileTabs.length > 1 && (
@@ -137,7 +143,10 @@ export default memo(function EditorPane({
           changedTextStyle={externalStyles.tabTextChanged}
         >
           {fullscreen && !title && (
-            <Fullscreen textStyle={externalStyles.tabText} />
+            <Fullscreen
+              title={strings.fullscreen}
+              textStyle={externalStyles.tabText}
+            />
           )}
         </Tabs>
       )}
@@ -170,7 +179,7 @@ export default memo(function EditorPane({
               ) : (
                 ''
               )}
-              <About />
+              <About text={strings.about} />
             </Overlay>
           </div>
         </div>
@@ -179,19 +188,21 @@ export default memo(function EditorPane({
         text={
           !!error
             ? error.summary
-            : !ready && loadingMessage
-            ? loadingMessage
-            : 'No Errors'
+            : !ready && strings.loading
+            ? strings.loading
+            : strings.noErrors
         }
         isError={isError}
       >
-        <Button
-          active={showDetails}
-          isError={isError}
-          onChange={setShowDetails}
-        >
-          {'Show Details'}
-        </Button>
+        {strings.showDetails && (
+          <Button
+            active={showDetails}
+            isError={isError}
+            onChange={setShowDetails}
+          >
+            {strings.showDetails}
+          </Button>
+        )}
       </Status>
     </div>
   )

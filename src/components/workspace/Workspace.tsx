@@ -26,7 +26,7 @@ import TranspilerPane from './panes/TranspilerPane'
 import WorkspacesPane from './panes/WorkspacesPane'
 import PlayerFrame from './PlayerFrame'
 import useResponsiveBreakpoint from '../../hooks/useResponsiveBreakpoint'
-import { WorkspaceStep } from '../../utils/options'
+import { WorkspaceStep, UserInterfaceStrings } from '../../utils/options'
 import { WorkspaceDiff } from './App'
 
 const {
@@ -113,7 +113,7 @@ export interface Props {
   files: Record<string, string>
   entry: string
   initialTab: string
-  loadingMessage: string
+  strings: UserInterfaceStrings
   onChange: (files: Record<string, string>) => void
   externalStyles: ExternalStyles
   fullscreen: boolean
@@ -134,7 +134,7 @@ type WorkspacePaneProps = {
   preset: string
   ready: boolean
   files: Record<string, string>
-  loadingMessage: string
+  strings: UserInterfaceStrings
   externalStyles: ExternalStyles
   fullscreen: boolean
   sharedEnvironment: boolean
@@ -170,7 +170,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
     preset,
     ready,
     files,
-    loadingMessage,
+    strings,
     externalStyles,
     sharedEnvironment,
     workspaces,
@@ -205,7 +205,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
           options={options}
           externalStyles={externalStyles}
           ready={ready}
-          loadingMessage={loadingMessage}
+          strings={strings}
           files={files}
           fullscreen={fullscreen}
           activeStepIndex={activeStepIndex}
@@ -514,7 +514,7 @@ export default function Workspace(props: Props) {
           // Props
           preset={props.preset}
           files={props.files}
-          loadingMessage={props.loadingMessage}
+          strings={props.strings}
           externalStyles={props.externalStyles}
           fullscreen={props.fullscreen}
           sharedEnvironment={props.sharedEnvironment}
@@ -549,7 +549,7 @@ export default function Workspace(props: Props) {
     [
       props.preset,
       props.files,
-      props.loadingMessage,
+      props.strings,
       props.externalStyles,
       props.fullscreen,
       props.sharedEnvironment,
