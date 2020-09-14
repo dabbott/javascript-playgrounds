@@ -51,6 +51,7 @@ type Props = Omit<InternalOptions, 'css'> & {
 }
 
 export default function App({
+  preset,
   title,
   files,
   entry,
@@ -83,6 +84,7 @@ export default function App({
     <div style={style}>
       <Workspace
         key={activeStepIndex}
+        preset={preset}
         title={title}
         files={files}
         entry={entry}

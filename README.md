@@ -216,7 +216,7 @@ These open source sites use this project in more complex ways.
 
 ```bash
 yarn
-yarn start
+yarn dev
 # => localhost:8080
 ```
 

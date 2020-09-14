@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --config webpack/webpack.config.js --inline --hot --colors --quiet",
+    "dev": "webpack-dev-server --config webpack/webpack.config.js --inline --hot --colors --quiet",
+    "start": "python3 -m http.server -d public 8080",
     "build": "npm run build:core && npm run build:embed",
     "build:core": "webpack --env production --config webpack/webpack.config.js --sort-assets-by --progress",
     "build:embed": "webpack --config webpack/webpack-embed.config.js --sort-assets-by --progress",

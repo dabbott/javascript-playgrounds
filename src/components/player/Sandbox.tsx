@@ -145,7 +145,7 @@ export default class Sandbox extends PureComponent<Props> {
 
     if (!host) return
 
-    environment.beforeEvaluate({ host })
+    environment.beforeEvaluate && environment.beforeEvaluate({ host })
 
     onRun()
 
@@ -156,7 +156,7 @@ export default class Sandbox extends PureComponent<Props> {
 
       this.evaluate(entry, fileMap[entry], context)
 
-      environment.afterEvaluate({ context, host })
+      environment.afterEvaluate && environment.afterEvaluate({ context, host })
     } catch (e) {
       const message = formatError(e, prefixLineCount)
       this.sendError(message)

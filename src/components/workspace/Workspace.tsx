@@ -107,6 +107,7 @@ export interface ExternalStyles {
 }
 
 export interface Props {
+  preset: string
   title: string
   files: Record<string, string>
   entry: string
@@ -128,6 +129,7 @@ type WorkspacePaneProps = {
   options: PaneOptions
 
   // Props
+  preset: string
   files: Record<string, string>
   externalStyles: ExternalStyles
   fullscreen: boolean
@@ -161,6 +163,7 @@ type WorkspacePaneProps = {
 
 const WorkspacePane = memo((props: WorkspacePaneProps) => {
   const {
+    preset,
     files,
     externalStyles,
     sharedEnvironment,
@@ -229,6 +232,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
           }}
           options={options}
           externalStyles={externalStyles}
+          preset={preset}
           sharedEnvironment={sharedEnvironment}
           files={files}
           logs={logs}
@@ -494,6 +498,7 @@ export default function Workspace(props: Props) {
         <WorkspacePane
           key={index}
           // Props
+          preset={props.preset}
           files={props.files}
           externalStyles={props.externalStyles}
           fullscreen={props.fullscreen}
@@ -526,6 +531,7 @@ export default function Workspace(props: Props) {
       )
     },
     [
+      props.preset,
       props.files,
       props.externalStyles,
       props.fullscreen,

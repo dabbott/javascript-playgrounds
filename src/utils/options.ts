@@ -20,6 +20,7 @@ export interface WorkspaceStep {
 }
 
 export interface PublicOptions {
+  preset?: string
   title?: string
   code?: string
   files?: Record<string, string>
@@ -52,6 +53,7 @@ export type InternalOptions = Required<
 
 export function normalize(options: PublicOptions): InternalOptions {
   let {
+    preset = 'react-native',
     title = '',
     code = DefaultCode,
     files = {},
@@ -101,6 +103,7 @@ export function normalize(options: PublicOptions): InternalOptions {
   }
 
   return {
+    preset,
     title,
     files,
     entry,

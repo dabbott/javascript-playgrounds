@@ -14,6 +14,7 @@ const styles = prefixObject({
 })
 
 interface Props {
+  preset: string
   platform: string
   width: number
   scale: number
@@ -36,6 +37,7 @@ interface State {
 
 export default class extends PureComponent<Props, State> {
   static defaultProps = {
+    preset: 'react-native',
     platform: 'ios',
     width: 210,
     scale: 1,
@@ -44,7 +46,7 @@ export default class extends PureComponent<Props, State> {
     statusBarColor: 'black',
     sharedEnvironment: true,
     vendorComponents: [],
-    styleSheet: '',
+    styleSheet: 'reset',
     css: '',
     prelude: '',
     onError: () => {},
@@ -122,6 +124,7 @@ export default class extends PureComponent<Props, State> {
 
   renderFrame = () => {
     const {
+      preset,
       assetRoot,
       vendorComponents,
       styleSheet,
@@ -136,6 +139,7 @@ export default class extends PureComponent<Props, State> {
     if (!id) return null
 
     const queryString = encode({
+      preset,
       id,
       sharedEnvironment,
       assetRoot,
