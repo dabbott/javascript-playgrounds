@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useCallback,
   memo,
+  useState,
 } from 'react'
 import type * as ts from 'typescript'
 import * as workspace from '../../reducers/workspace'
@@ -112,6 +113,7 @@ export interface Props {
   files: Record<string, string>
   entry: string
   initialTab: string
+  loadingMessage: string
   onChange: (files: Record<string, string>) => void
   externalStyles: ExternalStyles
   fullscreen: boolean
@@ -130,7 +132,9 @@ type WorkspacePaneProps = {
 
   // Props
   preset: string
+  ready: boolean
   files: Record<string, string>
+  loadingMessage: string
   externalStyles: ExternalStyles
   fullscreen: boolean
   sharedEnvironment: boolean
@@ -164,7 +168,9 @@ type WorkspacePaneProps = {
 const WorkspacePane = memo((props: WorkspacePaneProps) => {
   const {
     preset,
+    ready,
     files,
+    loadingMessage,
     externalStyles,
     sharedEnvironment,
     workspaces,
@@ -198,6 +204,8 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
         <EditorPane
           options={options}
           externalStyles={externalStyles}
+          ready={ready}
+          loadingMessage={loadingMessage}
           files={files}
           fullscreen={fullscreen}
           activeStepIndex={activeStepIndex}
@@ -293,6 +301,9 @@ export default function Workspace(props: Props) {
   const transpilerVisible = containsPane(panes, 'transpiler')
   const playerVisible = containsPane(panes, 'player')
 
+  // If we have a player pane, show a loading indicator
+  const [ready, setReady] = useState(!playerVisible)
+
   const [state, dispatch] = useReducer(
     reducer,
     workspace.initialState({
@@ -310,6 +321,9 @@ export default function Workspace(props: Props) {
   // Run the app once we've transformed each file at least once
   const runApplication = (compiledFiles: Record<string, string>) => {
     if (Object.keys(files).every((filename) => compiledFiles[filename])) {
+      if (!ready) {
+        setReady(true)
+      }
       dispatch(consoleClear())
       Object.values(players.current).forEach((player) => {
         player.runApplication(compiledFiles, entry)
@@ -500,6 +514,7 @@ export default function Workspace(props: Props) {
           // Props
           preset={props.preset}
           files={props.files}
+          loadingMessage={props.loadingMessage}
           externalStyles={props.externalStyles}
           fullscreen={props.fullscreen}
           sharedEnvironment={props.sharedEnvironment}
@@ -510,6 +525,7 @@ export default function Workspace(props: Props) {
           activeStepIndex={props.activeStepIndex}
           onChangeActiveStepIndex={props.onChangeActiveStepIndex}
           // State
+          ready={ready}
           compilerError={state.compilerError}
           runtimeError={state.runtimeError}
           logs={state.logs}
@@ -533,6 +549,7 @@ export default function Workspace(props: Props) {
     [
       props.preset,
       props.files,
+      props.loadingMessage,
       props.externalStyles,
       props.fullscreen,
       props.sharedEnvironment,
@@ -542,6 +559,7 @@ export default function Workspace(props: Props) {
       props.diff,
       props.activeStepIndex,
       props.onChangeActiveStepIndex,
+      ready,
       state.compilerError,
       state.runtimeError,
       state.logs,

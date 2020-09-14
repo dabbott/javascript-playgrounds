@@ -26,6 +26,7 @@ export interface PublicOptions {
   files?: Record<string, string>
   entry?: string
   initialTab?: string
+  loadingMessage?: string
   css?: string // was workspaceCSS
   styles?: ExternalStyles
   fullscreen?: boolean
@@ -59,6 +60,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     files = {},
     entry,
     initialTab,
+    loadingMessage = 'Loading dependencies...',
     css = '', // was workspaceCSS
     styles = {},
     fullscreen = false,
@@ -108,6 +110,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     files,
     entry,
     initialTab,
+    loadingMessage,
     css,
     styles,
     fullscreen,

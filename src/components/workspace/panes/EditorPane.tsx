@@ -61,7 +61,9 @@ const styles = prefixObject({
 interface Props {
   options: EditorPaneOptions
   externalStyles: ExternalStyles
+  ready: boolean
   files: Record<string, string>
+  loadingMessage: string
   logs: LogCommand[]
   fullscreen: boolean
   activeStepIndex: number
@@ -81,6 +83,8 @@ interface Props {
 export default memo(function EditorPane({
   files,
   externalStyles,
+  ready,
+  loadingMessage,
   fullscreen,
   activeStepIndex,
   diff,
@@ -171,7 +175,16 @@ export default memo(function EditorPane({
           </div>
         </div>
       )}
-      <Status text={!!error ? error.summary : 'No Errors'} isError={isError}>
+      <Status
+        text={
+          !!error
+            ? error.summary
+            : !ready && loadingMessage
+            ? loadingMessage
+            : 'No Errors'
+        }
+        isError={isError}
+      >
         <Button
           active={showDetails}
           isError={isError}

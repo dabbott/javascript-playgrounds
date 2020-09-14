@@ -56,6 +56,7 @@ export default function App({
   files,
   entry,
   initialTab,
+  loadingMessage,
   styles,
   sharedEnvironment,
   fullscreen,
@@ -89,6 +90,7 @@ export default function App({
         files={files}
         entry={entry}
         initialTab={initialTab}
+        loadingMessage={loadingMessage}
         externalStyles={styles}
         sharedEnvironment={sharedEnvironment}
         fullscreen={fullscreen && (screenfull as any).enabled}
