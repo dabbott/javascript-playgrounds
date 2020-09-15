@@ -105,12 +105,21 @@ The sandbox accepts the following props/parameters.
 
 ### Pane options
 
-Each pane supports pane-specific options. They all support:
+All panes support the following options:
 
 | Title       | Description                                                                                                               | Default     |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | **`style`** | The inline styles for this specific pane, merged with those passed in the top-level `styles` object if given.             | `undefined` |
 | **`title`** | An optional title for this pane. If used on an `'editor'` pane, this will override a top-level `title`, if one was given. | `''`        |
+
+Each pane additionally supports pane-specific options. For more detail:
+
+- [player](#the-player-pane)
+- [console](#the-console-pane)
+- [stack](#the-stack-pane)
+- [editor](#the-editor-pane)
+- [transpiler](#the-transpiler-pane)
+- [workspaces](#the-workspaces-pane)
 
 #### The `player` pane
 
