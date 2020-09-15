@@ -119,7 +119,7 @@ export default class Sandbox extends PureComponent<Props> {
     } else if (VendorComponents.require(name)) {
       const code = VendorComponents.require(name)
 
-      if (requireCache.hasOwnProperty(name)) {
+      if (!requireCache.hasOwnProperty(name)) {
         this.evaluate(name, code, context)
       }
 
