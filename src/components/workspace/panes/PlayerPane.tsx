@@ -26,6 +26,7 @@ export interface Props {
   preset: string
   sharedEnvironment: boolean
   files: Record<string, string>
+  modules: string[]
   logs: LogCommand[]
   onPlayerRun: () => void
   onPlayerError: (message: string) => void
@@ -44,6 +45,7 @@ const PlayerPane = memo(
       onPlayerRun,
       onPlayerError,
       onPlayerConsole,
+      modules: detectedModules,
     },
     ref
   ) {
@@ -89,7 +91,8 @@ const PlayerPane = memo(
               scale={scale}
               platform={platform}
               assetRoot={assetRoot}
-              vendorComponents={modules}
+              detectedModules={detectedModules}
+              modules={modules}
               styleSheet={styleSheet}
               css={css}
               prelude={prelude}

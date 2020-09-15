@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom'
 
 import Sandbox from './components/player/Sandbox'
 import { getHashString } from './utils/HashString'
-import { prefix, prefixAndApply, prefixObject } from './utils/Styles'
+import { prefixAndApply, prefixObject } from './utils/Styles'
 import { appendCSS } from './utils/CSS'
-import VendorComponents from './components/player/VendorComponents'
+import VendorComponents, {
+  ExternalModule,
+} from './components/player/VendorComponents'
 import type { IEnvironment } from './environments/IEnvironment'
 import JavaScriptEnvironment from './environments/javascript-environment'
 
@@ -13,7 +15,8 @@ const {
   preset = 'react-native',
   id = '0',
   assetRoot = '',
-  vendorComponents = '[]',
+  detectedModules: rawDetectedModules = '[]',
+  modules: rawModules = '[]',
   styleSheet = 'reset',
   css = '',
   statusBarHeight = '0',
@@ -66,7 +69,8 @@ const parsedStyles: PlayerStyles = prefixObject(
 
 prefixAndApply(parsedStyles.playerRoot, mount)
 
-const modules = JSON.parse(vendorComponents)
+const modules: ExternalModule[] = JSON.parse(rawModules)
+const detectedModules: string[] = JSON.parse(rawDetectedModules)
 
 const asyncEnvironment: Promise<IEnvironment> =
   preset === 'javascript'
@@ -77,21 +81,33 @@ const asyncEnvironment: Promise<IEnvironment> =
 
 asyncEnvironment.then((environment: IEnvironment) => {
   return environment.initialize().then(() => {
-    VendorComponents.load(modules, () => {
-      const root = (
-        <Sandbox
-          environment={environment}
-          id={id}
-          assetRoot={assetRoot}
-          styles={parsedStyles}
-          prelude={prelude}
-          statusBarHeight={parseFloat(statusBarHeight)}
-          statusBarColor={statusBarColor}
-          sharedEnvironment={sharedEnvironment === 'true'}
-        />
-      )
+    const normalizedModules = modules
+      .map(VendorComponents.normalizeExternalModule)
+      .filter(({ name }) => !environment.hasModule(name))
 
-      ReactDOM.render(root, mount)
-    })
+    // Only download detected modules that aren't also listed as vendor components
+    const detectedModulesToDownload = detectedModules
+      .filter((name) => !normalizedModules.find((m) => m.name === name))
+      .map(VendorComponents.normalizeExternalModule)
+
+    VendorComponents.load(
+      [...normalizedModules, ...detectedModulesToDownload],
+      () => {
+        const root = (
+          <Sandbox
+            environment={environment}
+            id={id}
+            assetRoot={assetRoot}
+            styles={parsedStyles}
+            prelude={prelude}
+            statusBarHeight={parseFloat(statusBarHeight)}
+            statusBarColor={statusBarColor}
+            sharedEnvironment={sharedEnvironment === 'true'}
+          />
+        )
+
+        ReactDOM.render(root, mount)
+      }
+    )
   })
 })

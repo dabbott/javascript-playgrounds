@@ -46,6 +46,7 @@ export interface PublicOptions {
   workspaces?: WorkspaceStep[]
   panes?: PublicPaneOptions[]
   responsivePaneSets?: PublicResponsivePaneSet[]
+  detectDependencies?: boolean
 }
 
 export type PublicPaneOptions = PaneShorthand | PaneOptions
@@ -56,10 +57,14 @@ export type PublicResponsivePaneSet = {
 }
 
 export type InternalOptions = Required<
-  Omit<PublicOptions, 'panes' | 'responsivePaneSets' | 'code'>
+  Omit<
+    PublicOptions,
+    'panes' | 'responsivePaneSets' | 'code' | 'detectDependencies'
+  >
 > & {
   panes: PaneOptions[]
   responsivePaneSets: ResponsivePaneSet[]
+  modules: string[]
 }
 
 const presetOptions: Record<string, PublicOptions> = {
@@ -93,6 +98,40 @@ const presetOptions: Record<string, PublicOptions> = {
   ['react-native']: {},
 }
 
+const importRe = /import\s+?(?:(?:(?:[\w*\s{},]*)\s+from\s+?)|)(?:(?:"(.*?)")|(?:'(.*?)'))[\s]*?(?:;|$|)/gm
+
+function findImports(code: string) {
+  const imports: string[] = []
+
+  let match
+  while ((match = importRe.exec(code))) {
+    const name = match[1] || match[2]
+
+    // Check if this import looks like a module name (and not a relative import)
+    if (name && name.match(/^[a-zA-Z]/)) {
+      imports.push(name)
+    }
+  }
+
+  return imports
+}
+
+function detectAllDependencies(files: Record<string, string>) {
+  const allImports: string[] = []
+
+  Object.values(files).forEach((code) => {
+    const imports = findImports(code)
+
+    for (let value of imports) {
+      if (allImports.indexOf(value) === -1) {
+        allImports.push(value)
+      }
+    }
+  })
+
+  return allImports
+}
+
 export function normalize(options: PublicOptions): InternalOptions {
   const preset = options.preset || 'react-native'
 
@@ -120,6 +159,7 @@ export function normalize(options: PublicOptions): InternalOptions {
       /* libs */
       /* types */
     },
+    detectDependencies = true,
   } = Object.assign({}, presetOptions[preset], options)
 
   const typescriptOptions = Object.assign(
@@ -165,5 +205,6 @@ export function normalize(options: PublicOptions): InternalOptions {
     workspaces,
     playground,
     typescript: typescriptOptions,
+    modules: detectDependencies ? detectAllDependencies(files) : [],
   }
 }

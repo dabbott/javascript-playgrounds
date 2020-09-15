@@ -65,6 +65,7 @@ export default function App({
   playground,
   workspaces,
   typescript,
+  modules,
   onChange,
 }: Props) {
   const [activeStepIndex, setActiveStepIndex] = useState(0)
@@ -101,6 +102,7 @@ export default function App({
         typescriptOptions={typescript}
         activeStepIndex={activeStepIndex}
         onChangeActiveStepIndex={setActiveStepIndex}
+        modules={modules}
         diff={diff}
         // Merge props from the current workspace step
         {...(workspaces.length > 0

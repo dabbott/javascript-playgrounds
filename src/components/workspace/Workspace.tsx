@@ -131,6 +131,7 @@ export interface Props {
   diff: Record<string, WorkspaceDiff>
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
+  modules: string[]
 }
 
 type WorkspacePaneProps = {
@@ -147,6 +148,7 @@ type WorkspacePaneProps = {
   playgroundOptions: PlaygroundOptions
   typescriptOptions: TypeScriptOptions
   workspaces: WorkspaceStep[]
+  modules: string[]
   diff: Record<string, WorkspaceDiff>
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
@@ -180,6 +182,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
     externalStyles,
     sharedEnvironment,
     workspaces,
+    modules,
     activeStepIndex,
     onChangeActiveStepIndex,
     fullscreen,
@@ -244,6 +247,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
           ref={(player) => {
             onCreatePlayer(options.id, player)
           }}
+          modules={modules}
           options={options}
           externalStyles={externalStyles}
           preset={preset}
@@ -526,6 +530,7 @@ export default function Workspace(props: Props) {
           playgroundOptions={props.playgroundOptions}
           typescriptOptions={props.typescriptOptions}
           workspaces={props.workspaces}
+          modules={props.modules}
           diff={props.diff}
           activeStepIndex={props.activeStepIndex}
           onChangeActiveStepIndex={props.onChangeActiveStepIndex}
@@ -561,6 +566,7 @@ export default function Workspace(props: Props) {
       props.playgroundOptions,
       props.typescriptOptions,
       props.workspaces,
+      props.modules,
       props.diff,
       props.activeStepIndex,
       props.onChangeActiveStepIndex,

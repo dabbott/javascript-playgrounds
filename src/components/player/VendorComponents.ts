@@ -3,8 +3,8 @@ import $scriptjs from 'scriptjs'
 import * as Networking from '../../utils/Networking'
 
 // Stubs for registering and getting vendor components
-const components: Record<string, unknown> = {}
-const requires: Record<string, string> = {}
+const externalModules: Record<string, unknown> = {}
+const cjsModules: Record<string, string> = {}
 
 // Allow for keypaths for use in namespacing (Org.Component.Blah)
 const getObjectFromKeyPath = (data: any, keyPath: string): unknown => {
@@ -27,28 +27,32 @@ export type ExternalModule = ExternalModuleShorthand | ExternalModuleDescription
 //   be executed in the module wrapper before use.
 // TODO figure out how to merge these
 export default class VendorComponents {
+  static get modules() {
+    return cjsModules
+  }
+
   // Register an external
   // name: name used in import/require
   // value: external to resolve
   static register(name: string, value: unknown) {
-    components[name] = value
+    externalModules[name] = value
   }
 
   // Get an external by name
   static get(name: string) {
-    return components[name]
+    return externalModules[name]
   }
 
   // Register a module
   // name: name used in import/require
   // code: module code to execute
   static define(name: string, code: string) {
-    requires[name] = code
+    cjsModules[name] = code
   }
 
   // Get a module by name
   static require(name: string) {
-    return requires[name]
+    return cjsModules[name]
   }
 
   static loadModules(modules: ExternalModuleDescription[]) {
@@ -85,22 +89,21 @@ export default class VendorComponents {
     })
   }
 
+  static normalizeExternalModule(
+    component: ExternalModule
+  ): ExternalModuleDescription {
+    return typeof component === 'string'
+      ? {
+          name: component,
+          url: `https://unpkg.com/${component}`,
+        }
+      : component
+  }
+
   // Load components from urls
-  static load(components: ExternalModule[], callback: () => void) {
-    const resolved = components.map((component) =>
-      typeof component === 'string'
-        ? {
-            name: component,
-            url: `https://unpkg.com/${component}`,
-          }
-        : component
-    )
-
-    // Format is an array of 2-element arrays [[ require-name, url ]]
-    const modules = resolved.filter((vc) => !vc.globalName)
-
-    // Format is an array of 3-element arrays [[ require-name, window-name, url ]]
-    const externals = resolved.filter(
+  static load(components: ExternalModuleDescription[], callback: () => void) {
+    const modules = components.filter((vc) => !vc.globalName)
+    const externals = components.filter(
       (vc) => !!vc.globalName
     ) as (ExternalModuleDescription & { globalName: string })[]
 

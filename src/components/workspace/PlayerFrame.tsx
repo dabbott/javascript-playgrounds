@@ -5,6 +5,7 @@ import Phone from './Phone'
 import { Message, ConsoleCommand } from '../../types/Messages'
 import { encode } from '../../utils/queryString'
 import { ExternalStyles } from './Workspace'
+import type { ExternalModule } from '../player/VendorComponents'
 
 const styles = prefixObject({
   iframe: {
@@ -24,7 +25,8 @@ interface Props {
   statusBarHeight: number
   statusBarColor: string
   sharedEnvironment: boolean
-  vendorComponents: unknown[]
+  detectedModules: string[]
+  modules: ExternalModule[]
   styleSheet: string
   css: string
   prelude: string
@@ -47,7 +49,7 @@ export default class extends PureComponent<Props, State> {
     statusBarHeight: 0,
     statusBarColor: 'black',
     sharedEnvironment: true,
-    vendorComponents: [],
+    modules: [],
     styleSheet: 'reset',
     css: '',
     prelude: '',
@@ -129,7 +131,8 @@ export default class extends PureComponent<Props, State> {
       externalStyles,
       preset,
       assetRoot,
-      vendorComponents,
+      detectedModules,
+      modules,
       styleSheet,
       css,
       statusBarColor,
@@ -146,7 +149,8 @@ export default class extends PureComponent<Props, State> {
       id,
       sharedEnvironment,
       assetRoot,
-      vendorComponents: JSON.stringify(vendorComponents),
+      detectedModules: JSON.stringify(detectedModules),
+      modules: JSON.stringify(modules),
       styleSheet,
       css,
       statusBarColor,

@@ -1,33 +1,15 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import hasProperty from '../utils/hasProperty'
+import JavaScriptEnvironment from './javascript-environment'
 import type { IEnvironment } from './IEnvironment'
 
-const modules: Record<string, unknown> = {}
-
 const Environment: IEnvironment = {
-  initialize() {
-    modules['react'] = React
-    modules['react-dom'] = ReactDOM
-    modules['prop-types'] = PropTypes
+  initialize: JavaScriptEnvironment.initialize,
 
-    Object.assign(window, {
-      React,
-      ReactDOM,
-      PropTypes,
-    })
+  hasModule: JavaScriptEnvironment.hasModule,
 
-    return Promise.resolve()
-  },
-
-  hasModule(name: string): boolean {
-    return modules.hasOwnProperty(name)
-  },
-
-  requireModule(name: string): unknown {
-    return modules.hasOwnProperty(name) ? modules[name] : undefined
-  },
+  requireModule: JavaScriptEnvironment.requireModule,
 
   beforeEvaluate({ host }: { host?: HTMLDivElement }) {
     if (host) {
