@@ -7,7 +7,7 @@ const { version } = require('../package.json')
 
 module.exports = {
   mode: 'production',
-  entry: path.join(DIRECTORY, 'src', 'components', 'embed', 'WebPlayer.tsx'),
+  entry: path.join(DIRECTORY, 'src', 'components', 'embed', 'Playground.tsx'),
   output: {
     path: path.join(DIRECTORY, 'dist'),
     filename: 'javascript-playgrounds.js',

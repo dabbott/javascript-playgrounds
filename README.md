@@ -41,10 +41,10 @@ yarn add javascript-playgrounds
 Then:
 
 ```js
-import WebPlayer from 'javascript-playgrounds'
+import Playground from 'javascript-playgrounds'
 
 export default function App() {
-  return <WebPlayer style={{ width: 800, height: 500 }} />
+  return <Playground style={{ width: 800, height: 500 }} />
 }
 ```
 

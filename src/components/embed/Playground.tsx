@@ -21,7 +21,7 @@ interface OwnProps {
   baseURL?: string
 }
 
-export type WebPlayerProps = OwnProps & PublicOptions
+export type PlaygroundProps = OwnProps & PublicOptions
 
 /**
  * A React component wrapper for the embeddable iframe player. This ensures
@@ -31,12 +31,12 @@ export type WebPlayerProps = OwnProps & PublicOptions
  * player can't be changed after the initial render. Other props can be updated
  * normally.
  */
-export default memo(function WebPlayer({
+export default memo(function Playground({
   style,
   className,
   baseURL = WEB_PLAYER_URL,
   ...rest
-}: WebPlayerProps) {
+}: PlaygroundProps) {
   // If the baseURL changes, set a new src.
   // We don't refresh the player if other props change.
   const src = useMemo(
@@ -53,8 +53,8 @@ export default memo(function WebPlayer({
 propsAreEqual)
 
 function propsAreEqual(
-  prevProps: WebPlayerProps,
-  nextProps: WebPlayerProps
+  prevProps: PlaygroundProps,
+  nextProps: PlaygroundProps
 ): boolean {
   return (
     prevProps.style === nextProps.style &&
