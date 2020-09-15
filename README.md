@@ -107,6 +107,7 @@ The sandbox accepts the following props/parameters.
 | **`workspaces`**                     | Add a tutorial-like sequence of sets of files, highlighting changes between each set. Each object in this array can contain: `{ title, description, workspace: { title, files, entry, initialTab } }`. Properties in the `workspace` object will override those given as top level parameters.                                          | `[]`                          |
 | **`panes`**                          | An array of UI panes to display. To display a pane without options, use a string. Otherwise, use an object with a `type` property. The available panes are: `'stack'`, `'editor'`, `'transpiler'`, `'player'`, `'workspaces'`, `'console'`. Note that there _must be_ a `player` pane for any code to run. For pane options, see below. | `['editor', 'player']`        |
 | **`responsivePaneSets`**             | An array of `{ maxWidth, panes }` objects to show at different responsive breakpoints. The iframe will use the first set where the `maxWidth` is greater than the current window width. The top-level `panes` parameter has `maxWidth: Infinity` so that it's used by default if there's no matching set of panes.                      | `[]`                          |
+| **`postMessageTarget`**              | If passed, the sandbox will call `postMessage(JSON.stringify(data), postMessageTarget)` on code changes.                                                                                                                                                                                                                                | `undefined`                   |
 
 ### Pane options
 
@@ -188,7 +189,7 @@ This project contains static assets that run standalone in the browser. You don'
 
 ### unpkg
 
-The recommended host is https://unpkg.com, which is a CDN that serves content from the npm registry. The examples in this readme all point to:
+The recommended host is https://unpkg.com, which is a CDN that serves content from the npm registry. The examples in this README all point to:
 
 ```html
 <iframe
@@ -198,6 +199,8 @@ The recommended host is https://unpkg.com, which is a CDN that serves content fr
   src="//unpkg.com/javascript-playgrounds@^0.1.0/public/index.html"
 ></iframe>
 ```
+
+> Note that `unpkg` resolves semver versions in the url
 
 ## Examples
 

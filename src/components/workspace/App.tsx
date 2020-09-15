@@ -46,7 +46,7 @@ function workspacesStepDiff(
   return result
 }
 
-type Props = Omit<InternalOptions, 'css'> & {
+type Props = Omit<InternalOptions, 'css' | 'postMessageTarget'> & {
   onChange: (files: Record<string, string>) => void
 }
 

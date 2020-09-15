@@ -16,7 +16,9 @@ const { data = '{}' } = getHashString()
 
 const publicOptions: PublicOptions = JSON.parse(data)
 
-const { css, ...rest }: InternalOptions = normalize(publicOptions)
+const { css, postMessageTarget, ...rest }: InternalOptions = normalize(
+  publicOptions
+)
 
 if (css) {
   appendCSS(css)
@@ -30,14 +32,18 @@ prefixAndApply({ display: 'flex' }, mount)
 ReactDOM.render(<App onChange={onChange} {...rest} />, mount)
 
 function onChange(files: Record<string, string>) {
-  const hashString = buildHashString({
-    data: JSON.stringify({
-      ...publicOptions,
-      ...(publicOptions.files
-        ? { files }
-        : { code: files[Object.keys(files)[0]] }),
-    }),
+  const data = JSON.stringify({
+    ...publicOptions,
+    ...(publicOptions.files
+      ? { files }
+      : { code: files[Object.keys(files)[0]] }),
   })
+
+  const hashString = buildHashString({ data })
+
+  if (postMessageTarget) {
+    postMessage(data, postMessageTarget)
+  }
 
   try {
     history.replaceState({}, '', hashString)
