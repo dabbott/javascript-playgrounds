@@ -6,9 +6,7 @@
 
 <br />
 
-An interactive JavaScript sandbox. [Try it out!](https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#title=JavaScript%20Playgrounds)
-
-## Overview
+**An interactive JavaScript sandbox. [Try it out!](https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#title=JavaScript%20Playgrounds)**
 
 This project provides a quick, visual way to experiment with JavaScript, React, and React Native code.
 
