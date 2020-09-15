@@ -184,6 +184,13 @@ export default class extends PureComponent<Props> {
     this.updateTimerId = setTimeout(() => {
       this.addPlaygroundWidgets()
     }, playgroundDebounceDuration)
+
+    // In the rare case where we get this far and the autoResize plugin hasn't
+    // refreshed the display, check if we should manually refresh it once.
+    const display = (this.cm as any).display
+    if (display.sizer.style.marginLeft === '0px') {
+      this.cm.refresh()
+    }
   }
 
   widgets: CM.LineWidget[] = []

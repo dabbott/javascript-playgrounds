@@ -1,7 +1,7 @@
+import './styles/reset.css'
 import 'codemirror/lib/codemirror.css'
 import './styles/codemirror-theme.css'
-import './styles/reset.css'
-import './styles/index.css'
+import './styles/index.css' // Load after CodeMirror, since it overrides defaults
 
 import React from 'react'
 import ReactDOM from 'react-dom'
