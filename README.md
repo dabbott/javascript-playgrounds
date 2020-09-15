@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/logo@2x.png" width="256" height="256" />
+  <img src="docs/assets/logo@2x.png" width="192" height="192" />
 </p>
 
 <h1 align="center">JavaScript Playgrounds</h1>
