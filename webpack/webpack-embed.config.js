@@ -10,8 +10,8 @@ module.exports = {
   entry: path.join(DIRECTORY, 'src', 'components', 'embed', 'WebPlayer.tsx'),
   output: {
     path: path.join(DIRECTORY, 'dist'),
-    filename: 'react-native-web-player.js',
-    library: 'react-native-web-player',
+    filename: 'javascript-playgrounds.js',
+    library: 'javascript-playgrounds',
     libraryTarget: 'umd',
     globalObject: 'this',
   },

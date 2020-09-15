@@ -6,7 +6,7 @@ declare global {
   const VERSION: string
 }
 
-const WEB_PLAYER_URL = `https://unpkg.com/react-native-web-player@${VERSION}/public/index.html`
+const WEB_PLAYER_URL = `https://unpkg.com/javascript-playgrounds@${VERSION}/public/index.html`
 
 const styles = {
   iframe: {

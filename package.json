@@ -1,8 +1,8 @@
 {
-  "name": "react-native-web-player",
-  "version": "2.0.0-alpha.26",
-  "description": "Run React Native apps in your browser!",
-  "main": "dist/react-native-web-player.js",
+  "name": "javascript-playgrounds",
+  "version": "0.1.0",
+  "description": "Interactive JavaScript sandbox",
+  "main": "dist/javascript-playgrounds.js",
   "files": [
     "dist",
     "public"
@@ -21,14 +21,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dabbott/react-native-web-player.git"
+    "url": "git+https://github.com/dabbott/javascript-playgrounds.git"
   },
   "author": "devinabbott@gmail.com",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/dabbott/react-native-web-player/issues"
+    "url": "https://github.com/dabbott/javascript-playgrounds/issues"
   },
-  "homepage": "https://github.com/dabbott/react-native-web-player#readme",
+  "homepage": "https://github.com/dabbott/javascript-playgrounds#readme",
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@juggle/resize-observer": "^3.1.3",

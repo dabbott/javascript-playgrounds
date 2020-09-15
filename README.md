@@ -1,18 +1,23 @@
-# React Native Web Player
+# JavaScript Playgrounds
 
-Run react native apps in your browser!
-
-[Try it out!](https://unpkg.com/react-native-web-player@^2.0.0-alpha/public/index.html#title=React%20Native%20Web%20Player)
+An interactive JavaScript sandbox. [Try it out!](https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#title=JavaScript%20Playgrounds)
 
 ### About
 
-This project uses [`react-native-web`](https://github.com/necolas/react-native-web) to create an environment for learning and experimenting with React Native.
+This project provides a quick, visual way to experiment with JavaScript, React, and React Native code.
 
-The web player is implemented as an `iframe` for easy, performant inclusion in any webpage. Babel and/or TypeScript run in a web worker so the main thread isn't blocked as the page loads.
+The project is designed to be loaded as an `iframe` for easy inclusion in any webpage. Babel and/or TypeScript run in a web worker so the main thread isn't blocked as the page loads.
+
+I use this sandbox in my interactive guides:
+
+- [JavaScript Express](https://www.javascript.express)
+- [TypeScript Express](https://www.typescript.express)
+- [React Express](https://www.react.express)
+- [React Native Express](https://www.reactnative.express)
 
 ### Usage
 
-The web player may be included in your site either:
+The sandbox may be included in your site either:
 
 - [as a React component](#as-a-react-component)
 - [directly as an `iframe`](#as-an-iframe)
@@ -22,24 +27,24 @@ The web player may be included in your site either:
 If you're using React:
 
 ```bash
-npm install --save react-native-web-player
+npm install --save javascript-playgrounds
 
 # or
 
-yarn add react-native-web-player
+yarn add javascript-playgrounds
 ```
 
 Then:
 
 ```js
-import WebPlayer from 'react-native-web-player'
+import WebPlayer from 'javascript-playgrounds'
 
 export default function App() {
   return <WebPlayer style={{ width: 800, height: 500 }} />
 }
 ```
 
-This component is a simple wrapper around the `iframe` that handles encoding parameters for you. While it passes most props along to the `iframe`, it has a few extra props:
+This component is a wrapper around the `iframe` that handles encoding parameters for you. While it passes most props along to the `iframe`, it has a few extra props:
 
 | Title           | Description                                                                                   | Default                           |
 | --------------- | --------------------------------------------------------------------------------------------- | --------------------------------- |
@@ -49,14 +54,14 @@ This component is a simple wrapper around the `iframe` that handles encoding par
 
 #### As an `iframe`
 
-If you're not using React, include the web player in an `iframe`.
+If you're not using React, include the sandbox in an `iframe`.
 
 ```html
 <iframe
   width="880"
   height="425"
   frameborder="0"
-  src="//unpkg.com/react-native-web-player@^2.0.0-alpha/public/index.html"
+  src="//unpkg.com/javascript-playgrounds@^0.1.0/public/index.html"
 ></iframe>
 ```
 
@@ -67,11 +72,11 @@ const parameters = { code: `console.log('Hello, world!')` }
 const hashString = '#data=' + encodeURIComponent(JSON.stringify(parameters))
 ```
 
-> When used as an `iframe`, the easiest way to set the `code` parameter is to edit the code in the web player and copy and paste the url when you're done (the url updates automatically as you type).
+> When used as an `iframe`, the easiest way to set the `code` parameter is to edit the code in the sandbox and copy and paste the url when you're done (the url updates automatically as you type).
 
 ### Parameters
 
-The web player accepts the following props/parameters.
+The sandbox accepts the following props/parameters.
 
 | Title                                | Description                                                                                                                                                                                                                                                                                                                             | Default                       |
 | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
@@ -176,7 +181,7 @@ The recommended host is https://unpkg.com, which is a CDN that serves content fr
   width="880"
   height="425"
   frameborder="0"
-  src="//unpkg.com/react-native-web-player@^2.0.0-alpha/public/index.html"
+  src="//unpkg.com/javascript-playgrounds@^0.1.0/public/index.html"
 ></iframe>
 ```
 
@@ -198,19 +203,10 @@ window.location.origin +
   )
 ```
 
-- Custom code - https://unpkg.com/react-native-web-player@^2.0.0-alpha/public/index.html#data=%7B%22code%22%3A%22import%20React%20from%20'react'%5Cnimport%20%7B%20Text%20%7D%20from%20'react-native'%5Cn%5Cnexport%20default%20()%20%3D%3E%20%3CText%3EHello%2C%20world!%3C%2FText%3E%5Cn%22%7D
-- Android device - https://unpkg.com/react-native-web-player@^2.0.0-alpha/public/index.html#data=%7B%22panes%22%3A%5B%22editor%22%2C%7B%22type%22%3A%22player%22%2C%22platform%22%3A%22android%22%7D%5D%7D
-- Custom title - https://unpkg.com/react-native-web-player@^2.0.0-alpha/public/index.html#data=%7B%22title%22%3A%22Hello%22%7D
-- Load moment.js - https://unpkg.com/react-native-web-player@^2.0.0-alpha/public/index.html#data=%7B"panes"%3A%5B"editor"%2C%7B"type"%3A"player"%2C"modules"%3A%5B"moment"%5D%2C"id"%3A"3"%7D%5D%2C"code"%3A"import%20React%20from%20'react'%5Cnimport%20%7B%20Text%20%7D%20from%20'react-native'%5Cnimport%20moment%20from%20'moment'%5Cn%5Cnexport%20default%20function%20App()%20%7B%5Cn%20%20return%20(%5Cn%20%20%20%20<Text>%5Cn%20%20%20%20%20%20%7Bmoment().toString()%7D%5Cn%20%20%20%20<%2FText>%5Cn%20%20)%5Cn%7D%5Cn"%7D
-
-##### Advanced Examples:
-
-These open source sites use this project in more complex ways.
-
-- [React Native Express](https://www.reactnative.express)
-- [React Express](https://www.react.express)
-- [JavaScript Express](https://www.javascript.express)
-- [TypeScript Express](https://www.typescript.express)
+- Custom code - https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22code%22%3A%22import%20React%20from%20'react'%5Cnimport%20%7B%20Text%20%7D%20from%20'react-native'%5Cn%5Cnexport%20default%20()%20%3D%3E%20%3CText%3EHello%2C%20world!%3C%2FText%3E%5Cn%22%7D
+- Android device - https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22panes%22%3A%5B%22editor%22%2C%7B%22type%22%3A%22player%22%2C%22platform%22%3A%22android%22%7D%5D%7D
+- Custom title - https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22title%22%3A%22Hello%22%7D
+- Load moment.js - https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B"panes"%3A%5B"editor"%2C%7B"type"%3A"player"%2C"modules"%3A%5B"moment"%5D%2C"id"%3A"3"%7D%5D%2C"code"%3A"import%20React%20from%20'react'%5Cnimport%20%7B%20Text%20%7D%20from%20'react-native'%5Cnimport%20moment%20from%20'moment'%5Cn%5Cnexport%20default%20function%20App()%20%7B%5Cn%20%20return%20(%5Cn%20%20%20%20<Text>%5Cn%20%20%20%20%20%20%7Bmoment().toString()%7D%5Cn%20%20%20%20<%2FText>%5Cn%20%20)%5Cn%7D%5Cn"%7D
 
 ## Development
 
