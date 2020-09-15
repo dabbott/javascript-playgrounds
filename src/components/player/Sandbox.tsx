@@ -3,9 +3,10 @@ import type { IEnvironment } from '../../environments/IEnvironment'
 import { Message } from '../../types/Messages'
 import formatError from '../../utils/formatError'
 import { initializeCommunication } from '../../utils/playerCommunication'
-import { prefixObject } from '../../utils/Styles'
+import { prefix } from '../../utils/Styles'
 import consoleProxy from './ConsoleProxy'
 import VendorComponents from './VendorComponents'
+import type { PlayerStyles } from '../../player'
 
 declare global {
   interface Window {
@@ -23,16 +24,6 @@ export type EvaluationContext = {
 // Make regeneratorRuntime globally available for async/await
 window.regeneratorRuntime = require('regenerator-runtime')
 
-const styles = prefixObject({
-  root: {
-    flex: '1 1 auto',
-    alignSelf: 'stretch',
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-  },
-})
-
 interface Props {
   id: string
   assetRoot: string
@@ -40,6 +31,7 @@ interface Props {
   statusBarHeight: number
   statusBarColor: string
   sharedEnvironment: boolean
+  styles: PlayerStyles
   onRun: () => {}
   onError: (error: Error) => {}
   environment: IEnvironment
@@ -54,6 +46,7 @@ const prefixLineCount = 2
 export default class Sandbox extends PureComponent<Props> {
   static defaultProps = {
     assetRoot: '',
+    styles: {},
     onRun: () => {},
     onError: () => {},
     prelude: '',
@@ -192,7 +185,7 @@ export default class Sandbox extends PureComponent<Props> {
   root = createRef<HTMLDivElement>()
 
   render() {
-    const { statusBarHeight, statusBarColor } = this.props
+    const { statusBarHeight, statusBarColor, styles } = this.props
 
     const showStatusBar = statusBarHeight > 0
 
@@ -208,8 +201,8 @@ export default class Sandbox extends PureComponent<Props> {
       : undefined
 
     return (
-      <div style={styles.root}>
-        <div ref={this.root} id={'app'} style={styles.root} />
+      <div style={prefix(styles.playerWrapper)}>
+        <div ref={this.root} id={'app'} style={styles.playerApp} />
         {showStatusBar && <div style={statusBarStyle} />}
       </div>
     )

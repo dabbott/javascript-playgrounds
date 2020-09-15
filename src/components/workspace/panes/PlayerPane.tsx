@@ -83,6 +83,7 @@ const PlayerPane = memo(
           <div style={styles.row}>
             <PlayerFrame
               ref={ref}
+              externalStyles={externalStyles}
               preset={preset}
               width={width}
               scale={scale}

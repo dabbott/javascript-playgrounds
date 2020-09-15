@@ -4,6 +4,7 @@ import { prefixObject } from '../../utils/Styles'
 import Phone from './Phone'
 import { Message, ConsoleCommand } from '../../types/Messages'
 import { encode } from '../../utils/queryString'
+import { ExternalStyles } from './Workspace'
 
 const styles = prefixObject({
   iframe: {
@@ -14,6 +15,7 @@ const styles = prefixObject({
 })
 
 interface Props {
+  externalStyles: ExternalStyles
   preset: string
   platform: string
   width: number
@@ -124,6 +126,7 @@ export default class extends PureComponent<Props, State> {
 
   renderFrame = () => {
     const {
+      externalStyles,
       preset,
       assetRoot,
       vendorComponents,
@@ -149,6 +152,11 @@ export default class extends PureComponent<Props, State> {
       statusBarColor,
       statusBarHeight,
       prelude,
+      styles: JSON.stringify({
+        playerRoot: externalStyles.playerRoot,
+        playerWrapper: externalStyles.playerWrapper,
+        playerApp: externalStyles.playerApp,
+      }),
     })
 
     return (

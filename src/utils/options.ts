@@ -4,7 +4,7 @@ import {
   ResponsivePaneSet,
   ExternalStyles,
 } from '../components/workspace/Workspace'
-import DefaultCode from '../constants/DefaultCode'
+import * as DefaultCode from '../constants/DefaultCode'
 import { PaneOptions, PaneShorthand, normalizePane } from './Panes'
 import defaultLibs from '../utils/TypeScriptDefaultLibs'
 
@@ -62,17 +62,49 @@ export type InternalOptions = Required<
   responsivePaneSets: ResponsivePaneSet[]
 }
 
+const presetOptions: Record<string, PublicOptions> = {
+  javascript: {
+    code: DefaultCode.javaScript,
+    panes: [
+      'editor',
+      {
+        id: 'player',
+        type: 'player',
+        platform: 'web',
+        style: { display: 'none' },
+      },
+    ],
+    playground: {
+      enabled: true,
+      renderReactElements: true,
+      debounceDuration: 200,
+    },
+  },
+  react: {
+    code: DefaultCode.react,
+    panes: ['editor', { id: 'player', type: 'player', platform: 'web' }],
+    styles: {
+      playerApp: {
+        width: '100%',
+        height: '100%',
+      },
+    },
+  },
+  ['react-native']: {},
+}
+
 export function normalize(options: PublicOptions): InternalOptions {
+  const preset = options.preset || 'react-native'
+
   let {
-    preset = 'react-native',
     title = '',
-    code = DefaultCode,
+    code = DefaultCode.reactNative,
     files = {},
     entry,
     initialTab,
     strings: rawStrings,
     css = '', // was workspaceCSS
-    styles = {},
+    styles = Object.assign({}, presetOptions[preset]?.styles, options.styles),
     fullscreen = false,
     sharedEnvironment = false,
     panes = ['editor', 'player'],
@@ -88,7 +120,7 @@ export function normalize(options: PublicOptions): InternalOptions {
       /* libs */
       /* types */
     },
-  } = options
+  } = Object.assign({}, presetOptions[preset], options)
 
   const typescriptOptions = Object.assign(
     { libs: defaultLibs, types: [] },

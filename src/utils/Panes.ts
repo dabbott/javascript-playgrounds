@@ -40,7 +40,7 @@ export type PlayerPaneOptions = PaneBaseOptions & {
   scale?: number
   width?: number
   assetRoot?: string
-  modules: ExternalModule[]
+  modules?: ExternalModule[]
   styleSheet?: string
   css?: string
   prelude?: string

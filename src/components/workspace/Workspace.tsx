@@ -28,6 +28,7 @@ import PlayerFrame from './PlayerFrame'
 import useResponsiveBreakpoint from '../../hooks/useResponsiveBreakpoint'
 import { WorkspaceStep, UserInterfaceStrings } from '../../utils/options'
 import { WorkspaceDiff } from './App'
+import useRerenderEffect from '../../hooks/useRerenderEffect'
 
 const {
   reducer,
@@ -105,6 +106,11 @@ export interface ExternalStyles {
   workspacesRowActive?: CSSProperties
   workspacesRowTitle?: CSSProperties
   workspacesRowTitleActive?: CSSProperties
+
+  // Passed to player
+  playerRoot?: CSSProperties
+  playerWrapper?: CSSProperties
+  playerApp?: CSSProperties
 }
 
 export interface Props {
@@ -304,8 +310,7 @@ export default function Workspace(props: Props) {
   // If we have a player pane, show a loading indicator
   const [ready, setReady] = useState(!playerVisible)
 
-  const [state, dispatch] = useReducer(
-    reducer,
+  const [state, dispatch] = useReducer(reducer, undefined, () =>
     workspace.initialState({
       fileTabs: Object.keys(files).map((filename, index) => ({
         title: filename,
@@ -450,7 +455,7 @@ export default function Workspace(props: Props) {
     [typescriptOptions, playerVisible, transpilerVisible, state.activeFile]
   )
 
-  useEffect(() => {
+  useRerenderEffect(() => {
     onChange(state.codeCache)
   }, [state.codeCache])
 

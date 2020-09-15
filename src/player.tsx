@@ -1,21 +1,13 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import ReactDOM from 'react-dom'
 
 import Sandbox from './components/player/Sandbox'
 import { getHashString } from './utils/HashString'
-import { prefix, prefixAndApply } from './utils/Styles'
+import { prefix, prefixAndApply, prefixObject } from './utils/Styles'
 import { appendCSS } from './utils/CSS'
 import VendorComponents from './components/player/VendorComponents'
 import type { IEnvironment } from './environments/IEnvironment'
 import JavaScriptEnvironment from './environments/javascript-environment'
-
-const style = prefix({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  overflow: 'hidden',
-  flex: '1 1 auto',
-})
 
 const {
   preset = 'react-native',
@@ -28,6 +20,7 @@ const {
   statusBarColor = 'black',
   prelude = '',
   sharedEnvironment = 'true',
+  styles = '{}',
 } = getHashString()
 
 if (styleSheet === 'reset') {
@@ -42,8 +35,36 @@ if (css) {
 
 const mount = document.getElementById('player-root') as HTMLDivElement
 
-// Set mount node to flex in a vendor-prefixed way
-prefixAndApply({ display: 'flex' }, mount)
+export type PlayerStyles = {
+  playerRoot: CSSProperties
+  playerWrapper: CSSProperties
+  playerApp: CSSProperties
+}
+
+const parsedStyles: PlayerStyles = prefixObject(
+  Object.assign(
+    {
+      playerRoot: { display: 'flex' },
+      playerWrapper: {
+        flex: '1 1 auto',
+        alignSelf: 'stretch',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+      },
+      playerApp: {
+        flex: '1 1 auto',
+        alignSelf: 'stretch',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+      },
+    },
+    JSON.parse(styles)
+  )
+)
+
+prefixAndApply(parsedStyles.playerRoot, mount)
 
 const modules = JSON.parse(vendorComponents)
 
@@ -58,17 +79,16 @@ asyncEnvironment.then((environment: IEnvironment) => {
   return environment.initialize().then(() => {
     VendorComponents.load(modules, () => {
       const root = (
-        <div style={style}>
-          <Sandbox
-            environment={environment}
-            id={id}
-            assetRoot={assetRoot}
-            prelude={prelude}
-            statusBarHeight={parseFloat(statusBarHeight)}
-            statusBarColor={statusBarColor}
-            sharedEnvironment={sharedEnvironment === 'true'}
-          />
-        </div>
+        <Sandbox
+          environment={environment}
+          id={id}
+          assetRoot={assetRoot}
+          styles={parsedStyles}
+          prelude={prelude}
+          statusBarHeight={parseFloat(statusBarHeight)}
+          statusBarColor={statusBarColor}
+          sharedEnvironment={sharedEnvironment === 'true'}
+        />
       )
 
       ReactDOM.render(root, mount)
