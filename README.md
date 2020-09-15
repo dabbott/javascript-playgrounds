@@ -1,4 +1,10 @@
-# JavaScript Playgrounds
+<p align="center">
+  <img src="docs/assets/logo@2x.png" width="256" height="256" />
+</p>
+
+<h1 align="center">JavaScript Playgrounds</h1>
+
+<br />
 
 An interactive JavaScript sandbox. [Try it out!](https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#title=JavaScript%20Playgrounds)
 
