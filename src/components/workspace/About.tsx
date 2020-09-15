@@ -6,7 +6,21 @@ interface Props {
 }
 
 export default memo(function About({ text }: Props) {
-  const markdownContent = useMemo(() => snarkdown(text), [text])
+  const markdownContent = useMemo(() => (text ? snarkdown(text) : ''), [text])
 
-  return <div dangerouslySetInnerHTML={{ __html: markdownContent }} />
+  return (
+    <div>
+      {markdownContent && (
+        <div dangerouslySetInnerHTML={{ __html: markdownContent }} />
+      )}
+      {markdownContent && <br />}
+      Powered by{' '}
+      <a
+        target="_blank"
+        href={'https://github.com/dabbott/javascript-playgrounds'}
+      >
+        JavaScript Playgrounds
+      </a>
+    </div>
+  )
 })

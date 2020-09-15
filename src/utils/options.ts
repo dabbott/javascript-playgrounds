@@ -21,7 +21,7 @@ export interface WorkspaceStep {
 
 const userInterfaceStrings = {
   loading: 'Loading dependencies...',
-  about: `The source code for this sandbox is available [here on GitHub](https://github.com/dabbott/javascript-playgrounds)`,
+  about: '',
   noErrors: 'No Errors',
   showDetails: 'Show Details',
   fullscreen: 'Fullscreen',

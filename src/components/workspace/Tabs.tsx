@@ -10,7 +10,7 @@ const baseTextStyle = prefix({
   padding: '0 20px',
   cursor: 'pointer',
   borderBottomStyle: 'solid',
-  borderBottomColor: '#1990B8',
+  borderBottomColor: 'rgb(59, 108, 212)',
   borderBottomWidth: 0,
   transition: 'border-width 0.1s, color 0.1s',
 })
