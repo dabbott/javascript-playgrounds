@@ -2,7 +2,7 @@
 
 An interactive JavaScript sandbox. [Try it out!](https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#title=JavaScript%20Playgrounds)
 
-### About
+## Overview
 
 This project provides a quick, visual way to experiment with JavaScript, React, and React Native code.
 
@@ -15,14 +15,14 @@ I use this sandbox in my interactive guides:
 - [React Express](https://www.react.express)
 - [React Native Express](https://www.reactnative.express)
 
-### Usage
+## Usage
 
 The sandbox may be included in your site either:
 
 - [as a React component](#as-a-react-component)
 - [directly as an `iframe`](#as-an-iframe)
 
-#### As a React Component
+### As a React Component
 
 If you're using React:
 
@@ -52,7 +52,7 @@ This component is a wrapper around the `iframe` that handles encoding parameters
 | **`className`** | The className of the `div` which wraps the `iframe`                                           | `undefined`                       |
 | **`baseURL`**   | Optionally, specify a custom url to load the player from. This url should not include a hash. | `unpkg.com` (see [unpkg](#unpkg)) |
 
-#### As an `iframe`
+### As an `iframe`
 
 If you're not using React, include the sandbox in an `iframe`.
 
@@ -74,7 +74,7 @@ const hashString = '#data=' + encodeURIComponent(JSON.stringify(parameters))
 
 > When used as an `iframe`, the easiest way to set the `code` parameter is to edit the code in the sandbox and copy and paste the url when you're done (the url updates automatically as you type).
 
-### Parameters
+## Parameters
 
 The sandbox accepts the following props/parameters.
 
@@ -177,11 +177,11 @@ None at the moment.
 
 None at the moment.
 
-### Hosting
+## Hosting
 
 This project contains static assets that run standalone in the browser. You don't need a server, unless you want to host the assets yourself.
 
-##### unpkg
+### unpkg
 
 The recommended host is https://unpkg.com, which is a CDN that serves content from the npm registry. The examples in this readme all point to:
 
@@ -194,7 +194,7 @@ The recommended host is https://unpkg.com, which is a CDN that serves content fr
 ></iframe>
 ```
 
-### Basic Examples
+## Examples
 
 These examples were created by loading the demo page and running roughly the following JS in the console:
 
@@ -233,6 +233,14 @@ yarn dev
 yarn build
 ```
 
-### License
+## Contributing
 
-BSD
+Contributions are welcome, but if you're planning to add features, I recommend opening an issue describing the change first.
+
+I maintain this project specifically for my educational guides, so if it's a feature I wouldn't use, I might not want to maintain it. It also may take me a little while to get to reviewing.
+
+## License
+
+3-Clause BSD
+
+https://opensource.org/licenses/BSD-3-Clause
