@@ -47,7 +47,7 @@ export interface PublicOptions {
   panes?: PublicPaneOptions[]
   responsivePaneSets?: PublicResponsivePaneSet[]
   detectDependencies?: boolean
-  postMessageTarget?: string
+  targetOrigin?: string
 }
 
 export type PublicPaneOptions = PaneShorthand | PaneOptions
@@ -161,7 +161,7 @@ export function normalize(options: PublicOptions): InternalOptions {
       /* types */
     },
     detectDependencies = true,
-    postMessageTarget = '',
+    targetOrigin = '',
   } = Object.assign({}, presetOptions[preset], options)
 
   const typescriptOptions = Object.assign(
@@ -208,6 +208,6 @@ export function normalize(options: PublicOptions): InternalOptions {
     playground,
     typescript: typescriptOptions,
     modules: detectDependencies ? detectAllDependencies(files) : [],
-    postMessageTarget,
+    targetOrigin,
   }
 }

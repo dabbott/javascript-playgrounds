@@ -16,9 +16,7 @@ const { data = '{}' } = getHashString()
 
 const publicOptions: PublicOptions = JSON.parse(data)
 
-const { css, postMessageTarget, ...rest }: InternalOptions = normalize(
-  publicOptions
-)
+const { css, targetOrigin, ...rest }: InternalOptions = normalize(publicOptions)
 
 if (css) {
   appendCSS(css)
@@ -41,8 +39,8 @@ function onChange(files: Record<string, string>) {
 
   const hashString = buildHashString({ data })
 
-  if (postMessageTarget) {
-    postMessage(data, postMessageTarget)
+  if (targetOrigin && parent) {
+    parent.postMessage(data, targetOrigin)
   }
 
   try {
