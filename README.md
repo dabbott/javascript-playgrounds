@@ -7,7 +7,7 @@
 <br />
 
 <p align="center">
-  <b>An interactive JavaScript sandbox. <a href="https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html">Try it!</a></b>
+  <b>An interactive JavaScript sandbox. <a href="https://unpkg.com/javascript-playgrounds@^1.0.0/public/index.html">Try it!</a></b>
 </p>
 
 <p align="center">
@@ -75,7 +75,7 @@ If you're not using React, include the sandbox in an `iframe`.
   width="880"
   height="425"
   frameborder="0"
-  src="//unpkg.com/javascript-playgrounds@^0.1.0/public/index.html"
+  src="//unpkg.com/javascript-playgrounds@^1.0.0/public/index.html"
 ></iframe>
 ```
 
@@ -208,7 +208,7 @@ The recommended host is https://unpkg.com, which is a CDN that serves content fr
   width="880"
   height="425"
   frameborder="0"
-  src="//unpkg.com/javascript-playgrounds@^0.1.0/public/index.html"
+  src="//unpkg.com/javascript-playgrounds@^1.0.0/public/index.html"
 ></iframe>
 ```
 
@@ -265,7 +265,7 @@ I maintain this project specifically for my educational guides, so if it's a fea
 
 https://opensource.org/licenses/BSD-3-Clause
 
-[react]: https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22preset%22%3A%22react%22%7D
-[react native]: https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22preset%22%3A%22react-native%22%7D
-[custom code]: https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22code%22%3A%22console.log(42)%22%7D
-[library]: https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22code%22%3A%22import%20moment%20from%20'moment'%5Cn%5Cnconsole.log(moment())%22%2C%22modules%22%3A%5B%22moment%22%5D%7D
+[react]: https://unpkg.com/javascript-playgrounds@^1.0.0/public/index.html#preset=react
+[react native]: https://unpkg.com/javascript-playgrounds@^1.0.0/public/index.html#preset=react-native
+[custom code]: https://unpkg.com/javascript-playgrounds@^1.0.0/public/index.html#data=%7B%22code%22%3A%22console.log(42)%22%7D
+[library]: https://unpkg.com/javascript-playgrounds@^1.0.0/public/index.html#data=%7B%22code%22%3A%22import%20moment%20from%20'moment'%5Cn%5Cnconsole.log(moment())%22%2C%22modules%22%3A%5B%22moment%22%5D%7D
