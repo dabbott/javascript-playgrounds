@@ -7,7 +7,7 @@
 <br />
 
 <p align="center">
-  <b>An interactive JavaScript sandbox. <a href="https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html">Try it out!</a><b>
+  <b>An interactive JavaScript sandbox. <a href="https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html">Try it out!</a></b>
 </p>
 
 <p align="center">
