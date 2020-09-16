@@ -8,6 +8,10 @@
 
 **An interactive JavaScript sandbox. [Try it out!](https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#title=JavaScript%20Playgrounds)**
 
+![Animated demo](docs/assets/demo.gif)
+
+## Overview
+
 This project provides a quick, visual way to experiment with JavaScript, React, and React Native code.
 
 The project is designed to be loaded as an `iframe` for easy inclusion in any webpage. Babel and/or TypeScript run in a web worker so the main thread isn't blocked as the page loads.
