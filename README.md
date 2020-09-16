@@ -10,12 +10,14 @@
 
 This project provides a quick, visual way to experiment with JavaScript, React, and React Native code. It's designed to be loaded as an `iframe` for easy inclusion in any webpage.
 
-I use this sandbox in my interactive guides:
+I use this sandbox in my free educational guides:
 
 - [JavaScript Express](https://www.javascript.express)
 - [TypeScript Express](https://www.typescript.express)
 - [React Express](https://www.react.express)
 - [React Native Express](https://www.reactnative.express)
+
+##### Demo
 
 ![Animated demo](docs/assets/demo.gif)
 
