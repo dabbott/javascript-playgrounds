@@ -7,7 +7,7 @@
 <br />
 
 <p align="center">
-  <b>An interactive JavaScript sandbox. <a href="https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html">Try it out!</a></b>
+  <b>An interactive JavaScript sandbox. <a href="https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html">Try it!</a></b>
 </p>
 
 <p align="center">
@@ -16,7 +16,9 @@
 
 ## Overview
 
-This project provides a quick, visual way to experiment with JavaScript, React, and React Native code. It's designed to be loaded as an `iframe` for easy inclusion in any webpage.
+This project provides a quick, visual way to experiment with JavaScript code. It's designed to be loaded as an `iframe` for easy inclusion in any webpage.
+
+There are a variety of configuration options, including a [React preset][react] and a [React Native preset][react native].
 
 I use this sandbox in my free educational guides:
 
@@ -27,7 +29,7 @@ I use this sandbox in my free educational guides:
 
 ## Usage
 
-The sandbox may be included in your site either:
+The sandbox may be included on your site in one of two ways:
 
 - [as a React component](#as-a-react-component)
 - [directly as an `iframe`](#as-an-iframe)
@@ -92,7 +94,7 @@ The sandbox accepts the following props/parameters.
 
 | Title                                | Description                                                                                                                                                                                                                                                                                                                             | Default                       |
 | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| **`preset`**                         | This sets reasonable defaults for other parameters. Options are `react-native`, `react`, and `javascript`.                                                                                                                                                                                                                              | `'javascript'`                |
+| **`preset`**                         | This sets reasonable defaults for other parameters. Options are `javascript`, `react`, and `react-native`.                                                                                                                                                                                                                              | `'javascript'`                |
 | **`title`**                          | An optional title for the editor pane.                                                                                                                                                                                                                                                                                                  | `''`                          |
 | **`code`**                           | The code to show/run in the player.                                                                                                                                                                                                                                                                                                     | The sample app                |
 | **`files`**                          | A map of `{ [filename]: code }`. This will take precedence over `code` if given.                                                                                                                                                                                                                                                        | `undefined`                   |
@@ -228,9 +230,10 @@ location.href.slice(0, location.href.indexOf('#')) +
   )
 ```
 
-- [Custom code][1]
-- [React Native][2]
-- [Load external library via URL][3]
+- [React][react]
+- [React Native][react native]
+- [Custom code][custom code]
+- [Load external library via URL][library]
 
 ## Development
 
@@ -260,6 +263,7 @@ I maintain this project specifically for my educational guides, so if it's a fea
 
 https://opensource.org/licenses/BSD-3-Clause
 
-[1]: https://unpkg.com/javascript-playgrounds@0.1.5/public/index.html#data=%7B%22code%22%3A%22console.log(42)%22%7D
-[2]: https://unpkg.com/javascript-playgrounds@0.1.5/public/index.html#data=%7B%22preset%22%3A%22react-native%22%7D
-[3]: https://unpkg.com/javascript-playgrounds@0.1.5/public/index.html#data=%7B%22code%22%3A%22import%20moment%20from%20'moment'%5Cn%5Cnconsole.log(moment())%22%2C%22modules%22%3A%5B%22moment%22%5D%7D
+[react]: https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22preset%22%3A%22react%22%7D
+[react native]: https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22preset%22%3A%22react-native%22%7D
+[custom code]: https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22code%22%3A%22console.log(42)%22%7D
+[library]: https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22code%22%3A%22import%20moment%20from%20'moment'%5Cn%5Cnconsole.log(moment())%22%2C%22modules%22%3A%5B%22moment%22%5D%7D
