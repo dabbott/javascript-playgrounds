@@ -151,7 +151,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     responsivePaneSets = [],
     workspaces = [],
     playground = {
-      enabled: false,
+      enabled: true,
       renderReactElements: true,
       debounceDuration: 200,
     },

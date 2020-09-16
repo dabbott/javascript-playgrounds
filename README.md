@@ -88,6 +88,8 @@ const hashString = '#data=' + encodeURIComponent(JSON.stringify(parameters))
 
 > When used as an `iframe`, the easiest way to set the `code` parameter is to edit the code in the sandbox and copy and paste the url when you're done (the url updates automatically as you type).
 
+For convenience, you may optionally pass the `preset` parameter in the url string directly, e.g. `#preset=react&data=...`.
+
 ## Parameters
 
 The sandbox accepts the following props/parameters.

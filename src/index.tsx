@@ -12,9 +12,13 @@ import { appendCSS } from './utils/CSS'
 import { normalize, InternalOptions, PublicOptions } from './utils/options'
 import App from './components/workspace/App'
 
-const { data = '{}' } = getHashString()
+const { data = '{}', preset } = getHashString()
 
 const publicOptions: PublicOptions = JSON.parse(data)
+
+if (preset) {
+  publicOptions.preset = decodeURIComponent(preset)
+}
 
 const { css, targetOrigin, ...rest }: InternalOptions = normalize(publicOptions)
 
@@ -30,14 +34,20 @@ prefixAndApply({ display: 'flex' }, mount)
 ReactDOM.render(<App onChange={onChange} {...rest} />, mount)
 
 function onChange(files: Record<string, string>) {
-  const data = JSON.stringify({
+  const merged = {
     ...publicOptions,
     ...(publicOptions.files
       ? { files }
       : { code: files[Object.keys(files)[0]] }),
-  })
+  }
 
-  const hashString = buildHashString({ data })
+  if (preset) {
+    delete merged.preset
+  }
+
+  const data = JSON.stringify(merged)
+
+  const hashString = buildHashString({ ...(preset ? { preset } : {}), data })
 
   if (targetOrigin && parent) {
     parent.postMessage(data, targetOrigin)
