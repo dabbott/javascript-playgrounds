@@ -98,7 +98,7 @@ export default class Sandbox extends PureComponent<Props> {
           )
         }
 
-        if (requireCache.hasOwnProperty(filename)) {
+        if (!requireCache.hasOwnProperty(filename)) {
           this.evaluate(filename, fileMap[filename], context)
         }
 
