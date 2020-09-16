@@ -215,7 +215,7 @@ The recommended host is https://unpkg.com, which is a CDN that serves content fr
 These examples were created by loading the demo page and running roughly the following JS in the console:
 
 ```js
-window.location.origin +
+location.href.slice(0, location.href.indexOf('#')) +
   '#data=' +
   encodeURIComponent(
     JSON.stringify({
@@ -228,10 +228,9 @@ window.location.origin +
   )
 ```
 
-- Custom code - https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22code%22%3A%22import%20React%20from%20'react'%5Cnimport%20%7B%20Text%20%7D%20from%20'react-native'%5Cn%5Cnexport%20default%20()%20%3D%3E%20%3CText%3EHello%2C%20world!%3C%2FText%3E%5Cn%22%7D
-- Android device - https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22panes%22%3A%5B%22editor%22%2C%7B%22type%22%3A%22player%22%2C%22platform%22%3A%22android%22%7D%5D%7D
-- Custom title - https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B%22title%22%3A%22Hello%22%7D
-- Load moment.js - https://unpkg.com/javascript-playgrounds@^0.1.0/public/index.html#data=%7B"panes"%3A%5B"editor"%2C%7B"type"%3A"player"%2C"modules"%3A%5B"moment"%5D%2C"id"%3A"3"%7D%5D%2C"code"%3A"import%20React%20from%20'react'%5Cnimport%20%7B%20Text%20%7D%20from%20'react-native'%5Cnimport%20moment%20from%20'moment'%5Cn%5Cnexport%20default%20function%20App()%20%7B%5Cn%20%20return%20(%5Cn%20%20%20%20<Text>%5Cn%20%20%20%20%20%20%7Bmoment().toString()%7D%5Cn%20%20%20%20<%2FText>%5Cn%20%20)%5Cn%7D%5Cn"%7D
+- [Custom code][1]
+- [React Native][2]
+- [Load external library via URL][3]
 
 ## Development
 
@@ -260,3 +259,7 @@ I maintain this project specifically for my educational guides, so if it's a fea
 3-Clause BSD
 
 https://opensource.org/licenses/BSD-3-Clause
+
+[1]: https://unpkg.com/javascript-playgrounds@0.1.5/public/index.html#data=%7B%22code%22%3A%22console.log(42)%22%7D
+[2]: https://unpkg.com/javascript-playgrounds@0.1.5/public/index.html#data=%7B%22preset%22%3A%22react-native%22%7D
+[3]: https://unpkg.com/javascript-playgrounds@0.1.5/public/index.html#data=%7B%22code%22%3A%22import%20moment%20from%20'moment'%5Cn%5Cnconsole.log(moment())%22%2C%22modules%22%3A%5B%22moment%22%5D%7D
