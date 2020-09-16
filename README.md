@@ -32,6 +32,8 @@ The sandbox may be included in your site either:
 - [as a React component](#as-a-react-component)
 - [directly as an `iframe`](#as-an-iframe)
 
+> For legacy React Native-specific docs, see the [v1 branch](https://github.com/dabbott/javascript-playgrounds/tree/v1)
+
 ### As a React Component
 
 If you're using React:
