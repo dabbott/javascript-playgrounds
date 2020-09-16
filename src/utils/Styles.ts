@@ -75,3 +75,25 @@ export const prefixAndApply = (
     node.style[key as any] = (prefixed as any)[key]
   }
 }
+
+export const columnStyle = prefix({
+  flex: '1',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'stretch',
+  minWidth: 0,
+  minHeight: 0,
+  overflow: 'hidden', // Clip box shadows
+  position: 'relative',
+})
+
+export const rowStyle = prefix({
+  flex: '1',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'stretch',
+  minWidth: 0,
+  minHeight: 0,
+  overflow: 'hidden', // Clip box shadows
+  position: 'relative',
+})

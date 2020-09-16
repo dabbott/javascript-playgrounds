@@ -1,230 +1,58 @@
-import React, { PureComponent, CSSProperties, RefObject } from 'react'
-import { getErrorDetails } from '../../utils/ErrorMessage'
-import { prefixObject } from '../../utils/Styles'
-import About from './About'
-import Button from './Button'
-import Console from './Console'
-import Editor from './Editor'
-import Fullscreen from './Fullscreen'
-import Header from './Header'
-import Overlay from './Overlay'
-import PlayerFrame from './PlayerFrame'
-import Status from './Status'
-import TabContainer from './TabContainer'
-import Tabs from './Tabs'
-import WorkspacesList from './WorkspacesList'
-import { workerRequest } from '../../utils/WorkerRequest'
-import type { WorkspaceDiff } from '../../index'
+import React, {
+  CSSProperties,
+  ReactNode,
+  useEffect,
+  useReducer,
+  useRef,
+  useMemo,
+  useCallback,
+  memo,
+  useState,
+} from 'react'
 import type * as ts from 'typescript'
+import * as workspace from '../../reducers/workspace'
 import { ConsoleCommand, LogCommand } from '../../types/Messages'
+import babelRequest, { BabelResponse } from '../../utils/BabelRequest'
+import { PaneOptions, containsPane } from '../../utils/Panes'
+import { prefixObject, rowStyle } from '../../utils/Styles'
+import { Tab } from '../../utils/Tab'
+import typeScriptRequest from '../../utils/TypeScriptRequest'
+import { Props as EditorProps } from './Editor'
+import ConsolePane from './panes/ConsolePane'
+import EditorPane from './panes/EditorPane'
+import PlayerPane from './panes/PlayerPane'
+import StackPane from './panes/StackPane'
+import TranspilerPane from './panes/TranspilerPane'
+import WorkspacesPane from './panes/WorkspacesPane'
+import PlayerFrame from './PlayerFrame'
+import useResponsiveBreakpoint from '../../hooks/useResponsiveBreakpoint'
+import { WorkspaceStep, UserInterfaceStrings } from '../../utils/options'
+import { WorkspaceDiff } from './App'
+import useRerenderEffect from '../../hooks/useRerenderEffect'
 
-export type BabelWorkerMessage = {
-  filename: string
-} & (
-  | {
-      type: 'code'
-      code: string
-    }
-  | {
-      type: 'error'
-      error: {
-        message: string
-      }
-    }
-)
-
-export type TypeScriptRequest =
-  | {
-      type: 'libs'
-      libs: string[]
-      types: string[]
-    }
-  | {
-      type: 'file'
-      filename: string
-      code: string
-    }
-  | {
-      type: 'quickInfo'
-      filename: string
-      position: number
-    }
-
-const BabelWorker = require('../../babel-worker.js')
-const babelWorker = new BabelWorker()
-
-// Utilities for determining which babel worker responses are for the player vs
-// the transpiler view, since we encode this information in the filename.
-const transpilerPrefix = '@babel-'
-const getTranspilerId = (filename: string): string =>
-  `${transpilerPrefix}${filename}`
-const isTranspilerId = (filename: string): boolean =>
-  filename.indexOf(transpilerPrefix) === 0
-
-interface Tab {
-  index: number
-  title: string
-  changed: boolean
-}
-const compareTabs = (a: Tab, b: Tab) => a.index === b.index
-const getTabTitle = (tab: Tab) => tab.title
-const getTabChanged = (tab: Tab) => tab.changed
-
-const containsPane = (panes: Pane[], target: string): boolean =>
-  panes.some((pane: Pane) => {
-    if (typeof pane === 'string') return pane === target
-
-    if (pane.type === target) return true
-
-    const children = (pane.type === 'stack' && pane.children) || []
-
-    return containsPane(children, target)
-  })
-
-const normalizePane = (pane: Pane): PaneObject => {
-  if (typeof pane === 'string') {
-    return { type: pane } as PaneObject
-  }
-
-  return pane
-}
-
-const findPaneSetIndex = (
-  responsivePaneSets: ResponsivePaneSet[],
-  windowWidth?: number
-): number =>
-  windowWidth === undefined
-    ? responsivePaneSets.length - 1
-    : responsivePaneSets.findIndex((paneSet) => paneSet.maxWidth > windowWidth)
+const {
+  reducer,
+  actionCreators: {
+    compiled,
+    transpiled,
+    babelCode,
+    babelError,
+    codeChange,
+    openEditorTab,
+    playerRun,
+    playerError,
+    consoleAppend,
+    consoleClear,
+  },
+} = workspace
 
 const styles = prefixObject({
-  container: {
-    flex: '1',
-    display: 'flex',
-    alignItems: 'stretch',
-    minWidth: 0,
-    minHeight: 0,
-  },
-  editorPane: {
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    minWidth: 0,
-    minHeight: 0,
-    overflow: 'hidden', // Clip box shadows
-  },
-  transpilerPane: {
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    minWidth: 0,
-    minHeight: 0,
-    overflow: 'hidden', // Clip box shadows
-  },
-  playerPane: {
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: 0,
-    minHeight: 0,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  workspacesPane: {
-    width: 220,
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: 0,
-    minHeight: 0,
-    overflowX: 'hidden', // Clip box shadows
-    overflowY: 'auto',
-  },
-  overlayContainer: {
-    position: 'relative',
-    flex: 0,
-    height: 0,
-    alignItems: 'stretch',
-  },
-  overlay: {
-    position: 'absolute',
-    bottom: 0,
-    background: 'rgba(255,255,255,0.95)',
-    zIndex: 100,
-    left: 4,
-    right: 0,
-    borderTop: '1px solid #F8F8F8',
-    display: 'flex',
-    alignItems: 'stretch',
-    overflow: 'auto',
-    maxHeight: 300,
-  },
-  column: {
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    minWidth: 0,
-    minHeight: 0,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  row: {
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    minWidth: 0,
-    minHeight: 0,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  boldMessage: {
-    fontWeight: 'bold',
-  },
-  codeMessage: {
-    display: 'block',
-    fontFamily: `'source-code-pro', Menlo, 'Courier New', Consolas, monospace`,
-    borderRadius: 4,
-    padding: '4px 8px',
-    backgroundColor: 'rgba(0,0,0,0.02)',
-    border: '1px solid rgba(0,0,0,0.05)',
-  },
+  container: rowStyle,
 })
 
-export type PaneBase = {
-  title?: string
-  style?: CSSProperties
-}
-export type StackPane = PaneBase & {
-  type: 'stack'
-  children: Pane[]
-}
-export type EditorPane = PaneBase & {
-  type: 'editor'
-}
-export type TranspilerPane = PaneBase & {
-  type: 'transpiler'
-}
-export type PlayerPane = PaneBase & {
-  type: 'player'
-}
-export type WorkspacesPane = PaneBase & {
-  type: 'workspaces'
-}
-export type PaneObject =
-  | StackPane
-  | EditorPane
-  | TranspilerPane
-  | PlayerPane
-  | WorkspacesPane
-export type PaneShorthand = PaneObject['type']
-export type Pane = PaneShorthand | PaneObject
 export type ResponsivePaneSet = {
   maxWidth: number
-  panes: Pane[]
+  panes: PaneOptions[]
 }
 
 export type PublicError = {
@@ -234,128 +62,339 @@ export type PublicError = {
   description: string
 }
 
-interface ConsoleOptions {
-  enabled: boolean
-  visible: boolean
-  maximized: boolean
-  collapsible: boolean
-  showFileName: boolean
-  showLineNumber: boolean
-  renderReactElements: boolean
-}
-
-interface PlaygroundOptions {
+export interface PlaygroundOptions {
   enabled: boolean
   renderReactElements: boolean
   debounceDuration: number
 }
 
-interface TypeScriptOptions {
-  enabled: false
+export interface TypeScriptOptions {
+  enabled?: false
   libs?: string[]
   types?: string[]
 }
 
+export interface ExternalStyles {
+  consolePane?: CSSProperties
+  consoleRow?: CSSProperties
+  header?: CSSProperties
+  headerText?: CSSProperties
+  playerHeader?: CSSProperties
+  playerHeaderText?: CSSProperties
+  playerPane?: CSSProperties
+  stackTab?: CSSProperties
+  stackTabText?: CSSProperties
+  stackTabTextActive?: CSSProperties
+  tab?: CSSProperties
+  tabText?: CSSProperties
+  tabTextActive?: CSSProperties
+  tabTextChanged?: CSSProperties
+  tooltip?: CSSProperties
+  transpilerHeader?: CSSProperties
+  transpilerHeaderText?: CSSProperties
+  workspacesButtonContainer?: CSSProperties
+  workspacesButtonText?: CSSProperties
+  workspacesButtonWrapper?: CSSProperties
+  workspacesDescription?: CSSProperties
+  workspacesDescriptionText?: CSSProperties
+  workspacesDivider?: CSSProperties
+  workspacesHeader?: CSSProperties
+  workspacesHeaderText?: CSSProperties
+  workspacesList?: CSSProperties
+  workspacesPane?: CSSProperties
+  workspacesRow?: CSSProperties
+  workspacesRowActive?: CSSProperties
+  workspacesRowTitle?: CSSProperties
+  workspacesRowTitleActive?: CSSProperties
+
+  // Passed to player
+  playerRoot?: CSSProperties
+  playerWrapper?: CSSProperties
+  playerApp?: CSSProperties
+}
+
 export interface Props {
+  preset: string
   title: string
-  description: string
   files: Record<string, string>
   entry: string
   initialTab: string
+  strings: UserInterfaceStrings
   onChange: (files: Record<string, string>) => void
-  platform?: string
-  scale?: number
-  width?: number
-  assetRoot?: string
-  vendorComponents: unknown[]
-  externalStyles: Record<string, CSSProperties>
+  externalStyles: ExternalStyles
   fullscreen: boolean
   sharedEnvironment: boolean
-  playerStyleSheet?: string
-  playerCSS?: string
-  prelude: string
   responsivePaneSets: ResponsivePaneSet[]
-  consoleOptions: ConsoleOptions
   playgroundOptions: PlaygroundOptions
   typescriptOptions: TypeScriptOptions
-  workspaces: Props[]
+  workspaces: WorkspaceStep[]
   diff: Record<string, WorkspaceDiff>
-  statusBarHeight: number
-  statusBarColor: string
-  playerTitle?: string
-  transpilerTitle?: string
-  workspacesTitle?: string
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
+  modules: string[]
 }
 
-interface State {
+type WorkspacePaneProps = {
+  options: PaneOptions
+
+  // Props
+  preset: string
+  ready: boolean
+  files: Record<string, string>
+  strings: UserInterfaceStrings
+  externalStyles: ExternalStyles
+  fullscreen: boolean
+  sharedEnvironment: boolean
+  playgroundOptions: PlaygroundOptions
+  typescriptOptions: TypeScriptOptions
+  workspaces: WorkspaceStep[]
+  modules: string[]
+  diff: Record<string, WorkspaceDiff>
+  activeStepIndex: number
+  onChangeActiveStepIndex: (index: number) => void
+
+  // State
   compilerError?: PublicError
   runtimeError?: PublicError
-  showDetails: boolean
-  showLogs: boolean
   logs: LogCommand[]
   activeFile: string
   transpilerCache: Record<string, string>
-  transpilerVisible: boolean
-  playerVisible: boolean
   fileTabs: Tab[]
   activeFileTab?: Tab
-  paneSetIndex: number
+
+  // Callbacks
+  onCodeChange: EditorProps['onChange']
+  onClickTab: (tab: Tab) => void
+  onCreatePlayer: (id: string, player: PlayerFrame | null) => void
+  onPlayerRun: () => void
+  onPlayerError: (message: string) => void
+  onPlayerConsole: (payload: ConsoleCommand) => void
+  getTypeScriptInfo: EditorProps['getTypeInfo']
+  renderPane: (options: PaneOptions, index: number) => ReactNode
 }
 
-export default class Workspace extends PureComponent<Props, State> {
-  static defaultProps = {
-    title: 'Live Editor',
-    files: { ['index.js']: '' },
-    entry: 'index.js',
-    initialTab: 'index.js',
-    onChange: () => {},
-    platform: null,
-    scale: null,
-    width: null,
-    assetRoot: null,
-    vendorComponents: [],
-    externalStyles: {},
-    fullscreen: false,
-    sharedEnvironment: true,
-    playerStyleSheet: null,
-    playerCSS: null,
-    prelude: '',
-    responsivePaneSets: [],
-    consoleOptions: {},
-    playgroundOptions: {},
-    typescriptOptions: {},
-    workspaces: [],
-    diff: {},
-    statusBarHeight: 0,
-    statusBarColor: 'black',
+const WorkspacePane = memo((props: WorkspacePaneProps) => {
+  const {
+    preset,
+    ready,
+    files,
+    strings,
+    externalStyles,
+    sharedEnvironment,
+    workspaces,
+    modules,
+    activeStepIndex,
+    onChangeActiveStepIndex,
+    fullscreen,
+    diff,
+    playgroundOptions,
+    typescriptOptions,
+    logs,
+    transpilerCache,
+    activeFile,
+    compilerError,
+    runtimeError,
+    activeFileTab,
+    fileTabs,
+    options,
+    onCodeChange,
+    onClickTab,
+    onCreatePlayer,
+    onPlayerRun,
+    onPlayerError,
+    onPlayerConsole,
+    getTypeScriptInfo,
+    renderPane,
+  } = props
+
+  switch (options.type) {
+    case 'editor':
+      return (
+        <EditorPane
+          options={options}
+          externalStyles={externalStyles}
+          ready={ready}
+          strings={strings}
+          files={files}
+          fullscreen={fullscreen}
+          activeStepIndex={activeStepIndex}
+          diff={diff}
+          playgroundOptions={playgroundOptions}
+          typescriptOptions={typescriptOptions}
+          compilerError={compilerError}
+          runtimeError={runtimeError}
+          activeFile={activeFile}
+          activeFileTab={activeFileTab}
+          fileTabs={fileTabs}
+          logs={logs}
+          onChange={onCodeChange}
+          getTypeInfo={getTypeScriptInfo}
+          onClickTab={onClickTab}
+        />
+      )
+    case 'transpiler':
+      return (
+        <TranspilerPane
+          options={options}
+          externalStyles={externalStyles}
+          transpilerCache={transpilerCache}
+          activeFile={activeFile}
+        />
+      )
+    case 'player':
+      return (
+        <PlayerPane
+          ref={(player) => {
+            onCreatePlayer(options.id, player)
+          }}
+          modules={modules}
+          options={options}
+          externalStyles={externalStyles}
+          preset={preset}
+          sharedEnvironment={sharedEnvironment}
+          files={files}
+          logs={logs}
+          onPlayerRun={onPlayerRun}
+          onPlayerError={onPlayerError}
+          onPlayerConsole={onPlayerConsole}
+        />
+      )
+    case 'workspaces':
+      return (
+        <WorkspacesPane
+          options={options}
+          externalStyles={externalStyles}
+          workspaces={workspaces}
+          activeStepIndex={activeStepIndex}
+          onChangeActiveStepIndex={onChangeActiveStepIndex}
+        />
+      )
+    case 'stack':
+      return (
+        <StackPane
+          options={options}
+          externalStyles={externalStyles}
+          renderPane={renderPane}
+        />
+      )
+    case 'console':
+      return (
+        <ConsolePane
+          options={options}
+          externalStyles={externalStyles}
+          files={files}
+          logs={logs}
+        />
+      )
+    default:
+      return <div>{`Unknown pane type: ${options['type']}`}</div>
   }
+})
 
-  codeCache: Record<string, string> = {}
-  playerCache: Record<string, string> = {}
-  player?: PlayerFrame
+export default function Workspace(props: Props) {
+  const {
+    files = { ['index.js']: '' },
+    entry = 'index.js',
+    initialTab = 'index.js',
+    onChange = () => {},
+    responsivePaneSets = [],
+    typescriptOptions = {},
+    diff = {},
+  } = props
 
-  constructor(props: Props) {
-    super(props)
+  // Determine which pane set to use based on responsive breakpoint
+  const widths = useMemo(() => responsivePaneSets.map((set) => set.maxWidth), [
+    responsivePaneSets,
+  ])
+  const paneSetIndex = useResponsiveBreakpoint(widths)
+  const panes = responsivePaneSets[paneSetIndex].panes
+  const transpilerVisible = containsPane(panes, 'transpiler')
+  const playerVisible = containsPane(panes, 'player')
 
-    const {
-      initialTab,
-      responsivePaneSets,
-      consoleOptions,
-      files,
-      diff,
-      typescriptOptions,
-    } = props
+  // If we have a player pane, show a loading indicator
+  const [ready, setReady] = useState(!playerVisible)
 
-    const fileTabs: Tab[] = Object.keys(files).map((filename, index) => {
-      return {
+  const [state, dispatch] = useReducer(reducer, undefined, () =>
+    workspace.initialState({
+      fileTabs: Object.keys(files).map((filename, index) => ({
         title: filename,
         changed: diff[filename] ? diff[filename].ranges.length > 0 : false,
         index,
+      })),
+      initialTab,
+    })
+  )
+
+  const players = useRef<Record<string, PlayerFrame>>({})
+
+  // Run the app once we've transformed each file at least once
+  const runApplication = (compiledFiles: Record<string, string>) => {
+    if (Object.keys(files).every((filename) => compiledFiles[filename])) {
+      if (!ready) {
+        setReady(true)
+      }
+      dispatch(consoleClear())
+      Object.values(players.current).forEach((player) => {
+        player.runApplication(compiledFiles, entry)
+      })
+    }
+  }
+
+  // Re-run when files changes.
+  // When breakpoints change, we may be rendering different player panes,
+  // so we need to re-run then too.
+  useEffect(() => {
+    runApplication(state.playerCache)
+  }, [paneSetIndex, state.playerCache])
+
+  const onCreatePlayer = useCallback(
+    (id: string, player: PlayerFrame | null) => {
+      if (player) {
+        players.current[id] = player
+      } else {
+        delete players.current[id]
+      }
+    },
+    []
+  )
+
+  const updateStatus = (babelMessage: BabelResponse) => {
+    switch (babelMessage.type) {
+      case 'code':
+        dispatch(babelCode())
+        break
+      case 'error':
+        dispatch(babelError(babelMessage.error.message))
+        break
+    }
+  }
+
+  const compilerRequest = (filename: string, code: string) => {
+    babelRequest({
+      filename,
+      code,
+      options: { retainLines: true },
+    }).then((response: BabelResponse) => {
+      updateStatus(response)
+
+      if (response.type === 'code') {
+        dispatch(compiled(response.filename, response.code))
       }
     })
+  }
 
+  const transpilerRequest = (filename: string, code: string) => {
+    babelRequest({
+      filename,
+      code,
+    }).then((response) => {
+      if (response.type === 'code') {
+        dispatch(transpiled(response.filename, response.code))
+      }
+    })
+  }
+
+  useEffect(() => {
     if (
       typescriptOptions.enabled &&
       Object.keys(files).filter((file) => file.match(/\.tsx?/)).length === 0
@@ -363,602 +402,191 @@ export default class Workspace extends PureComponent<Props, State> {
       console.warn('TypeScript is enabled but there are no .ts or .tsx files.')
     }
 
-    let initialWindowWidth
-
-    if (typeof window !== 'undefined') {
-      initialWindowWidth = window.outerWidth
-
-      if (responsivePaneSets.length > 1) {
-        window.addEventListener('resize', () => {
-          const nextIndex = findPaneSetIndex(
-            responsivePaneSets,
-            window.outerWidth
-          )
-
-          if (nextIndex !== this.state.paneSetIndex) {
-            this.setState(
-              {
-                paneSetIndex: nextIndex,
-              },
-              () => {
-                // We may be rendering a different player pane, so we need to re-run
-                this.runApplication()
-              }
-            )
-          }
-        })
-      }
-    }
-
-    const paneSetIndex = findPaneSetIndex(
-      responsivePaneSets,
-      initialWindowWidth
-    )
-    const panes = responsivePaneSets[paneSetIndex].panes
-
-    this.state = {
-      compilerError: undefined,
-      runtimeError: undefined,
-      showDetails: false,
-      showLogs: consoleOptions.visible,
-      logs: [],
-      activeFile: initialTab,
-      transpilerCache: {},
-      transpilerVisible: containsPane(panes, 'transpiler'),
-      playerVisible: containsPane(panes, 'player'),
-      fileTabs,
-      activeFileTab: fileTabs.find((tab) => tab.title === initialTab),
-      paneSetIndex,
-    }
-
-    babelWorker.addEventListener('message', this.onBabelWorkerMessage)
-  }
-
-  componentWillUnmount() {
-    babelWorker.removeEventListener('message', this.onBabelWorkerMessage)
-  }
-
-  componentDidMount() {
     if (typeof navigator !== 'undefined') {
-      const { files, typescriptOptions } = this.props
-      const { playerVisible, transpilerVisible } = this.state
-
       // Cache and compile each file
       Object.keys(files).forEach((filename) => {
         const code = files[filename]
 
-        this.codeCache[filename] = code
+        state.codeCache[filename] = code
 
-        this.runTypeScriptRequest({
-          type: 'libs',
-          libs: typescriptOptions.libs || [],
-          types: typescriptOptions.types || [],
-        })
+        if (typescriptOptions.enabled) {
+          typeScriptRequest({
+            type: 'libs',
+            libs: typescriptOptions.libs || [],
+            types: typescriptOptions.types || [],
+          })
 
-        this.runTypeScriptRequest({
-          type: 'file',
-          filename,
-          code,
-        })
-
-        if (playerVisible) {
-          babelWorker.postMessage({
+          typeScriptRequest({
+            type: 'file',
             filename,
             code,
-            options: { retainLines: true },
           })
+        }
+
+        if (playerVisible) {
+          compilerRequest(filename, code)
         }
 
         if (transpilerVisible) {
-          babelWorker.postMessage({
-            filename: getTranspilerId(filename),
-            code,
+          transpilerRequest(filename, code)
+        }
+      })
+    }
+  }, [])
+
+  /* CALLBACKS */
+
+  const onCodeChange = useCallback(
+    (code: string) => {
+      if (typescriptOptions.enabled) {
+        typeScriptRequest({
+          type: 'file',
+          filename: state.activeFile,
+          code,
+        })
+      }
+
+      if (playerVisible) {
+        compilerRequest(state.activeFile, code)
+      }
+
+      if (transpilerVisible) {
+        transpilerRequest(state.activeFile, code)
+      }
+
+      dispatch(codeChange(state.activeFile, code))
+    },
+    [typescriptOptions, playerVisible, transpilerVisible, state.activeFile]
+  )
+
+  useRerenderEffect(() => {
+    onChange(state.codeCache)
+  }, [state.codeCache])
+
+  const onClickTab = useCallback((tab: Tab) => {
+    dispatch(openEditorTab(tab))
+  }, [])
+
+  const onPlayerRun = useCallback(() => {
+    dispatch(playerRun())
+  }, [])
+
+  const onPlayerError = useCallback((message: string) => {
+    dispatch(playerError(message))
+  }, [])
+
+  const onPlayerConsole = useCallback((payload: ConsoleCommand) => {
+    // if (consoleOptions.enabled || playgroundOptions.enabled) {
+    switch (payload.command) {
+      case 'clear':
+        dispatch(consoleClear())
+        return
+      case 'log':
+        dispatch(consoleAppend(payload))
+        return
+    }
+    // }
+  }, [])
+
+  const getTypeScriptInfo = useCallback(
+    (
+      prefixedFilename: string,
+      index: number,
+      done: (info: ts.QuickInfo) => void
+    ): void => {
+      const [, filename] = prefixedFilename.split(':')
+
+      if (typescriptOptions.enabled) {
+        typeScriptRequest({
+          type: 'quickInfo',
+          filename,
+          position: index,
+        })
+          .then((info?: ts.QuickInfo) => {
+            if (info && info.displayParts && info.displayParts.length > 0) {
+              done(info)
+            }
           })
-        }
-      })
-    }
-  }
-
-  runApplication = () => {
-    const { playerCache, player } = this
-    const { entry, files } = this.props
-
-    // Run the app once we've transformed each file at least once
-    if (
-      player &&
-      Object.keys(files).every((filename) => playerCache[filename])
-    ) {
-      this.clearLogs()
-      player.runApplication(playerCache, entry)
-    }
-  }
-
-  onBabelWorkerMessage = ({ data }: MessageEvent) => {
-    const { playerCache } = this
-    const { transpilerCache } = this.state
-    const babelMessage = JSON.parse(data) as BabelWorkerMessage
-
-    this.updateStatus(babelMessage)
-
-    if (babelMessage.type === 'code') {
-      const { filename, code } = babelMessage
-
-      if (isTranspilerId(filename)) {
-        this.setState({
-          transpilerCache: {
-            ...transpilerCache,
-            [filename]: code,
-          },
-        })
-      } else {
-        playerCache[filename] = code
-        this.runApplication()
+          .catch((error: unknown) => {
+            console.log('Error finding type info', error)
+          })
       }
-    }
-  }
+    },
+    [typescriptOptions]
+  )
 
-  updateStatus = (babelMessage: BabelWorkerMessage) => {
-    switch (babelMessage.type) {
-      case 'code':
-        this.setState({
-          compilerError: undefined,
-          showDetails: false,
-        })
-        break
-      case 'error':
-        this.setState({
-          compilerError: getErrorDetails(babelMessage.error.message),
-        })
-        break
-    }
-  }
-
-  typeScriptWorker?: Promise<any>
-
-  runTypeScriptRequest = (payload: TypeScriptRequest) => {
-    if (!this.props.typescriptOptions.enabled) {
-      return Promise.resolve()
-    }
-
-    if (!this.typeScriptWorker) {
-      this.typeScriptWorker = import(
-        '../../typescript-worker.js'
-      ).then((worker) => (worker as any).default())
-    }
-
-    return this.typeScriptWorker.then((worker: unknown) =>
-      workerRequest(worker, payload)
-    )
-  }
-
-  getTypeScriptInfo = (
-    prefixedFilename: string,
-    index: number,
-    done: (info: ts.QuickInfo) => void
-  ): void => {
-    const [, filename] = prefixedFilename.split(':')
-
-    this.runTypeScriptRequest({
-      type: 'quickInfo',
-      filename,
-      position: index,
-    })
-      .then((info?: ts.QuickInfo) => {
-        if (info && info.displayParts && info.displayParts.length > 0) {
-          done(info)
-        }
-      })
-      .catch((error: unknown) => {
-        console.log('Error finding type info', error)
-      })
-  }
-
-  onCodeChange = (code: string) => {
-    const { activeFile, transpilerVisible, playerVisible } = this.state
-
-    this.runTypeScriptRequest({
-      type: 'file',
-      filename: activeFile,
-      code,
-    })
-
-    if (playerVisible) {
-      babelWorker.postMessage({
-        filename: activeFile,
-        code,
-        options: { retainLines: true },
-      })
-    }
-
-    if (transpilerVisible) {
-      babelWorker.postMessage({
-        filename: getTranspilerId(activeFile),
-        code,
-      })
-    }
-
-    this.codeCache[activeFile] = code
-    this.props.onChange(this.codeCache)
-  }
-
-  onToggleDetails = (showDetails: boolean) => {
-    this.setState({ showDetails })
-  }
-
-  onToggleLogs = (showLogs: boolean) => {
-    this.setState({ showLogs })
-  }
-
-  onPlayerRun = () => {
-    this.setState({ runtimeError: undefined })
-  }
-
-  // TODO: Runtime errors should indicate which file they're coming from,
-  // and only cause a line highlight on that file.
-  onPlayerError = (message: string) => {
-    this.setState({ runtimeError: getErrorDetails(message) })
-  }
-
-  onPlayerConsole = (payload: ConsoleCommand) => {
-    const { consoleOptions, playgroundOptions } = this.props
-    const { logs } = this.state
-
-    if (consoleOptions.enabled || playgroundOptions.enabled) {
-      switch (payload.command) {
-        case 'log':
-          this.setState({ logs: logs.concat(payload) })
-          break
-        case 'clear':
-          this.clearLogs()
-          break
-      }
-    }
-  }
-
-  clearLogs() {
-    const { logs } = this.state
-
-    if (logs.length === 0) return
-
-    this.setState({ logs: [] })
-  }
-
-  onClickTab = (tab: Tab) => {
-    this.setState({
-      activeFile: tab.title,
-      activeFileTab: tab,
-    })
-  }
-
-  renderEditor = (key: number, options: EditorPane) => {
-    const {
-      files,
-      title,
-      externalStyles,
-      fullscreen,
-      activeStepIndex,
-      diff,
-      playgroundOptions,
-      typescriptOptions,
-    } = this.props
-    const {
-      compilerError,
-      runtimeError,
-      showDetails,
-      activeFile,
-      activeFileTab,
-      fileTabs,
-      logs,
-    } = this.state
-
-    const fileDiff = diff[activeFile] ? diff[activeFile].ranges : []
-
-    const error = compilerError || runtimeError
-    const isError = !!error
-
-    const style = options.style
-      ? { ...styles.editorPane, ...options.style }
-      : styles.editorPane
-
-    return (
-      <div key={key} style={style}>
-        {title && (
-          <Header
-            text={title}
-            headerStyle={externalStyles.header}
-            textStyle={externalStyles.headerText}
-          >
-            {fullscreen && <Fullscreen textStyle={externalStyles.headerText} />}
-          </Header>
-        )}
-        {fileTabs.length > 1 && (
-          <Tabs
-            tabs={fileTabs}
-            getTitle={getTabTitle}
-            getChanged={getTabChanged}
-            activeTab={activeFileTab}
-            compareTabs={compareTabs}
-            onClickTab={this.onClickTab}
-            tabStyle={externalStyles.tab}
-            textStyle={externalStyles.tabText}
-            activeTextStyle={externalStyles.tabTextActive}
-            changedTextStyle={externalStyles.tabTextChanged}
-          >
-            {fullscreen && !title && (
-              <Fullscreen textStyle={externalStyles.tabText} />
-            )}
-          </Tabs>
-        )}
-        <Editor
-          key={activeFile}
-          initialValue={files[activeFile]}
-          filename={activeStepIndex + ':' + activeFile}
-          onChange={this.onCodeChange}
-          errorLineNumber={error?.lineNumber}
-          showDiff={true}
-          diff={fileDiff}
-          logs={playgroundOptions.enabled ? logs : undefined}
-          playgroundDebounceDuration={playgroundOptions.debounceDuration}
-          playgroundRenderReactElements={playgroundOptions.renderReactElements}
-          getTypeInfo={
-            typescriptOptions.enabled ? this.getTypeScriptInfo : undefined
-          }
-          tooltipStyle={externalStyles.tooltip}
+  const renderPane = useCallback(
+    (options: PaneOptions, index: number) => {
+      return (
+        <WorkspacePane
+          key={index}
+          // Props
+          preset={props.preset}
+          files={props.files}
+          strings={props.strings}
+          externalStyles={props.externalStyles}
+          fullscreen={props.fullscreen}
+          sharedEnvironment={props.sharedEnvironment}
+          playgroundOptions={props.playgroundOptions}
+          typescriptOptions={props.typescriptOptions}
+          workspaces={props.workspaces}
+          modules={props.modules}
+          diff={props.diff}
+          activeStepIndex={props.activeStepIndex}
+          onChangeActiveStepIndex={props.onChangeActiveStepIndex}
+          // State
+          ready={ready}
+          compilerError={state.compilerError}
+          runtimeError={state.runtimeError}
+          logs={state.logs}
+          activeFile={state.activeFile}
+          transpilerCache={state.transpilerCache}
+          fileTabs={state.fileTabs}
+          activeFileTab={state.activeFileTab}
+          // Callbacks
+          options={options}
+          onCreatePlayer={onCreatePlayer}
+          onCodeChange={onCodeChange}
+          onClickTab={onClickTab}
+          onPlayerRun={onPlayerRun}
+          onPlayerError={onPlayerError}
+          onPlayerConsole={onPlayerConsole}
+          getTypeScriptInfo={getTypeScriptInfo}
+          renderPane={renderPane}
         />
-        {showDetails && (
-          <div style={styles.overlayContainer}>
-            <div style={styles.overlay}>
-              <Overlay isError={isError}>
-                {isError ? (
-                  <>
-                    <b style={styles.boldMessage}>{error?.description}</b>
-                    <br />
-                    <br />
-                    <code style={styles.codeMessage}>
-                      {error?.errorMessage}
-                    </code>
-                    <br />
-                  </>
-                ) : (
-                  ''
-                )}
-                <About />
-              </Overlay>
-            </div>
-          </div>
-        )}
-        <Status text={!!error ? error.summary : 'No Errors'} isError={isError}>
-          <Button
-            active={showDetails}
-            isError={isError}
-            onChange={this.onToggleDetails}
-          >
-            {'Show Details'}
-          </Button>
-        </Status>
-      </div>
-    )
-  }
+      )
+    },
+    [
+      props.preset,
+      props.files,
+      props.strings,
+      props.externalStyles,
+      props.fullscreen,
+      props.sharedEnvironment,
+      props.playgroundOptions,
+      props.typescriptOptions,
+      props.workspaces,
+      props.modules,
+      props.diff,
+      props.activeStepIndex,
+      props.onChangeActiveStepIndex,
+      ready,
+      state.compilerError,
+      state.runtimeError,
+      state.logs,
+      state.activeFile,
+      state.transpilerCache,
+      state.fileTabs,
+      state.activeFileTab,
+      onCreatePlayer,
+      onCodeChange,
+      onClickTab,
+      onPlayerRun,
+      onPlayerError,
+      onPlayerConsole,
+      getTypeScriptInfo,
+    ]
+  )
 
-  renderTranspiler = (key: number, options: TranspilerPane) => {
-    const { externalStyles, transpilerTitle } = this.props
-    const { activeFile, transpilerCache } = this.state
-
-    const style = options.style
-      ? { ...styles.transpilerPane, ...options.style }
-      : styles.transpilerPane
-
-    return (
-      <div key={key} style={style}>
-        {transpilerTitle && (
-          <Header
-            text={transpilerTitle}
-            headerStyle={externalStyles.transpilerHeader}
-            textStyle={externalStyles.transpilerHeaderText}
-          />
-        )}
-        <Editor
-          key={getTranspilerId(activeFile)}
-          readOnly={true}
-          value={transpilerCache[getTranspilerId(activeFile)]}
-          filename={getTranspilerId(activeFile)}
-        />
-      </div>
-    )
-  }
-
-  renderWorkspaces = (key: number, options: WorkspacesPane) => {
-    const {
-      externalStyles,
-      workspacesTitle,
-      workspaces,
-      activeStepIndex,
-      onChangeActiveStepIndex,
-    } = this.props
-
-    const style =
-      externalStyles.workspacesPane || options.style
-        ? {
-            ...styles.workspacesPane,
-            ...externalStyles.workspacesPane,
-            ...options.style,
-          }
-        : styles.workspacesPane
-
-    return (
-      <div key={key} style={style}>
-        {workspacesTitle && (
-          <Header
-            text={workspacesTitle}
-            headerStyle={externalStyles.workspacesHeader}
-            textStyle={externalStyles.workspacesHeaderText}
-          />
-        )}
-        <WorkspacesList
-          key={key}
-          steps={workspaces}
-          activeStepIndex={activeStepIndex}
-          onChangeActiveStepIndex={onChangeActiveStepIndex}
-          style={externalStyles.workspacesList}
-          rowStyle={externalStyles.workspacesRow}
-          rowStyleActive={externalStyles.workspacesRowActive}
-          rowTitleStyle={externalStyles.workspacesRowTitle}
-          rowTitleStyleActive={externalStyles.workspacesRowTitleActive}
-          descriptionStyle={externalStyles.workspacesDescription}
-          descriptionTextStyle={externalStyles.workspacesDescriptionText}
-          buttonTextStyle={externalStyles.workspacesButtonText}
-          buttonContainerStyle={externalStyles.workspacesButtonContainer}
-          buttonWrapperStyle={externalStyles.workspacesButtonWrapper}
-          dividerStyle={externalStyles.workspacesDivider}
-        />
-      </div>
-    )
-  }
-
-  renderPlayer = (key: number, options: PlayerPane) => {
-    const {
-      files,
-      width,
-      scale,
-      platform,
-      assetRoot,
-      vendorComponents,
-      externalStyles,
-      playerStyleSheet,
-      playerCSS,
-      playerTitle,
-      prelude,
-      consoleOptions,
-      statusBarHeight,
-      statusBarColor,
-      sharedEnvironment,
-    } = this.props
-    const { showLogs, logs } = this.state
-
-    const style =
-      externalStyles.playerPane || options.style
-        ? {
-            ...styles.playerPane,
-            ...externalStyles.playerPane,
-            ...options.style,
-          }
-        : styles.playerPane
-
-    return (
-      <div key={key} style={style}>
-        {playerTitle && (
-          <Header
-            text={playerTitle}
-            headerStyle={externalStyles.playerHeader}
-            textStyle={externalStyles.playerHeaderText}
-          />
-        )}
-        <div style={styles.column}>
-          <div style={styles.row}>
-            <PlayerFrame
-              ref={(ref) => {
-                this.player = ref || undefined
-              }}
-              width={width}
-              scale={scale}
-              platform={platform}
-              assetRoot={assetRoot}
-              vendorComponents={vendorComponents}
-              playerStyleSheet={playerStyleSheet}
-              playerCSS={playerCSS}
-              prelude={prelude}
-              statusBarHeight={statusBarHeight}
-              statusBarColor={statusBarColor}
-              sharedEnvironment={sharedEnvironment}
-              onRun={this.onPlayerRun}
-              onError={this.onPlayerError}
-              onConsole={this.onPlayerConsole}
-            />
-            {consoleOptions.enabled && showLogs && (
-              <Console
-                style={externalStyles.consolePane}
-                rowStyle={externalStyles.consoleRow}
-                maximize={consoleOptions.maximized}
-                showFileName={
-                  Object.keys(files).length > 1 && consoleOptions.showFileName
-                }
-                showLineNumber={consoleOptions.showLineNumber}
-                logs={logs}
-                renderReactElements={consoleOptions.renderReactElements}
-              />
-            )}
-          </div>
-          {consoleOptions.enabled && consoleOptions.collapsible !== false && (
-            <Status
-              text={'Logs' + (showLogs ? '' : ` (${logs.length})`)}
-              isError={false}
-            >
-              <Button active={showLogs} onChange={this.onToggleLogs}>
-                {'Show Logs'}
-              </Button>
-            </Status>
-          )}
-        </div>
-      </div>
-    )
-  }
-
-  renderStack = (key: number, options: StackPane) => {
-    const { externalStyles } = this.props
-
-    const { children } = options
-
-    const tabs: (Tab & { pane: Pane })[] = children
-      .map(normalizePane)
-      .map((pane, i) => ({
-        title: pane.title || pane.type,
-        index: i,
-        pane,
-        changed: false,
-      }))
-
-    return (
-      <TabContainer
-        key={key}
-        tabs={tabs}
-        getTitle={getTabTitle}
-        initialTab={tabs[0]}
-        tabStyle={externalStyles.stackTab || externalStyles.tab}
-        textStyle={externalStyles.stackTabText || externalStyles.tabText}
-        activeTextStyle={
-          externalStyles.stackTabTextActive || externalStyles.tabTextActive
-        }
-        renderHiddenContent={true}
-        compareTabs={compareTabs}
-        renderContent={(tab) => this.renderPane(tab.pane, tab.index)}
-      />
-    )
-  }
-
-  renderPane = (pane: Pane, key: number) => {
-    const paneObject = normalizePane(pane)
-
-    switch (paneObject.type) {
-      case 'editor':
-        return this.renderEditor(key, paneObject)
-      case 'transpiler':
-        return this.renderTranspiler(key, paneObject)
-      case 'player':
-        return this.renderPlayer(key, paneObject)
-      case 'workspaces':
-        return this.renderWorkspaces(key, paneObject)
-      case 'stack':
-        return this.renderStack(key, paneObject)
-      default:
-        return `Unknown pane type: ${paneObject['type']}`
-    }
-  }
-
-  render() {
-    const { responsivePaneSets } = this.props
-    const { paneSetIndex } = this.state
-    const panes = responsivePaneSets[paneSetIndex].panes
-
-    return <div style={styles.container}>{panes.map(this.renderPane)}</div>
-  }
+  return <div style={styles.container}>{panes.map(renderPane)}</div>
 }

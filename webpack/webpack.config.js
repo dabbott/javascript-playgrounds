@@ -56,7 +56,7 @@ const common = merge({
       {
         test: /-worker\.js/,
         loader: 'worker-loader',
-        options: { name: '[name]-bundle.js' },
+        options: { filename: '[name]-bundle.js', esModule: false },
       },
       {
         test: /\.svg$/i,
@@ -85,7 +85,7 @@ const common = merge({
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'React Native Web Player',
+      title: 'JavaScript Playgrounds',
       filename: 'index.html',
       template: paths.htmlTemplate,
       minify: false,

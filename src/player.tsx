@@ -1,30 +1,29 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import ReactDOM from 'react-dom'
 
 import Sandbox from './components/player/Sandbox'
 import { getHashString } from './utils/HashString'
-import { prefix, prefixAndApply } from './utils/Styles'
+import { prefixAndApply, prefixObject } from './utils/Styles'
 import { appendCSS } from './utils/CSS'
-import VendorComponents from './components/player/VendorComponents'
-
-const style = prefix({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  overflow: 'hidden',
-  flex: '1 1 auto',
-})
+import VendorComponents, {
+  ExternalModule,
+} from './components/player/VendorComponents'
+import type { IEnvironment } from './environments/IEnvironment'
+import JavaScriptEnvironment from './environments/javascript-environment'
 
 const {
+  preset = 'react-native',
   id = '0',
   assetRoot = '',
-  vendorComponents = '[]',
+  detectedModules: rawDetectedModules = '[]',
+  modules: rawModules = '[]',
   styleSheet = 'reset',
   css = '',
   statusBarHeight = '0',
   statusBarColor = 'black',
   prelude = '',
   sharedEnvironment = 'true',
+  styles = '{}',
 } = getHashString()
 
 if (styleSheet === 'reset') {
@@ -37,25 +36,78 @@ if (css) {
   appendCSS(css)
 }
 
-const root = (
-  <div style={style}>
-    <Sandbox
-      id={id}
-      assetRoot={assetRoot}
-      prelude={prelude}
-      statusBarHeight={parseFloat(statusBarHeight)}
-      statusBarColor={statusBarColor}
-      sharedEnvironment={sharedEnvironment === 'true'}
-    />
-  </div>
+const mount = document.getElementById('player-root') as HTMLDivElement
+
+export type PlayerStyles = {
+  playerRoot: CSSProperties
+  playerWrapper: CSSProperties
+  playerApp: CSSProperties
+}
+
+const parsedStyles: PlayerStyles = prefixObject(
+  Object.assign(
+    {
+      playerRoot: { display: 'flex' },
+      playerWrapper: {
+        flex: '1 1 auto',
+        alignSelf: 'stretch',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+      },
+      playerApp: {
+        flex: '1 1 auto',
+        alignSelf: 'stretch',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+      },
+    },
+    JSON.parse(styles)
+  )
 )
 
-const mount = document.getElementById('react-root')
+prefixAndApply(parsedStyles.playerRoot, mount)
 
-// Set mount node to flex in a vendor-prefixed way
-prefixAndApply({ display: 'flex' }, mount!)
+const modules: ExternalModule[] = JSON.parse(rawModules)
+const detectedModules: string[] = JSON.parse(rawDetectedModules)
 
-// if we have vendor components, we need to pre-load those
-// otherwise, we can just render normally
-const components = JSON.parse(vendorComponents)
-VendorComponents.load(components, () => ReactDOM.render(root, mount))
+const asyncEnvironment: Promise<IEnvironment> =
+  preset === 'javascript'
+    ? Promise.resolve(JavaScriptEnvironment)
+    : import('./environments/' + preset + '-environment').then(
+        (module) => module.default
+      )
+
+asyncEnvironment.then((environment: IEnvironment) => {
+  return environment.initialize().then(() => {
+    const normalizedModules = modules
+      .map(VendorComponents.normalizeExternalModule)
+      .filter(({ name }) => !environment.hasModule(name))
+
+    // Only download detected modules that aren't also listed as vendor components
+    const detectedModulesToDownload = detectedModules
+      .filter((name) => !normalizedModules.find((m) => m.name === name))
+      .map(VendorComponents.normalizeExternalModule)
+
+    VendorComponents.load(
+      [...normalizedModules, ...detectedModulesToDownload],
+      () => {
+        const root = (
+          <Sandbox
+            environment={environment}
+            id={id}
+            assetRoot={assetRoot}
+            styles={parsedStyles}
+            prelude={prelude}
+            statusBarHeight={parseFloat(statusBarHeight)}
+            statusBarColor={statusBarColor}
+            sharedEnvironment={sharedEnvironment === 'true'}
+          />
+        )
+
+        ReactDOM.render(root, mount)
+      }
+    )
+  })
+})

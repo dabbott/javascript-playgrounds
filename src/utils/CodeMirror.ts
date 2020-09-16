@@ -19,6 +19,7 @@ export const options = {
       })
     },
   },
+  autoRefresh: true,
 }
 
 export const requireAddons = () => {
@@ -29,4 +30,5 @@ export const requireAddons = () => {
   require('codemirror/addon/edit/closebrackets')
   require('codemirror/addon/comment/comment')
   require('codemirror/addon/selection/active-line')
+  require('codemirror/addon/display/autorefresh')
 }

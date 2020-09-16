@@ -11,8 +11,8 @@ const messages: MessageHandler[] = [
     `TypeError: Unable to get property 'pos' of undefined or null reference`,
     (message) => {
       return {
-        summary: `This web player isn't supported for your web browser.`,
-        description: `Please use the latest Google Chrome, Safari, Firefox, or Internet Explorer to use the React Native Web Player.`,
+        summary: `This playground isn't supported for your web browser.`,
+        description: `Please use the latest Google Chrome, Safari, Firefox, or Edge to use this playground.`,
       }
     },
   ],
@@ -32,13 +32,13 @@ const messages: MessageHandler[] = [
       const byOwner = ownerName ? ` by ${ownerName[0]} ` : ' '
       return {
         summary: `The element rendered${byOwner}is either invalid, or can't run on the web.`,
-        description: `Every element must be an instance of a React Class, instantiated either with React.createElement or using a JSX expression like '<MyClass/>'. Additionally, some components aren’t available to the web player, and thus will only run on a real native device or emulator.`,
+        description: `Every element must be an instance of a React Class, instantiated either with React.createElement or using a JSX expression like '<MyClass />'. Additionally, some components aren’t available to the playground, and thus will only run on a real native device or emulator.`,
       }
     },
   ],
 ]
 
-const defaultDescription = `The web player encountered an error. When you fix the error, the web player will automatically re-run your code.`
+const defaultDescription = `The playground encountered an error. When you fix the error, the playground will automatically re-run your code.`
 
 export const getErrorDetails = (originalMessage: string): PublicError => {
   const firstLine = originalMessage.split('\n')[0]

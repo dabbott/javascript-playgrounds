@@ -3,29 +3,34 @@ const webpack = require('webpack')
 
 const DIRECTORY = path.dirname(__dirname)
 
+const { version } = require('../package.json')
+
 module.exports = {
   mode: 'production',
-  entry: path.join(DIRECTORY, 'src', 'components', 'embed', 'WebPlayer.js'),
+  entry: path.join(DIRECTORY, 'src', 'components', 'embed', 'Playground.tsx'),
   output: {
     path: path.join(DIRECTORY, 'dist'),
-    filename: 'react-native-web-player.js',
-    library: 'react-native-web-player',
+    filename: 'javascript-playgrounds.js',
+    library: 'javascript-playgrounds',
     libraryTarget: 'umd',
     globalObject: 'this',
   },
   module: {
     rules: [
       {
-        test: /\.js/,
-        exclude: /node_modules/,
+        test: /\.tsx?$/,
         use: [
           {
-            loader: 'babel-loader',
+            loader: 'ts-loader',
             options: {
-              cacheDirectory: true,
+              compilerOptions: {
+                declaration: true,
+                declarationDir: '../dist',
+              },
             },
           },
         ],
+        exclude: /node_modules/,
       },
     ],
   },
@@ -46,6 +51,7 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
+      VERSION: JSON.stringify(version),
     }),
   ],
 }

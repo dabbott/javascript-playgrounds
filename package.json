@@ -1,15 +1,17 @@
 {
-  "name": "react-native-web-player",
-  "version": "2.0.0-alpha.26",
-  "description": "Run React Native apps in your browser!",
-  "main": "dist/react-native-web-player.js",
+  "name": "javascript-playgrounds",
+  "version": "1.0.0",
+  "description": "Interactive JavaScript sandbox",
+  "main": "dist/javascript-playgrounds.js",
   "files": [
     "dist",
     "public"
   ],
+  "types": "dist/src/components/embed/Playground.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --config webpack/webpack.config.js --inline --hot --colors --quiet",
+    "dev": "webpack-dev-server --config webpack/webpack.config.js --inline --hot --colors --quiet",
+    "start": "python3 -m http.server -d public 8080",
     "build": "npm run build:core && npm run build:embed",
     "build:core": "webpack --env production --config webpack/webpack.config.js --sort-assets-by --progress",
     "build:embed": "webpack --config webpack/webpack-embed.config.js --sort-assets-by --progress",
@@ -20,14 +22,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dabbott/react-native-web-player.git"
+    "url": "git+https://github.com/dabbott/javascript-playgrounds.git"
   },
   "author": "devinabbott@gmail.com",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/dabbott/react-native-web-player/issues"
+    "url": "https://github.com/dabbott/javascript-playgrounds/issues"
   },
-  "homepage": "https://github.com/dabbott/react-native-web-player#readme",
+  "homepage": "https://github.com/dabbott/javascript-playgrounds#readme",
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@juggle/resize-observer": "^3.1.3",
@@ -81,7 +83,7 @@
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.11.0",
     "webpack-merge": "^4.2.2",
-    "worker-loader": "^2.0.0"
+    "worker-loader": "^3.0.2"
   },
   "dependencies": {},
   "prettier": {

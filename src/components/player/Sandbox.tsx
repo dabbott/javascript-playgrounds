@@ -1,80 +1,28 @@
-import PropTypes from 'prop-types'
-import React, {
-  PureComponent,
-  isValidElement,
-  createRef,
-  CSSProperties,
-} from 'react'
-import ReactDOM from 'react-dom'
-import * as ReactNative from 'react-native-web'
-import { prefixObject } from '../../utils/Styles'
-import consoleProxy, {
-  consoleClear,
-  consoleLog,
-  consoleLogRNWP,
-} from './ConsoleProxy'
-import VendorComponents from './VendorComponents'
-import * as ExtendedJSON from '../../utils/ExtendedJSON'
-import hasProperty from '../../utils/hasProperty'
+import React, { createRef, CSSProperties, PureComponent } from 'react'
+import type { IEnvironment } from '../../environments/IEnvironment'
 import { Message } from '../../types/Messages'
+import formatError from '../../utils/formatError'
+import { initializeCommunication } from '../../utils/playerCommunication'
+import { prefix } from '../../utils/Styles'
+import consoleProxy from './ConsoleProxy'
+import VendorComponents from './VendorComponents'
+import type { PlayerStyles } from '../../player'
 
 declare global {
   interface Window {
-    ReactNative: unknown
-    PropTypes: unknown
-    _VendorComponents: typeof VendorComponents
-    _consoleProxy: typeof console
     regeneratorRuntime: unknown
-    _requireCache: Record<string, unknown>
-    _didRegisterComponent: boolean
-    _require: (name: string) => unknown
     __message: (message: Message) => void
   }
 }
 
-window._VendorComponents = VendorComponents
-
-const AppRegistry = ReactNative.AppRegistry
-
-window._consoleProxy = consoleProxy
+export type EvaluationContext = {
+  fileMap: Record<string, string>
+  entry: string
+  requireCache: Record<string, unknown>
+}
 
 // Make regeneratorRuntime globally available for async/await
 window.regeneratorRuntime = require('regenerator-runtime')
-
-const APP_NAME = 'App'
-
-// Override registerComponent in order to ignore the name used
-const registerComponent = AppRegistry.registerComponent.bind(AppRegistry)
-AppRegistry.registerComponent = (name: string, f: () => void) => {
-  registerComponent(APP_NAME, f)
-  window._didRegisterComponent = true
-}
-
-const prefix = `
-var exports = {};
-var module = {exports: exports};
-var console = window._consoleProxy;
-
-(function(module, exports, require) {
-`
-
-const getSuffix = (filename: string) => `
-})(module, exports, window._require);
-window._requireCache['${filename}'] = module.exports;
-;
-`
-
-const prefixLineCount = prefix.split('\n').length - 1
-
-const styles = prefixObject({
-  root: {
-    flex: '1 1 auto',
-    alignSelf: 'stretch',
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-  },
-})
 
 interface Props {
   id: string
@@ -83,13 +31,22 @@ interface Props {
   statusBarHeight: number
   statusBarColor: string
   sharedEnvironment: boolean
+  styles: PlayerStyles
   onRun: () => {}
   onError: (error: Error) => {}
+  environment: IEnvironment
 }
+
+/**
+ * An arbitrary offset to error message line numbers that gets things to line up
+ * with the code editor
+ */
+const prefixLineCount = 2
 
 export default class Sandbox extends PureComponent<Props> {
   static defaultProps = {
     assetRoot: '',
+    styles: {},
     onRun: () => {},
     onError: () => {},
     prelude: '',
@@ -98,86 +55,37 @@ export default class Sandbox extends PureComponent<Props> {
     sharedEnvironment: true,
   }
 
+  constructor(props: Props) {
+    super(props)
+
+    const { sendError, sendReady } = initializeCommunication({
+      id: this.props.id,
+      sharedEnvironment: this.props.sharedEnvironment,
+      prefixLineCount,
+      runApplication: this.runApplication,
+    })
+
+    this.sendError = sendError
+    this.sendReady = sendReady
+  }
+
+  sendError: (message: string) => void
+  sendReady: () => void
+
   componentDidMount() {
-    window.onmessage = (e: MessageEvent) => {
-      if (!e.data || e.data.source !== 'rnwp') return
-
-      this.runApplication(e.data)
-    }
-
-    window.onerror = (
-      message: Event | string,
-      source?: string,
-      line?: number
-    ) => {
-      const editorLine = (line || 0) - prefixLineCount
-      this.throwError(`${message} (${editorLine})`)
-      return true
-    }
-
-    parent.postMessage(
-      JSON.stringify({
-        id: this.props.id,
-        type: 'ready',
-      }),
-      '*'
-    )
+    this.sendReady()
   }
 
-  buildErrorMessage(e: Error) {
-    let message = `${e.name}: ${e.message}`
-    let line = null
+  require = (context: EvaluationContext, name: string) => {
+    const { fileMap, entry, requireCache } = context
+    let { environment, assetRoot } = this.props
 
-    // Safari
-    if ((e as any).line != null) {
-      line = (e as any).line
-
-      // FF
-    } else if ((e as any).lineNumber != null) {
-      line = (e as any).lineNumber
-
-      // Chrome
-    } else if (e.stack) {
-      const matched = e.stack.match(/<anonymous>:(\d+)/)
-      if (matched) {
-        line = parseInt(matched[1])
-      }
+    if (environment.hasModule(name)) {
+      return environment.requireModule(name)
     }
 
-    if (typeof line === 'number') {
-      line -= prefixLineCount
-      message = `${message} (${line})`
-    }
-
-    return message
-  }
-
-  throwError(message: string) {
-    parent.postMessage(
-      JSON.stringify({
-        id: this.props.id,
-        type: 'error',
-        payload: message,
-      }),
-      '*'
-    )
-  }
-
-  require = (fileMap: Record<string, string>, entry: string, name: string) => {
-    const { _requireCache } = window
-    let { assetRoot } = this.props
-
-    if (name === 'react-native') {
-      return ReactNative
-    } else if (name === 'react-dom') {
-      return ReactDOM
-    } else if (name === 'react') {
-      return React
-    } else if (name === 'prop-types') {
-      return PropTypes
-
-      // If name begins with . or ..
-    } else if (name.match(/^\.{1,2}\//)) {
+    // If name begins with . or ..
+    if (name.match(/^\.{1,2}\//)) {
       // Check if we're referencing another tab
       const filename = Object.keys(fileMap).find(
         (x) => `${name}.js` === `./${x}`
@@ -190,11 +98,11 @@ export default class Sandbox extends PureComponent<Props> {
           )
         }
 
-        if (!_requireCache[filename]) {
-          this.evaluate(filename, fileMap[filename])
+        if (!requireCache.hasOwnProperty(filename)) {
+          this.evaluate(filename, fileMap[filename], context)
         }
 
-        return _requireCache[filename]
+        return requireCache[filename]
       }
 
       // Resolve local asset paths
@@ -211,137 +119,73 @@ export default class Sandbox extends PureComponent<Props> {
     } else if (VendorComponents.require(name)) {
       const code = VendorComponents.require(name)
 
-      if (!_requireCache[name]) {
-        this.evaluate(name, code)
+      if (!requireCache.hasOwnProperty(name)) {
+        this.evaluate(name, code, context)
       }
 
-      return _requireCache[name]
+      return requireCache[name]
     } else {
       console.error(`Failed to resolve module ${name}`)
       return {}
     }
   }
 
-  sendMessage = (message: Message) => {
-    const { sharedEnvironment } = this.props
+  runApplication = (context: EvaluationContext) => {
+    const { entry, fileMap } = context
+    const { environment, prelude, onError, onRun } = this.props
 
-    if (sharedEnvironment) {
-      if (message.type === 'console' && message.payload.command === 'log') {
-        message.payload.data = message.payload.data.map((log) => {
-          if (isValidElement(log as any)) {
-            return {
-              __is_react_element: true,
-              element: log,
-              ReactDOM,
-            }
-          } else {
-            return log
-          }
-        })
-      }
+    const host = this.root.current
 
-      parent.__message(message)
-    } else {
-      parent.postMessage(ExtendedJSON.stringify(message), '*')
-    }
-  }
+    if (!host) return
 
-  runApplication({
-    fileMap,
-    entry,
-  }: {
-    fileMap: Record<string, string>
-    entry: string
-  }) {
-    const screenElement = this.root.current
+    environment.beforeEvaluate && environment.beforeEvaluate({ host })
 
-    if (!screenElement) return
-
-    if (window._didRegisterComponent) {
-      this.resetApplication()
-    }
-
-    this.props.onRun()
+    onRun()
 
     try {
-      window._require = this.require.bind(this, fileMap, entry)
-      window._requireCache = {}
-      window._didRegisterComponent = false
-
-      consoleProxy._rnwp_log = consoleLogRNWP.bind(
-        consoleProxy,
-        this.sendMessage,
-        this.props.id
-      )
-      consoleProxy.log = consoleLog.bind(
-        consoleProxy,
-        this.sendMessage,
-        this.props.id
-      )
-      consoleProxy.clear = consoleClear.bind(
-        consoleProxy,
-        this.sendMessage,
-        this.props.id
-      )
-
-      if (this.props.prelude.length > 0) {
-        eval(this.props.prelude)
+      if (prelude.length > 0) {
+        eval(prelude)
       }
 
-      this.evaluate(entry, fileMap[entry])
+      this.evaluate(entry, fileMap[entry], context)
 
-      // Attempt to register the default export of the entry file
-      if (!window._didRegisterComponent) {
-        const EntryComponent = window._requireCache[entry]
-
-        if (
-          EntryComponent &&
-          typeof EntryComponent === 'object' &&
-          hasProperty(EntryComponent, 'default')
-        ) {
-          AppRegistry.registerComponent(APP_NAME, () => EntryComponent.default)
-        }
-      }
-
-      // If no component was registered, bail out
-      if (!window._didRegisterComponent) {
-        return
-      }
-
-      AppRegistry.runApplication(APP_NAME, {
-        rootTag: screenElement,
-      })
-
-      // After rendering, add {overflow: hidden} to prevent scrollbars
-      if (screenElement.firstElementChild) {
-        ;(screenElement.firstElementChild as HTMLElement).style.overflow =
-          'hidden'
-      }
+      environment.afterEvaluate && environment.afterEvaluate({ context, host })
     } catch (e) {
-      const message = this.buildErrorMessage(e)
-      this.throwError(message)
-      this.props.onError(e)
+      const message = formatError(e, prefixLineCount)
+      this.sendError(message)
+      onError(e)
     }
   }
 
-  resetApplication() {
-    const screenElement = this.root.current
+  /**
+   * @param moduleName The file or module to evaluate (e.g. "index.js" or "moment")
+   * @param code
+   * @param fileMap
+   * @param entry
+   */
+  evaluate(moduleName: string, code: string, context: EvaluationContext) {
+    const f = new Function(
+      'exports',
+      'require',
+      'module',
+      'console',
+      '_VendorComponents', // Temporarily exposed, but consider this private
+      code
+    )
 
-    if (screenElement) {
-      ReactDOM.unmountComponentAtNode(screenElement)
-    }
+    const exports = {}
+    const module = { exports }
+    const requireModule = (name: string) => this.require(context, name)
+
+    f(exports, requireModule, module, consoleProxy, VendorComponents)
+
+    context.requireCache[moduleName] = module.exports
   }
 
-  evaluate(filename: string, code: string) {
-    const wrapped = prefix + code + getSuffix(filename)
-
-    eval(wrapped)
-  }
-
-  root = React.createRef<HTMLDivElement>()
+  root = createRef<HTMLDivElement>()
 
   render() {
-    const { statusBarHeight, statusBarColor } = this.props
+    const { statusBarHeight, statusBarColor, styles } = this.props
 
     const showStatusBar = statusBarHeight > 0
 
@@ -357,8 +201,8 @@ export default class Sandbox extends PureComponent<Props> {
       : undefined
 
     return (
-      <div style={styles.root}>
-        <div ref={this.root} id={'app'} style={styles.root} />
+      <div style={prefix(styles.playerWrapper)}>
+        <div ref={this.root} id={'app'} style={styles.playerApp} />
         {showStatusBar && <div style={statusBarStyle} />}
       </div>
     )

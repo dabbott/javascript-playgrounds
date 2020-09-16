@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react'
 import { prefix, prefixObject } from '../../utils/Styles'
 
 const baseTextStyle = prefix({
-  color: '#D8D8D8',
+  color: '#BBB',
   fontSize: 13,
   fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
   padding: '0 12px',

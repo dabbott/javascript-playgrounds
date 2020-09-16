@@ -3,6 +3,9 @@ import * as ExtendedJSON from '../../utils/ExtendedJSON'
 import { prefixObject } from '../../utils/Styles'
 import Phone from './Phone'
 import { Message, ConsoleCommand } from '../../types/Messages'
+import { encode } from '../../utils/queryString'
+import { ExternalStyles } from './Workspace'
+import type { ExternalModule } from '../player/VendorComponents'
 
 const styles = prefixObject({
   iframe: {
@@ -13,6 +16,8 @@ const styles = prefixObject({
 })
 
 interface Props {
+  externalStyles: ExternalStyles
+  preset: string
   platform: string
   width: number
   scale: number
@@ -20,9 +25,10 @@ interface Props {
   statusBarHeight: number
   statusBarColor: string
   sharedEnvironment: boolean
-  vendorComponents: unknown[]
-  playerStyleSheet: string
-  playerCSS: string
+  detectedModules: string[]
+  modules: ExternalModule[]
+  styleSheet: string
+  css: string
   prelude: string
   onError: (payload: string) => void
   onRun: () => void
@@ -35,16 +41,17 @@ interface State {
 
 export default class extends PureComponent<Props, State> {
   static defaultProps = {
+    preset: 'react-native',
     platform: 'ios',
-    width: 300,
+    width: 210,
     scale: 1,
     assetRoot: '',
     statusBarHeight: 0,
     statusBarColor: 'black',
     sharedEnvironment: true,
-    vendorComponents: [],
-    playerStyleSheet: '',
-    playerCSS: '',
+    modules: [],
+    styleSheet: 'reset',
+    css: '',
     prelude: '',
     onError: () => {},
     onRun: () => {},
@@ -55,7 +62,7 @@ export default class extends PureComponent<Props, State> {
   fileMap?: Record<string, string>
   entry?: string
 
-  state = {
+  state: State = {
     id: null,
   }
 
@@ -121,10 +128,13 @@ export default class extends PureComponent<Props, State> {
 
   renderFrame = () => {
     const {
+      externalStyles,
+      preset,
       assetRoot,
-      vendorComponents,
-      playerStyleSheet,
-      playerCSS,
+      detectedModules,
+      modules,
+      styleSheet,
+      css,
       statusBarColor,
       statusBarHeight,
       sharedEnvironment,
@@ -134,18 +144,31 @@ export default class extends PureComponent<Props, State> {
 
     if (!id) return null
 
-    const vendorComponentsEncoded = encodeURIComponent(
-      JSON.stringify(vendorComponents)
-    )
-    const css = encodeURIComponent(playerCSS)
-    const preludeEncoded = encodeURIComponent(prelude)
+    const queryString = encode({
+      preset,
+      id,
+      sharedEnvironment,
+      assetRoot,
+      detectedModules: JSON.stringify(detectedModules),
+      modules: JSON.stringify(modules),
+      styleSheet,
+      css,
+      statusBarColor,
+      statusBarHeight,
+      prelude,
+      styles: JSON.stringify({
+        playerRoot: externalStyles.playerRoot,
+        playerWrapper: externalStyles.playerWrapper,
+        playerApp: externalStyles.playerApp,
+      }),
+    })
 
     return (
       <iframe
         style={styles.iframe}
         ref={'iframe'}
         frameBorder={0}
-        src={`player.html#id=${id}&sharedEnvironment=${sharedEnvironment}&assetRoot=${assetRoot}&vendorComponents=${vendorComponentsEncoded}&styleSheet=${playerStyleSheet}&css=${css}&statusBarColor=${statusBarColor}&statusBarHeight=${statusBarHeight}&prelude=${preludeEncoded}`}
+        src={`player.html#${queryString}`}
       />
     )
   }

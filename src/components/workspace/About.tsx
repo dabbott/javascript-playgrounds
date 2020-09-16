@@ -1,25 +1,26 @@
-import React, { memo } from 'react'
+import React, { memo, useMemo } from 'react'
+import snarkdown from 'snarkdown'
 
-const nbsp = '\u00a0'
+interface Props {
+  text: string
+}
 
-export default memo(function About() {
+export default memo(function About({ text }: Props) {
+  const markdownContent = useMemo(() => (text ? snarkdown(text) : ''), [text])
+
   return (
     <div>
-      How this simulator works: the
-      {nbsp}
+      {markdownContent && (
+        <div dangerouslySetInnerHTML={{ __html: markdownContent }} />
+      )}
+      {markdownContent && <br />}
+      Powered by{' '}
       <a
         target="_blank"
-        href={'https://github.com/dabbott/react-native-web-player'}
+        href={'https://github.com/dabbott/javascript-playgrounds'}
       >
-        react-native-web-player
+        JavaScript Playgrounds
       </a>
-      {nbsp}
-      simulates a React Native environment using the components from
-      {nbsp}
-      <a target="_blank" href={'https://github.com/necolas/react-native-web'}>
-        react-native-web
-      </a>
-      .
     </div>
   )
 })

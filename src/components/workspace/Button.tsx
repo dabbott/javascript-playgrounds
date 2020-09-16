@@ -2,7 +2,7 @@ import React, { PureComponent, CSSProperties } from 'react'
 import { prefixObject } from '../../utils/Styles'
 
 const colors = {
-  normal: '#D8D8D8',
+  normal: '#BBB',
   error: '#C92C2C',
   inverse: 'white',
 }
@@ -85,7 +85,7 @@ export default class extends PureComponent<Props, State> {
   render() {
     const { children, isError, active, inverse, onChange, onClick } = this.props
     const { hover } = this.state
-    const hoverOpacity = hover ? 0.7 : 0.85
+    const hoverOpacity = hover ? 0.85 : 1
 
     let currentStyles =
       styles[isError ? 'error' : 'normal'][
