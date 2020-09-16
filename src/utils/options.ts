@@ -134,7 +134,7 @@ function detectAllDependencies(files: Record<string, string>) {
 }
 
 export function normalize(options: PublicOptions): InternalOptions {
-  const preset = options.preset || 'react-native'
+  const preset = options.preset || 'javascript'
 
   let {
     title = '',
