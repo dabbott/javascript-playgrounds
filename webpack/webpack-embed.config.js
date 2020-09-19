@@ -1,15 +1,23 @@
 const path = require('path')
 const webpack = require('webpack')
 
-const DIRECTORY = path.dirname(__dirname)
-
 const { version } = require('../package.json')
+
+const paths = {
+  root: path.dirname(__dirname),
+  get dist() {
+    return path.join(this.root, 'dist')
+  },
+  get playground() {
+    return path.join(this.root, 'src', 'components', 'embed', 'Playground.tsx')
+  },
+}
 
 module.exports = {
   mode: 'production',
-  entry: path.join(DIRECTORY, 'src', 'components', 'embed', 'Playground.tsx'),
+  entry: paths.playground,
   output: {
-    path: path.join(DIRECTORY, 'dist'),
+    path: path.dist,
     filename: 'javascript-playgrounds.js',
     library: 'javascript-playgrounds',
     libraryTarget: 'umd',
@@ -25,7 +33,7 @@ module.exports = {
             options: {
               compilerOptions: {
                 declaration: true,
-                declarationDir: '../dist',
+                declarationDir: paths.dist,
               },
             },
           },
