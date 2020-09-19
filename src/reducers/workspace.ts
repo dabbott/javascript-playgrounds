@@ -28,11 +28,13 @@ export const actionCreators = {
     filename,
     code,
   }),
-  babelCode: () => ({
+  babelCode: (filename: string) => ({
     type: types.BABEL_CODE,
+    filename,
   }),
-  babelError: (message: string) => ({
+  babelError: (filename: string, message: string) => ({
     type: types.BABEL_ERROR,
+    filename,
     message,
   }),
   codeChange: (filename: string, code: string) => ({
@@ -118,7 +120,8 @@ export function reducer(state: State, action: Action): State {
       }
     }
     case types.BABEL_CODE: {
-      return state.compilerError !== undefined
+      return state.compilerError !== undefined &&
+        state.compilerError.filename === action.filename
         ? {
             ...state,
             compilerError: undefined,
@@ -128,7 +131,10 @@ export function reducer(state: State, action: Action): State {
     case types.BABEL_ERROR: {
       return {
         ...state,
-        compilerError: getErrorDetails(action.message),
+        compilerError: {
+          filename: action.filename,
+          ...getErrorDetails(action.message),
+        },
       }
     }
     case types.CODE_CHANGE: {

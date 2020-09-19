@@ -57,6 +57,7 @@ export type ResponsivePaneSet = {
 
 export type PublicError = {
   lineNumber?: number
+  filename?: string
   errorMessage: string
   summary: string
   description: string
@@ -358,13 +359,13 @@ export default function Workspace(props: Props) {
     []
   )
 
-  const updateStatus = (babelMessage: BabelResponse) => {
+  const updateStatus = (filename: string, babelMessage: BabelResponse) => {
     switch (babelMessage.type) {
       case 'code':
-        dispatch(babelCode())
+        dispatch(babelCode(filename))
         break
       case 'error':
-        dispatch(babelError(babelMessage.error.message))
+        dispatch(babelError(filename, babelMessage.error.message))
         break
     }
   }
@@ -375,7 +376,7 @@ export default function Workspace(props: Props) {
       code,
       options: { retainLines: true },
     }).then((response: BabelResponse) => {
-      updateStatus(response)
+      updateStatus(filename, response)
 
       if (response.type === 'code') {
         dispatch(compiled(response.filename, response.code))
