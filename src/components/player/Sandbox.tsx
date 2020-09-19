@@ -7,6 +7,7 @@ import { prefix } from '../../utils/Styles'
 import consoleProxy from './ConsoleProxy'
 import VendorComponents from './VendorComponents'
 import type { PlayerStyles } from '../../player'
+import * as path from '../../utils/path'
 
 declare global {
   interface Window {
@@ -76,7 +77,11 @@ export default class Sandbox extends PureComponent<Props> {
     this.sendReady()
   }
 
-  require = (context: EvaluationContext, name: string) => {
+  require = (
+    context: EvaluationContext,
+    name: string,
+    requirerName: string
+  ) => {
     const { fileMap, entry, requireCache } = context
     let { environment, assetRoot } = this.props
 
@@ -86,10 +91,15 @@ export default class Sandbox extends PureComponent<Props> {
 
     // If name begins with . or ..
     if (name.match(/^\.{1,2}\//)) {
+      const lookup = path.join(path.dirname(requirerName), name)
+
       // Check if we're referencing another tab
-      const filename = Object.keys(fileMap).find(
-        (x) => `${name}.js` === `./${x}`
-      )
+      const filename = Object.keys(fileMap).find((file) => {
+        return (
+          file === lookup ||
+          file.slice(0, -path.extname(file).length) === lookup
+        )
+      })
 
       if (filename) {
         if (filename === entry) {
@@ -175,7 +185,8 @@ export default class Sandbox extends PureComponent<Props> {
 
     const exports = {}
     const module = { exports }
-    const requireModule = (name: string) => this.require(context, name)
+    const requireModule = (name: string) =>
+      this.require(context, name, moduleName)
 
     f(exports, requireModule, module, consoleProxy, VendorComponents)
 
