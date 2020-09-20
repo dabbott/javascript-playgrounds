@@ -176,7 +176,7 @@ export function normalize(options: PublicOptions): InternalOptions {
   if (Object.keys(files).length > 0) {
     // If entry file is invalid or not given, choose the first file
     if (!files.hasOwnProperty(entry)) {
-      entry = files[Object.keys(files)[0]]
+      entry = Object.keys(files)[0]
     }
   } else {
     // If no files are given, use the code param
