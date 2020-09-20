@@ -388,6 +388,7 @@ export default function Workspace(props: Props) {
     babelRequest({
       filename,
       code,
+      options: { retainLines: true },
     }).then((response) => {
       if (response.type === 'code') {
         dispatch(transpiled(response.filename, response.code))
