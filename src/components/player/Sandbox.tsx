@@ -135,8 +135,7 @@ export default class Sandbox extends PureComponent<Props> {
 
       return requireCache[name]
     } else {
-      console.error(`Failed to resolve module ${name}`)
-      return {}
+      throw new Error(`Failed to resolve module ${name}`)
     }
   }
 
@@ -154,7 +153,19 @@ export default class Sandbox extends PureComponent<Props> {
 
     try {
       if (prelude.length > 0) {
-        eval(prelude)
+        try {
+          const f = new Function(
+            // Temporarily exposed, but consider this private
+            '__VendorComponents',
+            prelude
+          )
+
+          f(VendorComponents)
+        } catch (e) {
+          console.error('Prelude error')
+          console.error(e)
+          throw e
+        }
       }
 
       this.evaluate(entry, fileMap[entry], context)
@@ -174,21 +185,14 @@ export default class Sandbox extends PureComponent<Props> {
    * @param entry
    */
   evaluate(moduleName: string, code: string, context: EvaluationContext) {
-    const f = new Function(
-      'exports',
-      'require',
-      'module',
-      'console',
-      '_VendorComponents', // Temporarily exposed, but consider this private
-      code
-    )
+    const f = new Function('exports', 'require', 'module', 'console', code)
 
     const exports = {}
     const module = { exports }
     const requireModule = (name: string) =>
       this.require(context, name, moduleName)
 
-    f(exports, requireModule, module, consoleProxy, VendorComponents)
+    f(exports, requireModule, module, consoleProxy)
 
     context.requireCache[moduleName] = module.exports
   }
