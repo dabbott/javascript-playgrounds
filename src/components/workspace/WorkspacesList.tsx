@@ -219,7 +219,7 @@ export default class WorkspacesList extends PureComponent<Props> {
       <React.Fragment key={index}>
         <div
           style={this.getComputedRowStyle(isActive)}
-          onClick={onChangeActiveStepIndex.bind(null, index)}
+          onClick={() => onChangeActiveStepIndex(index)}
         >
           <div style={this.getComputedRowTitleStyle(isActive)}>{title}</div>
         </div>
@@ -238,7 +238,7 @@ export default class WorkspacesList extends PureComponent<Props> {
               inverse={true}
               containerStyle={this.getComputedButtonContainerStyle()}
               textStyle={this.getComputedButtonTextStyle()}
-              onChange={onChangeActiveStepIndex.bind(null, index + 1)}
+              onChange={() => onChangeActiveStepIndex(index + 1)}
             >
               {'Next'}
             </Button>
