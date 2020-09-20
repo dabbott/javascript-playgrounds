@@ -24,13 +24,20 @@ export default memo(function StackPane({
       children.map((pane, i) => ({
         title: pane.title || pane.type,
         index: i,
-        pane,
+        pane: {
+          ...pane,
+          // A title bar is redundant, since the title shows in the stack tab
+          title: undefined,
+        },
         changed: false,
       })),
     [children]
   )
 
-  const callback = useCallback((tab) => renderPane(tab.pane, tab.index), [tabs])
+  const callback = useCallback((tab) => renderPane(tab.pane, tab.index), [
+    tabs,
+    renderPane,
+  ])
 
   return (
     <TabContainer
