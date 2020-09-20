@@ -1,4 +1,4 @@
-import React, { PureComponent, CSSProperties } from 'react'
+import React, { PureComponent, CSSProperties, MutableRefObject } from 'react'
 import ReactDOM from 'react-dom'
 import { options, requireAddons } from '../../utils/CodeMirror'
 import { prefixObject } from '../../utils/Styles'
@@ -9,6 +9,11 @@ import type * as CM from 'codemirror'
 import type { DiffRange } from '../../utils/Diff'
 import { SourceLocation, LogCommand } from '../../types/Messages'
 import type * as ts from 'typescript'
+import CodeMirror from 'codemirror'
+
+// Import scrollPosIntoView directly. The public API calls the native DOM scrollIntoView,
+// which will scroll the parent window when displayed in an iframe.
+const { scrollPosIntoView } = require('codemirror/src/display/scrolling')
 
 // Work around a codemirror + flexbox + chrome issue by creating an absolute
 // positioned parent and flex grandparent of the codemirror element.
@@ -67,109 +72,106 @@ export default class extends PureComponent<Props> {
 
   currentDiff: DiffRange[] = []
   cm!: CM.Editor
+  editorNode: MutableRefObject<HTMLDivElement | null> = React.createRef()
 
   componentDidMount() {
-    if (typeof navigator !== 'undefined') {
-      const {
-        filename,
-        initialValue,
-        value,
-        readOnly,
-        onChange,
-        getTypeInfo,
-        tooltipStyle,
-      } = this.props
+    const {
+      filename,
+      initialValue,
+      value,
+      readOnly,
+      onChange,
+      getTypeInfo,
+      tooltipStyle,
+    } = this.props
 
-      let toolipPlugin: TooltipValue | undefined
+    if (!this.editorNode.current) return
 
-      if (getTypeInfo) {
-        tooltipAddon()
-        toolipPlugin = {
-          getNode: (cm, { index }, callback) => {
-            getTypeInfo(
-              filename,
-              index - 1,
-              ({ displayParts, documentation }) => {
-                const reactHost = document.createElement('div')
-                reactHost.className = 'cm-s-react'
+    let toolipPlugin: TooltipValue | undefined
 
-                ReactDOM.render(
-                  <Tooltip type={displayParts} documentation={documentation} />,
-                  reactHost
-                )
+    if (getTypeInfo) {
+      tooltipAddon()
+      toolipPlugin = {
+        getNode: (cm, { index }, callback) => {
+          getTypeInfo(
+            filename,
+            index - 1,
+            ({ displayParts, documentation }) => {
+              const reactHost = document.createElement('div')
+              reactHost.className = 'cm-s-react'
 
-                callback(reactHost)
-              }
-            )
-          },
-          removeNode: (node) => {
-            ReactDOM.unmountComponentAtNode(node)
-          },
-          style: tooltipStyle,
+              ReactDOM.render(
+                <Tooltip type={displayParts} documentation={documentation} />,
+                reactHost
+              )
+
+              callback(reactHost)
+            }
+          )
+        },
+        removeNode: (node) => {
+          ReactDOM.unmountComponentAtNode(node)
+        },
+        style: tooltipStyle,
+      }
+    }
+
+    requireAddons()
+
+    if (!docCache[filename]) {
+      docCache[filename] = new CodeMirror.Doc(
+        initialValue || value || '',
+        options.mode
+      )
+    }
+
+    this.cm = CodeMirror(this.editorNode.current, {
+      ...options,
+      ...(typeof toolipPlugin && {
+        tooltip: toolipPlugin,
+      }),
+      readOnly,
+      value: docCache[filename].linkedDoc({
+        sharedHist: true,
+        mode: undefined,
+      }),
+    })
+
+    this.cm.on('beforeChange', (cm) => {
+      this.currentDiff.forEach((range) => {
+        for (let i = range[0]; i <= range[1]; i++) {
+          this.cm.removeLineClass(i, 'background', 'cm-line-changed')
+          this.cm.removeLineClass(i, 'gutter', 'cm-line-changed')
         }
-      }
-
-      requireAddons()
-      const CodeMirror = require('codemirror')
-
-      if (!docCache[filename]) {
-        docCache[filename] = new CodeMirror.Doc(
-          initialValue || value || '',
-          options.mode
-        )
-      }
-
-      this.cm = CodeMirror(this.refs.editor, {
-        ...options,
-        ...(typeof toolipPlugin && {
-          tooltip: toolipPlugin,
-        }),
-        readOnly,
-        value: docCache[filename].linkedDoc({
-          sharedHist: true,
-          mode: undefined,
-        }),
       })
+    })
 
-      this.cm.on('beforeChange', (cm) => {
-        this.currentDiff.forEach((range) => {
-          for (let i = range[0]; i <= range[1]; i++) {
-            this.cm.removeLineClass(i, 'background', 'cm-line-changed')
-            this.cm.removeLineClass(i, 'gutter', 'cm-line-changed')
-          }
-        })
-      })
+    this.cm.on('changes', (cm) => {
+      onChange(cm.getValue())
+    })
 
-      this.cm.on('changes', (cm) => {
-        onChange(cm.getValue())
-      })
+    // If this document is unmodified, highlight the diff
+    const historySize = docCache[filename].historySize()
 
-      // If this document is unmodified, highlight the diff
-      const historySize = docCache[filename].historySize()
-
-      if (historySize.undo === 0) {
-        this.highlightDiff()
-      }
+    if (historySize.undo === 0) {
+      this.highlightDiff()
     }
   }
 
   componentWillUnmount() {
+    const { filename } = this.props
+
     if (typeof this.updateTimerId !== 'undefined') {
       clearTimeout(this.updateTimerId)
     }
 
-    if (typeof navigator !== 'undefined') {
-      const { filename } = this.props
-      const CodeMirror = require('codemirror')
+    // Store a reference to the current linked doc
+    const linkedDoc = this.cm.getDoc()
 
-      // Store a reference to the current linked doc
-      const linkedDoc = this.cm.getDoc()
+    this.cm.swapDoc(new CodeMirror.Doc('', options.mode))
 
-      this.cm.swapDoc(new CodeMirror.Doc('', options.mode))
-
-      // Unlink the doc
-      docCache[filename].unlinkDoc(linkedDoc)
-    }
+    // Unlink the doc
+    docCache[filename].unlinkDoc(linkedDoc)
   }
 
   updateTimerId?: ReturnType<typeof setTimeout> = undefined
@@ -315,17 +317,22 @@ export default class extends PureComponent<Props> {
         const toHeight = this.cm.heightAtLine(toLine)
 
         const visibleHeight = toHeight - fromHeight
+        const margin = scrollInfo.clientHeight / 2
 
         if (visibleHeight < scrollInfo.clientHeight) {
           const middleLine = fromLine + Math.floor((toLine - fromLine) / 2)
-          this.cm.scrollIntoView(
+          scrollPosIntoView(
+            this.cm,
             CodeMirror.Pos(middleLine, 0),
-            scrollInfo.clientHeight / 2
+            undefined,
+            margin
           )
         } else {
-          this.cm.scrollIntoView(
+          scrollPosIntoView(
+            this.cm,
             CodeMirror.Pos(fromLine, 0),
-            scrollInfo.clientHeight / 2
+            undefined,
+            margin
           )
         }
       }
@@ -363,7 +370,7 @@ export default class extends PureComponent<Props> {
         style={styles.editorContainer}
         className={readOnly ? 'read-only' : undefined}
       >
-        <div style={styles.editor} ref={'editor'} />
+        <div style={styles.editor} ref={this.editorNode} />
       </div>
     )
   }
