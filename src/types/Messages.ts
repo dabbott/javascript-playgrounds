@@ -12,10 +12,13 @@ export type ClearCommand = CommandBase & {
   command: 'clear'
 }
 
+export type LogVisibility = 'visible' | 'hidden'
+
 export type LogCommand = CommandBase & {
   command: 'log'
   location: SourceLocation
   data: unknown[]
+  visibility: LogVisibility
 }
 
 export type ConsoleCommand = ClearCommand | LogCommand

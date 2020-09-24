@@ -66,6 +66,7 @@ export type PublicError = {
 
 export interface PlaygroundOptions {
   enabled: boolean
+  inspector: 'browser' | 'node'
   renderReactElements: boolean
   debounceDuration: number
   instrumentExpressionStatements: boolean
@@ -243,6 +244,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
           externalStyles={externalStyles}
           transpilerCache={transpilerCache}
           activeFile={activeFile}
+          playgroundOptions={playgroundOptions}
         />
       )
     case 'player':

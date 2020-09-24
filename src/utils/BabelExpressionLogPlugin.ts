@@ -37,6 +37,7 @@ export default () => {
           state.filename.slice(1),
           path.node.loc!.end.line.toString(),
           path.node.loc!.start.column.toString(),
+          'hidden',
         ]
 
         const stringLiterals: StringLiteral[] = strings.map((value) => ({

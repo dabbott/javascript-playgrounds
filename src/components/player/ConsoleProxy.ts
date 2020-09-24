@@ -3,6 +3,7 @@ import {
   ConsoleCommand,
   Message,
   SourceLocation,
+  LogVisibility,
 } from '../../types/Messages'
 
 const consoleProxy = ({ id: '0' } as unknown) as typeof window.console & {
@@ -30,15 +31,19 @@ const consoleLogCommon = (
   callback: MessageCallback,
   id: string,
   location: SourceLocation,
+  visibility: LogVisibility,
   ...logs: unknown[]
 ) => {
-  console.log(...logs)
+  if (visibility !== 'hidden') {
+    console.log(...logs)
+  }
 
   const payload: ConsoleCommand = {
     id: nextMessageId(),
     command: 'log',
     data: logs,
     location,
+    visibility,
   }
 
   const message: Message = {
@@ -56,21 +61,24 @@ export const consoleLogRNWP = (
   file: string,
   line: number,
   column: number,
+  visibility: 'visible' | 'hidden',
   ...logs: unknown[]
 ) => {
   const location = { file, line, column }
-  return consoleLogCommon(callback, id, location, ...logs)
+  return consoleLogCommon(callback, id, location, visibility, ...logs)
 }
 
 export const consoleLog = (
   callback: MessageCallback,
   id: string,
+  visibility: 'visible' | 'hidden',
   ...args: unknown[]
 ) => {
   return consoleLogCommon(
     callback,
     id,
     { file: '<unknown>', line: 0, column: 0 },
+    visibility,
     ...args
   )
 }

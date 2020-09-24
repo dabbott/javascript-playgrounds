@@ -159,9 +159,7 @@ export default memo(function EditorPane({
         showDiff={true}
         diff={fileDiff}
         logs={playgroundOptions.enabled ? logs : undefined}
-        playgroundDebounceDuration={playgroundOptions.debounceDuration}
-        playgroundRenderReactElements={playgroundOptions.renderReactElements}
-        playgroundExpandLevel={playgroundOptions.expandLevel}
+        playgroundOptions={playgroundOptions}
         getTypeInfo={typescriptOptions.enabled ? getTypeInfo : undefined}
         tooltipStyle={externalStyles.tooltip}
       />

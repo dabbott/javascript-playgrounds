@@ -21,7 +21,9 @@ export function initializeCommunication({
   runApplication: (context: EvaluationContext) => void
 }) {
   function post(message: Message) {
-    parent.postMessage(ExtendedJSON.stringify(message), '*')
+    try {
+      parent.postMessage(ExtendedJSON.stringify(message), '*')
+    } catch {}
   }
 
   function sendError(errorMessage: string) {

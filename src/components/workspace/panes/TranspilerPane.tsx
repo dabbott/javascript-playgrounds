@@ -1,4 +1,5 @@
-import React, { CSSProperties, memo } from 'react'
+import React, { memo } from 'react'
+import { TranspilerPaneOptions } from '../../../utils/Panes'
 import {
   columnStyle,
   mergeStyles,
@@ -7,8 +8,7 @@ import {
 } from '../../../utils/Styles'
 import Editor from '../Editor'
 import Header from '../Header'
-import { TranspilerPaneOptions } from '../../../utils/Panes'
-import { ExternalStyles } from '../Workspace'
+import type { ExternalStyles, PlaygroundOptions } from '../Workspace'
 
 const styles = prefixObject({
   transpilerPane: columnStyle,
@@ -21,6 +21,7 @@ interface Props {
   externalStyles: ExternalStyles
   activeFile: string
   transpilerCache: Record<string, string>
+  playgroundOptions: PlaygroundOptions
 }
 
 export default memo(function TranspilerPane({
@@ -28,6 +29,7 @@ export default memo(function TranspilerPane({
   externalStyles,
   activeFile,
   transpilerCache,
+  playgroundOptions,
 }: Props) {
   const { title } = options
 
@@ -47,6 +49,7 @@ export default memo(function TranspilerPane({
         readOnly={true}
         value={transpilerCache[activeFile]}
         filename={activeFile}
+        playgroundOptions={playgroundOptions}
       />
     </div>
   )

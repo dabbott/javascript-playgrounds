@@ -2,6 +2,7 @@ import { ResizeObserver } from '@juggle/resize-observer'
 import React, { useEffect, useRef, RefObject } from 'react'
 import { prefixObject } from '../../utils/Styles'
 import { MultiInspector } from './Inspector'
+import type { PlaygroundOptions } from './Workspace'
 
 const styles = prefixObject({
   container: {
@@ -17,6 +18,7 @@ const styles = prefixObject({
   },
   content: {
     display: 'flex',
+    whiteSpace: 'pre',
   },
   itemSpacer: {
     width: 8,
@@ -52,18 +54,16 @@ function useResizeObserver(ref: RefObject<HTMLDivElement>, f: () => void) {
 
 interface Props {
   indent: number
-  renderReactElements: boolean
   data: unknown[]
   didResize: () => void
-  expandLevel?: number
+  playgroundOptions: PlaygroundOptions
 }
 
 export default function PlaygroundPreview({
   indent,
   data,
   didResize,
-  renderReactElements,
-  expandLevel,
+  playgroundOptions,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null)
 
@@ -74,8 +74,9 @@ export default function PlaygroundPreview({
       <div style={styles.content}>
         <MultiInspector
           data={data}
-          renderReactElements={renderReactElements}
-          expandLevel={expandLevel}
+          inspector={playgroundOptions.inspector}
+          renderReactElements={playgroundOptions.renderReactElements}
+          expandLevel={playgroundOptions.expandLevel}
         />
       </div>
     </div>

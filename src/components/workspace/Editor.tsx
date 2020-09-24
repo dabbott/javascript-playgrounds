@@ -10,6 +10,7 @@ import type { DiffRange } from '../../utils/Diff'
 import { SourceLocation, LogCommand } from '../../types/Messages'
 import type * as ts from 'typescript'
 import CodeMirror from 'codemirror'
+import type { PlaygroundOptions } from './Workspace'
 
 // Import scrollPosIntoView directly. The public API calls the native DOM scrollIntoView,
 // which will scroll the parent window when displayed in an iframe.
@@ -44,7 +45,7 @@ export interface Props {
   showDiff: boolean
   diff: DiffRange[]
   logs?: LogCommand[] // Undefined instead of array to simplify re-rendering,
-  playgroundDebounceDuration: number
+  playgroundOptions: PlaygroundOptions
   getTypeInfo?: (
     prefixedFilename: string,
     index: number,
@@ -52,8 +53,6 @@ export interface Props {
   ) => void
   tooltipStyle?: CSSProperties
   errorLineNumber?: number
-  playgroundRenderReactElements: boolean
-  playgroundExpandLevel?: number
 }
 
 export default class extends PureComponent<Props> {
@@ -178,7 +177,7 @@ export default class extends PureComponent<Props> {
   updateTimerId?: ReturnType<typeof setTimeout> = undefined
 
   componentDidUpdate() {
-    const { playgroundDebounceDuration } = this.props
+    const { playgroundOptions } = this.props
 
     if (this.updateTimerId) {
       clearTimeout(this.updateTimerId)
@@ -186,7 +185,7 @@ export default class extends PureComponent<Props> {
 
     this.updateTimerId = setTimeout(() => {
       this.addPlaygroundWidgets()
-    }, playgroundDebounceDuration)
+    }, playgroundOptions.debounceDuration)
 
     // In the rare case where we get this far and the autoResize plugin hasn't
     // refreshed the display, check if we should manually refresh it once.
@@ -201,12 +200,7 @@ export default class extends PureComponent<Props> {
   addPlaygroundWidgets() {
     if (!this.cm) return
 
-    const {
-      filename,
-      logs,
-      playgroundRenderReactElements,
-      playgroundExpandLevel,
-    } = this.props
+    const { filename, logs, playgroundOptions } = this.props
 
     // Skip configuring playgrounds altogether if there are no logs
     if (logs === undefined) return
@@ -284,14 +278,13 @@ export default class extends PureComponent<Props> {
         ReactDOM.render(
           <PlaygroundPreview
             indent={4 + location.column * this.cm.defaultCharWidth()}
-            renderReactElements={playgroundRenderReactElements}
             data={data}
             didResize={() => {
               if (this.widgets.includes(widget)) {
                 widget.changed()
               }
             }}
-            expandLevel={playgroundExpandLevel}
+            playgroundOptions={playgroundOptions}
           />,
           (widget as any).node
         )

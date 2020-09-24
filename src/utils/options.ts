@@ -83,6 +83,7 @@ const presetOptions: Record<string, PublicOptions> = {
     ],
     playground: {
       enabled: true,
+      inspector: 'browser',
       renderReactElements: true,
       debounceDuration: 200,
       instrumentExpressionStatements: false,
@@ -154,6 +155,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     workspaces = [],
     playground = {
       enabled: true,
+      inspector: 'browser',
       renderReactElements: true,
       debounceDuration: 200,
       instrumentExpressionStatements: false,

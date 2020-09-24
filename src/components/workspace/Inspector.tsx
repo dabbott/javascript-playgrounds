@@ -2,6 +2,7 @@ import React, { PureComponent, useRef, useEffect } from 'react'
 import { prefixObject } from '../../utils/Styles'
 import * as DOMCoding from '../../utils/DOMCoding'
 import type { InspectorThemeDefinition, InspectorProps } from 'react-inspector'
+import inspect from '../../utils/inspect'
 
 // Types don't match the version we're using. TODO: Upgrade or remove
 const Loadable = require('react-loadable')
@@ -64,13 +65,19 @@ function isNodeInDOM(o: any) {
 
 interface Props {
   data: unknown[]
+  inspector: 'browser' | 'node'
   renderReactElements: boolean
   expandLevel?: number
 }
 
 export class MultiInspector extends PureComponent<Props> {
   render() {
-    const { data, renderReactElements, expandLevel } = this.props
+    const {
+      data,
+      renderReactElements,
+      expandLevel,
+      inspector: inspectorType,
+    } = this.props
 
     const inspectors = []
 
@@ -120,9 +127,25 @@ export class MultiInspector extends PureComponent<Props> {
           )
         }
       } else {
-        inspectors.push(
-          <Inspector key={i} data={item} expandLevel={expandLevel} />
-        )
+        switch (inspectorType) {
+          case 'browser':
+            inspectors.push(
+              <Inspector key={i} data={item} expandLevel={expandLevel} />
+            )
+            break
+          case 'node':
+            const spans = inspect(item, {
+              colors: true,
+              bracketSeparator: '',
+            }).map((span, j) => (
+              <span key={j} style={{ color: span.style }}>
+                {span.value}
+              </span>
+            ))
+
+            inspectors.push(<span key={i}>{spans}</span>)
+            break
+        }
       }
     }
 

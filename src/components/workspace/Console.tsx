@@ -35,6 +35,7 @@ const styles = prefixObject({
     boxSizing: 'border-box',
     boxShadow: '0 -1px 0 0 rgb(240,240,240) inset',
     padding: '0 7px',
+    whiteSpace: 'pre',
   },
   lineNumberSpacer: {
     flex: '1 1 auto',
@@ -125,6 +126,8 @@ export default class extends PureComponent<Props> {
   }
 
   renderEntry = (entry: LogCommand) => {
+    if (entry.visibility === 'hidden') return
+
     const { renderReactElements, showFileName } = this.props
 
     const lineNumber =
@@ -137,6 +140,7 @@ export default class extends PureComponent<Props> {
         <MultiInspector
           data={entry.data}
           renderReactElements={renderReactElements}
+          inspector="browser"
         />
         {lineNumber}
       </div>
