@@ -1,5 +1,6 @@
 import { CSSProperties } from 'react'
 import { ExternalModule } from '../components/player/VendorComponents'
+import { PublicOptions } from './options'
 
 export interface ConsoleOptions {
   showFileName: boolean
@@ -85,10 +86,8 @@ const getNextId = () => `${initialId++}`
  */
 export const normalizePane = (
   pane: PaneShorthand | PaneOptions,
-  title: string
+  publicOptions: PublicOptions
 ): PaneOptions => {
-  const id = getNextId()
-
   let options =
     typeof pane === 'string' ? ({ type: pane } as PaneOptions) : pane
 
@@ -97,14 +96,27 @@ export const normalizePane = (
   if (options.type === 'stack') {
     return {
       ...options,
-      children: options.children.map((child) => normalizePane(child, title)),
+      children: options.children.map((child) =>
+        normalizePane(child, publicOptions)
+      ),
     }
   }
 
-  if (options.type === 'editor' && title && !options.title) {
+  if (options.type === 'editor' && publicOptions.title && !options.title) {
     return {
       ...options,
-      title,
+      title: publicOptions.title,
+    }
+  }
+
+  if (
+    options.type === 'player' &&
+    publicOptions.modules &&
+    publicOptions.modules.length > 0
+  ) {
+    return {
+      ...options,
+      modules: [...(options.modules || []), ...publicOptions.modules],
     }
   }
 

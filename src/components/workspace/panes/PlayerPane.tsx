@@ -13,6 +13,7 @@ import PlayerFrame from '../PlayerFrame'
 import Status from '../Status'
 import { PlayerPaneOptions } from '../../../utils/Panes'
 import { ExternalStyles } from '../Workspace'
+import type { ExternalModule } from '../../player/VendorComponents'
 
 const styles = prefixObject({
   playerPane: mergeStyles(columnStyle, { flex: '0 0 auto' }),
@@ -26,7 +27,7 @@ export interface Props {
   preset: string
   sharedEnvironment: boolean
   files: Record<string, string>
-  modules: string[]
+  detectedModules: ExternalModule[]
   logs: LogCommand[]
   onPlayerRun: () => void
   onPlayerError: (message: string) => void
@@ -45,7 +46,7 @@ const PlayerPane = memo(
       onPlayerRun,
       onPlayerError,
       onPlayerConsole,
-      modules: detectedModules,
+      detectedModules,
     },
     ref
   ) {

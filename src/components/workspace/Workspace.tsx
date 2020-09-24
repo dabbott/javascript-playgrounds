@@ -29,6 +29,7 @@ import useResponsiveBreakpoint from '../../hooks/useResponsiveBreakpoint'
 import { WorkspaceStep, UserInterfaceStrings } from '../../utils/options'
 import { WorkspaceDiff } from './App'
 import useRerenderEffect from '../../hooks/useRerenderEffect'
+import type { ExternalModule } from '../player/VendorComponents'
 
 const {
   reducer,
@@ -132,7 +133,7 @@ export interface Props {
   diff: Record<string, WorkspaceDiff>
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
-  modules: string[]
+  detectedModules: ExternalModule[]
 }
 
 type WorkspacePaneProps = {
@@ -149,7 +150,7 @@ type WorkspacePaneProps = {
   playgroundOptions: PlaygroundOptions
   typescriptOptions: TypeScriptOptions
   workspaces: WorkspaceStep[]
-  modules: string[]
+  detectedModules: ExternalModule[]
   diff: Record<string, WorkspaceDiff>
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
@@ -183,7 +184,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
     externalStyles,
     sharedEnvironment,
     workspaces,
-    modules,
+    detectedModules,
     activeStepIndex,
     onChangeActiveStepIndex,
     fullscreen,
@@ -248,7 +249,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
           ref={(player) => {
             onCreatePlayer(options.id, player)
           }}
-          modules={modules}
+          detectedModules={detectedModules}
           options={options}
           externalStyles={externalStyles}
           preset={preset}
@@ -532,7 +533,7 @@ export default function Workspace(props: Props) {
           playgroundOptions={props.playgroundOptions}
           typescriptOptions={props.typescriptOptions}
           workspaces={props.workspaces}
-          modules={props.modules}
+          detectedModules={props.detectedModules}
           diff={props.diff}
           activeStepIndex={props.activeStepIndex}
           onChangeActiveStepIndex={props.onChangeActiveStepIndex}
@@ -568,7 +569,7 @@ export default function Workspace(props: Props) {
       props.playgroundOptions,
       props.typescriptOptions,
       props.workspaces,
-      props.modules,
+      props.detectedModules,
       props.diff,
       props.activeStepIndex,
       props.onChangeActiveStepIndex,

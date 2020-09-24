@@ -70,7 +70,7 @@ const parsedStyles: PlayerStyles = prefixObject(
 prefixAndApply(parsedStyles.playerRoot, mount)
 
 const modules: ExternalModule[] = JSON.parse(rawModules)
-const detectedModules: string[] = JSON.parse(rawDetectedModules)
+const detectedModules: ExternalModule[] = JSON.parse(rawDetectedModules)
 
 const asyncEnvironment: Promise<IEnvironment> =
   preset === 'javascript'
@@ -87,8 +87,8 @@ asyncEnvironment.then((environment: IEnvironment) => {
 
     // Only download detected modules that aren't also listed as vendor components
     const detectedModulesToDownload = detectedModules
-      .filter((name) => !normalizedModules.find((m) => m.name === name))
       .map(VendorComponents.normalizeExternalModule)
+      .filter(({ name }) => !normalizedModules.some((m) => m.name === name))
 
     VendorComponents.load(
       [...normalizedModules, ...detectedModulesToDownload],

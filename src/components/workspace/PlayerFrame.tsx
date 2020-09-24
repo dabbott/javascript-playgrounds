@@ -25,7 +25,7 @@ interface Props {
   statusBarHeight: number
   statusBarColor: string
   sharedEnvironment: boolean
-  detectedModules: string[]
+  detectedModules: ExternalModule[]
   modules: ExternalModule[]
   styleSheet: string
   css: string

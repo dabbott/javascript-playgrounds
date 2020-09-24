@@ -61,11 +61,10 @@ export default function App({
   sharedEnvironment,
   fullscreen,
   responsivePaneSets,
-  panes,
   playground,
   workspaces,
   typescript,
-  modules,
+  detectedModules,
   onChange,
 }: Props) {
   const [activeStepIndex, setActiveStepIndex] = useState(0)
@@ -77,10 +76,6 @@ export default function App({
           workspaces[activeStepIndex - 1]
         )
       : {}
-
-  const paneSets = useMemo(() => {
-    return [...responsivePaneSets, { panes: panes, maxWidth: Infinity }]
-  }, [responsivePaneSets])
 
   return (
     <div style={style}>
@@ -95,14 +90,14 @@ export default function App({
         externalStyles={styles}
         sharedEnvironment={sharedEnvironment}
         fullscreen={fullscreen && (screenfull as any).enabled}
-        responsivePaneSets={paneSets}
+        responsivePaneSets={responsivePaneSets}
         workspaces={workspaces}
         onChange={onChange}
         playgroundOptions={playground}
         typescriptOptions={typescript}
         activeStepIndex={activeStepIndex}
         onChangeActiveStepIndex={setActiveStepIndex}
-        modules={modules}
+        detectedModules={detectedModules}
         diff={diff}
         // Merge props from the current workspace step
         {...(workspaces.length > 0

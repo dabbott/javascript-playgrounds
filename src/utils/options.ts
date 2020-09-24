@@ -7,6 +7,7 @@ import {
 import * as DefaultCode from '../constants/DefaultCode'
 import { PaneOptions, PaneShorthand, normalizePane } from './Panes'
 import defaultLibs from '../utils/TypeScriptDefaultLibs'
+import type { ExternalModule } from '../components/player/VendorComponents'
 
 export interface WorkspaceStep {
   title: string
@@ -47,6 +48,7 @@ export interface PublicOptions {
   panes?: PublicPaneOptions[]
   responsivePaneSets?: PublicResponsivePaneSet[]
   detectDependencies?: boolean
+  modules?: ExternalModule[] // These are added to each player pane's options
   targetOrigin?: string
 }
 
@@ -60,12 +62,11 @@ export type PublicResponsivePaneSet = {
 export type InternalOptions = Required<
   Omit<
     PublicOptions,
-    'panes' | 'responsivePaneSets' | 'code' | 'detectDependencies'
+    'panes' | 'responsivePaneSets' | 'code' | 'detectDependencies' | 'modules'
   >
 > & {
-  panes: PaneOptions[]
   responsivePaneSets: ResponsivePaneSet[]
-  modules: string[]
+  detectedModules: ExternalModule[]
 }
 
 const presetOptions: Record<string, PublicOptions> = {
@@ -117,10 +118,10 @@ function findImports(code: string) {
   return imports
 }
 
-function detectAllDependencies(files: Record<string, string>) {
+function detectAllDependencies(files: string[]) {
   const allImports: string[] = []
 
-  Object.values(files).forEach((code) => {
+  files.forEach((code) => {
     const imports = findImports(code)
 
     for (let value of imports) {
@@ -188,6 +189,17 @@ export function normalize(options: PublicOptions): InternalOptions {
     initialTab = entry
   }
 
+  const normalizedPaneSets: ResponsivePaneSet[] = [
+    ...responsivePaneSets,
+    {
+      panes,
+      maxWidth: Infinity,
+    },
+  ].map((set) => ({
+    ...set,
+    panes: set.panes.map((pane) => normalizePane(pane, options)),
+  }))
+
   return {
     preset,
     title,
@@ -199,15 +211,19 @@ export function normalize(options: PublicOptions): InternalOptions {
     strings: Object.assign({}, userInterfaceStrings, rawStrings),
     fullscreen,
     sharedEnvironment,
-    panes: panes.map((pane) => normalizePane(pane, title)),
-    responsivePaneSets: responsivePaneSets.map((set) => ({
-      ...set,
-      panes: set.panes.map((pane) => normalizePane(pane, title)),
-    })),
+    responsivePaneSets: normalizedPaneSets,
     workspaces,
     playground,
     typescript: typescriptOptions,
-    modules: detectDependencies ? detectAllDependencies(files) : [],
+    detectedModules: detectDependencies
+      ? detectAllDependencies(
+          Object.values(files).concat(
+            ...workspaces.map((workspace) =>
+              Object.values(workspace.workspace.files)
+            )
+          )
+        )
+      : [],
     targetOrigin,
   }
 }
