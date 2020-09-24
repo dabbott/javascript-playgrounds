@@ -3,7 +3,11 @@ import * as Babel from '@babel/core'
 onmessage = function (event) {
   const {
     id,
-    payload: { code: value, filename, options },
+    payload: {
+      code: value,
+      filename,
+      options: { instrumentExpressionStatements, ...options },
+    },
   } = event.data
 
   let output
@@ -16,6 +20,9 @@ onmessage = function (event) {
     ]
 
     const plugins = [
+      ...(instrumentExpressionStatements
+        ? [require('./utils/BabelExpressionLogPlugin')]
+        : []),
       require('./utils/BabelConsolePlugin'),
       [
         require('@babel/plugin-transform-typescript'),

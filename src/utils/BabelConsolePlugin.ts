@@ -1,16 +1,12 @@
-type Position = { line: string; column: string }
-type Location = { start: Position; end: Position }
-type CallExpression = {
-  loc: Location
-  callee: {
-    object: {
-      name: string
-    }
-    property: {
-      name: string
-    }
-  }
-  arguments: any[]
+import type { CallExpression, StringLiteral } from '@babel/types'
+
+const baseNode = {
+  leadingComments: null,
+  innerComments: null,
+  trailingComments: null,
+  start: null,
+  end: null,
+  loc: null,
 }
 
 // Add line & column info to console.log calls.
@@ -24,25 +20,26 @@ export default () => {
         state: { filename: string }
       ) {
         if (
-          path.node.callee.object &&
+          path.node.callee.type === 'MemberExpression' &&
+          path.node.callee.object.type === 'Identifier' &&
           path.node.callee.object.name === 'console' &&
           path.node.callee.property.name === 'log'
         ) {
           path.node.callee.property.name = '_rnwp_log'
 
-          const locationArguments = [
+          const strings = [
             state.filename.slice(1),
-            path.node.loc.end.line.toString(),
-            path.node.loc.start.column.toString(),
+            path.node.loc!.end.line.toString(),
+            path.node.loc!.start.column.toString(),
           ]
 
-          path.node.arguments = [
-            ...locationArguments.map((value) => ({
-              type: 'StringLiteral',
-              value,
-            })),
-            ...path.node.arguments,
-          ]
+          const stringLiterals: StringLiteral[] = strings.map((value) => ({
+            type: 'StringLiteral',
+            value,
+            ...baseNode,
+          }))
+
+          path.node.arguments = [...stringLiterals, ...path.node.arguments]
         }
       },
     },

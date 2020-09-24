@@ -55,6 +55,7 @@ interface Props {
   renderReactElements: boolean
   data: unknown[]
   didResize: () => void
+  expandLevel?: number
 }
 
 export default function PlaygroundPreview({
@@ -62,6 +63,7 @@ export default function PlaygroundPreview({
   data,
   didResize,
   renderReactElements,
+  expandLevel,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null)
 
@@ -70,7 +72,11 @@ export default function PlaygroundPreview({
   return (
     <div ref={ref} style={{ ...styles.container, marginLeft: indent }}>
       <div style={styles.content}>
-        <MultiInspector data={data} renderReactElements={renderReactElements} />
+        <MultiInspector
+          data={data}
+          renderReactElements={renderReactElements}
+          expandLevel={expandLevel}
+        />
       </div>
     </div>
   )

@@ -53,6 +53,7 @@ export interface Props {
   tooltipStyle?: CSSProperties
   errorLineNumber?: number
   playgroundRenderReactElements: boolean
+  playgroundExpandLevel?: number
 }
 
 export default class extends PureComponent<Props> {
@@ -200,7 +201,12 @@ export default class extends PureComponent<Props> {
   addPlaygroundWidgets() {
     if (!this.cm) return
 
-    const { filename, logs, playgroundRenderReactElements } = this.props
+    const {
+      filename,
+      logs,
+      playgroundRenderReactElements,
+      playgroundExpandLevel,
+    } = this.props
 
     // Skip configuring playgrounds altogether if there are no logs
     if (logs === undefined) return
@@ -285,6 +291,7 @@ export default class extends PureComponent<Props> {
                 widget.changed()
               }
             }}
+            expandLevel={playgroundExpandLevel}
           />,
           (widget as any).node
         )

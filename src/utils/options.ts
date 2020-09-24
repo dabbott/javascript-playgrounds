@@ -85,6 +85,7 @@ const presetOptions: Record<string, PublicOptions> = {
       enabled: true,
       renderReactElements: true,
       debounceDuration: 200,
+      instrumentExpressionStatements: false,
     },
   },
   react: {
@@ -155,6 +156,7 @@ export function normalize(options: PublicOptions): InternalOptions {
       enabled: true,
       renderReactElements: true,
       debounceDuration: 200,
+      instrumentExpressionStatements: false,
     },
     typescript = {
       enabled: false,

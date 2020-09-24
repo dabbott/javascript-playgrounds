@@ -65,11 +65,12 @@ function isNodeInDOM(o: any) {
 interface Props {
   data: unknown[]
   renderReactElements: boolean
+  expandLevel?: number
 }
 
 export class MultiInspector extends PureComponent<Props> {
   render() {
-    const { data, renderReactElements } = this.props
+    const { data, renderReactElements, expandLevel } = this.props
 
     const inspectors = []
 
@@ -114,10 +115,14 @@ export class MultiInspector extends PureComponent<Props> {
             />
           )
         } else {
-          inspectors.push(<Inspector key={key} data={element} />)
+          inspectors.push(
+            <Inspector key={key} data={element} expandLevel={expandLevel} />
+          )
         }
       } else {
-        inspectors.push(<Inspector key={i} data={item} />)
+        inspectors.push(
+          <Inspector key={i} data={item} expandLevel={expandLevel} />
+        )
       }
     }
 

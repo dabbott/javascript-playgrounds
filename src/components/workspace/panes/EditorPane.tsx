@@ -161,6 +161,7 @@ export default memo(function EditorPane({
         logs={playgroundOptions.enabled ? logs : undefined}
         playgroundDebounceDuration={playgroundOptions.debounceDuration}
         playgroundRenderReactElements={playgroundOptions.renderReactElements}
+        playgroundExpandLevel={playgroundOptions.expandLevel}
         getTypeInfo={typescriptOptions.enabled ? getTypeInfo : undefined}
         tooltipStyle={externalStyles.tooltip}
       />

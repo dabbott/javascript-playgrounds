@@ -68,6 +68,8 @@ export interface PlaygroundOptions {
   enabled: boolean
   renderReactElements: boolean
   debounceDuration: number
+  instrumentExpressionStatements: boolean
+  expandLevel?: number
 }
 
 export interface TypeScriptOptions {
@@ -375,7 +377,11 @@ export default function Workspace(props: Props) {
     babelRequest({
       filename,
       code,
-      options: { retainLines: true },
+      options: {
+        retainLines: true,
+        instrumentExpressionStatements:
+          props.playgroundOptions.instrumentExpressionStatements,
+      },
     }).then((response: BabelResponse) => {
       updateStatus(filename, response)
 
