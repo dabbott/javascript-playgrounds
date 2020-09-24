@@ -1,6 +1,6 @@
 {
   "name": "javascript-playgrounds",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Interactive JavaScript sandbox",
   "main": "dist/javascript-playgrounds.js",
   "files": [
