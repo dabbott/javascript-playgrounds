@@ -38,6 +38,29 @@ function getValue(span: Span): string {
   }
 }
 
+function mapValue(span: Span, f: (value: string) => string): Span {
+  if (typeof span === 'string') return f(span)
+
+  switch (span.type) {
+    case 'property':
+      return {
+        ...span,
+        key: mapValue(span.key, f),
+        value: mapValue(span.value, f),
+      }
+    case 'span':
+      return {
+        ...span,
+        value: f(span.value),
+      }
+    case 'list':
+      return {
+        ...span,
+        value: span.value.map((value) => mapValue(value, f)),
+      }
+  }
+}
+
 function styled(value: string) {
   return { style: '#333', value }
 }
@@ -438,25 +461,9 @@ function formatProperty(
       } else {
         str = formatValue(ctx, desc.value, recurseTimes - 1)
       }
-      if (typeof str === 'string' && str.indexOf('\n') > -1) {
-        if (array) {
-          str = str
-            .split('\n')
-            .map((line: string) => {
-              return '  ' + line
-            })
-            .join('\n')
-            .substr(2)
-        } else {
-          str =
-            '\n' +
-            str
-              .split('\n')
-              .map((line: string) => {
-                return '   ' + line
-              })
-              .join('\n')
-        }
+      // Add indentation
+      if (getValue(str).indexOf('\n') > -1) {
+        str = mapValue(str, (value) => value.replace('\n', '\n  '))
       }
     } else {
       str = ctx.stylize('[Circular]', 'special')

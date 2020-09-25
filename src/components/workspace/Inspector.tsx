@@ -137,6 +137,7 @@ export class MultiInspector extends PureComponent<Props> {
             const spans = inspect(item, {
               colors: true,
               bracketSeparator: '',
+              depth: expandLevel,
             }).map((span, j) => (
               <span key={j} style={{ color: span.style }}>
                 {span.value}
