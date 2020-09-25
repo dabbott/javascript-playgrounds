@@ -4,7 +4,7 @@ export default function formatError(e: Error, prefixLineCount: number): string {
 
   // Safari
   if ((e as any).line != null) {
-    line = (e as any).line
+    line = (e as any).line + 1
 
     // FF
   } else if ((e as any).lineNumber != null) {
