@@ -6,7 +6,11 @@ onmessage = function (event) {
     payload: {
       code: value,
       filename,
-      options: { instrumentExpressionStatements, ...options },
+      options: {
+        instrumentExpressionStatements,
+        maxLoopIterations,
+        ...options
+      },
     },
   } = event.data
 
@@ -20,6 +24,14 @@ onmessage = function (event) {
     ]
 
     const plugins = [
+      ...(maxLoopIterations > 0
+        ? [
+            [
+              require('./utils/BabelInfiniteLoopPlugin'),
+              { maxIterations: maxLoopIterations },
+            ],
+          ]
+        : []),
       ...(instrumentExpressionStatements
         ? [require('./utils/BabelExpressionLogPlugin')]
         : []),

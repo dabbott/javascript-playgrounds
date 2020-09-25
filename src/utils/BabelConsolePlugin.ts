@@ -1,46 +1,36 @@
-import type { CallExpression, StringLiteral } from '@babel/types'
-
-const baseNode = {
-  leadingComments: null,
-  innerComments: null,
-  trailingComments: null,
-  start: null,
-  end: null,
-  loc: null,
-}
+import type Babel from '@babel/core'
 
 // Add line & column info to console.log calls.
 //
 // console.log(arg) becomes console._rnwp_log("index.js", "8", "2", arg)
-export default () => {
+export default ({
+  types: t,
+}: typeof Babel): { visitor: Babel.Visitor<Babel.PluginOptions> } => {
   return {
     visitor: {
-      CallExpression(
-        path: { node: CallExpression },
-        state: { filename: string }
-      ) {
+      CallExpression(path, options) {
+        const optionsObject = { filename: '/', ...options }
+
         if (
-          path.node.callee.type === 'MemberExpression' &&
-          path.node.callee.object.type === 'Identifier' &&
+          t.isMemberExpression(path.node.callee) &&
+          t.isIdentifier(path.node.callee.object) &&
+          t.isIdentifier(path.node.callee.property) &&
           path.node.callee.object.name === 'console' &&
           path.node.callee.property.name === 'log'
         ) {
           path.node.callee.property.name = '_rnwp_log'
 
           const strings = [
-            state.filename.slice(1),
+            optionsObject.filename.slice(1),
             path.node.loc!.end.line.toString(),
             path.node.loc!.start.column.toString(),
             'visible',
           ]
 
-          const stringLiterals: StringLiteral[] = strings.map((value) => ({
-            type: 'StringLiteral',
-            value,
-            ...baseNode,
-          }))
-
-          path.node.arguments = [...stringLiterals, ...path.node.arguments]
+          path.node.arguments = [
+            ...strings.map((value) => t.stringLiteral(value)),
+            ...path.node.arguments,
+          ]
         }
       },
     },

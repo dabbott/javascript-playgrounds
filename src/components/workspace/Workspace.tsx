@@ -26,7 +26,11 @@ import TranspilerPane from './panes/TranspilerPane'
 import WorkspacesPane from './panes/WorkspacesPane'
 import PlayerFrame from './PlayerFrame'
 import useResponsiveBreakpoint from '../../hooks/useResponsiveBreakpoint'
-import { WorkspaceStep, UserInterfaceStrings } from '../../utils/options'
+import {
+  WorkspaceStep,
+  UserInterfaceStrings,
+  CompilerOptions,
+} from '../../utils/options'
 import { WorkspaceDiff } from './App'
 import useRerenderEffect from '../../hooks/useRerenderEffect'
 import type { ExternalModule } from '../player/VendorComponents'
@@ -130,6 +134,7 @@ export interface Props {
   fullscreen: boolean
   sharedEnvironment: boolean
   responsivePaneSets: ResponsivePaneSet[]
+  compilerOptions: CompilerOptions
   playgroundOptions: PlaygroundOptions
   typescriptOptions: TypeScriptOptions
   workspaces: WorkspaceStep[]
@@ -381,6 +386,7 @@ export default function Workspace(props: Props) {
       code,
       options: {
         retainLines: true,
+        maxLoopIterations: props.compilerOptions.maxLoopIterations ?? 0,
         instrumentExpressionStatements:
           props.playgroundOptions.instrumentExpressionStatements,
       },

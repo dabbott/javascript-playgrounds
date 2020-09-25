@@ -30,6 +30,10 @@ const userInterfaceStrings = {
 
 export type UserInterfaceStrings = typeof userInterfaceStrings
 
+export interface CompilerOptions {
+  maxLoopIterations?: number
+}
+
 export interface PublicOptions {
   preset?: string
   title?: string
@@ -42,6 +46,7 @@ export interface PublicOptions {
   styles?: ExternalStyles
   fullscreen?: boolean
   sharedEnvironment?: boolean
+  compiler?: CompilerOptions
   playground?: PlaygroundOptions
   typescript?: TypeScriptOptions
   workspaces?: WorkspaceStep[]
@@ -153,6 +158,9 @@ export function normalize(options: PublicOptions): InternalOptions {
     panes = ['editor', 'player'],
     responsivePaneSets = [],
     workspaces = [],
+    compiler = {
+      maxLoopIterations: 1000,
+    },
     playground = {
       enabled: true,
       inspector: 'browser',
@@ -229,5 +237,6 @@ export function normalize(options: PublicOptions): InternalOptions {
         )
       : [],
     targetOrigin,
+    compiler,
   }
 }

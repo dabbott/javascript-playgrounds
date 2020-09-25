@@ -4,7 +4,11 @@ import { workerRequest } from './WorkerRequest'
 export type BabelRequest = {
   filename: string
   code: string
-  options?: { retainLines?: boolean; instrumentExpressionStatements?: boolean }
+  options?: {
+    retainLines?: boolean
+    instrumentExpressionStatements?: boolean
+    maxLoopIterations?: number
+  }
 }
 
 type BabelResponseBase = {

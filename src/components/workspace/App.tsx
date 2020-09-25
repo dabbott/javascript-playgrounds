@@ -65,6 +65,7 @@ export default function App({
   workspaces,
   typescript,
   detectedModules,
+  compiler,
   onChange,
 }: Props) {
   const [activeStepIndex, setActiveStepIndex] = useState(0)
@@ -93,6 +94,7 @@ export default function App({
         responsivePaneSets={responsivePaneSets}
         workspaces={workspaces}
         onChange={onChange}
+        compilerOptions={compiler}
         playgroundOptions={playground}
         typescriptOptions={typescript}
         activeStepIndex={activeStepIndex}
