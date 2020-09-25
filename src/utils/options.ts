@@ -74,6 +74,28 @@ export type InternalOptions = Required<
   detectedModules: ExternalModule[]
 }
 
+const defaults: {
+  compiler: CompilerOptions
+  playground: PlaygroundOptions
+  typescript: TypeScriptOptions
+} = {
+  compiler: {
+    maxLoopIterations: 1000,
+  },
+  playground: {
+    enabled: true,
+    inspector: 'browser',
+    renderReactElements: true,
+    debounceDuration: 200,
+    instrumentExpressionStatements: false,
+  },
+  typescript: {
+    enabled: false,
+    libs: defaultLibs,
+    types: [],
+  },
+}
+
 const presetOptions: Record<string, PublicOptions> = {
   javascript: {
     code: DefaultCode.javaScript,
@@ -158,32 +180,31 @@ export function normalize(options: PublicOptions): InternalOptions {
     panes = ['editor', 'player'],
     responsivePaneSets = [],
     workspaces = [],
-    compiler = {
-      maxLoopIterations: 1000,
-    },
-    playground = {
-      enabled: true,
-      inspector: 'browser',
-      renderReactElements: true,
-      debounceDuration: 200,
-      instrumentExpressionStatements: false,
-    },
-    typescript = {
-      enabled: false,
-      /* libs */
-      /* types */
-    },
+    compiler: rawCompiler,
+    playground: rawPlayground,
+    typescript: rawTypescript,
     detectDependencies = true,
     targetOrigin = '',
   } = Object.assign({}, presetOptions[preset], options)
 
-  const typescriptOptions = Object.assign(
-    { libs: defaultLibs, types: [] },
-    typescript
-  )
+  const compiler = {
+    ...defaults.compiler,
+    ...presetOptions[preset].compiler,
+    ...rawCompiler,
+  }
+  const playground = {
+    ...defaults.playground,
+    ...presetOptions[preset].playground,
+    ...rawPlayground,
+  }
+  const typescript = {
+    ...defaults.typescript,
+    ...presetOptions[preset].typescript,
+    ...rawTypescript,
+  }
 
   if (!entry) {
-    entry = typescriptOptions.enabled ? 'index.tsx' : 'index.js'
+    entry = typescript.enabled ? 'index.tsx' : 'index.js'
   }
 
   if (Object.keys(files).length > 0) {
@@ -226,7 +247,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     responsivePaneSets: normalizedPaneSets,
     workspaces,
     playground,
-    typescript: typescriptOptions,
+    typescript,
     detectedModules: detectDependencies
       ? detectAllDependencies(
           Object.values(files).concat(
