@@ -17,7 +17,7 @@ const styles = prefixObject({
 
 interface Props {
   externalStyles: ExternalStyles
-  preset: string
+  environmentName: string
   platform: string
   width: number
   scale: number
@@ -129,7 +129,7 @@ export default class extends PureComponent<Props, State> {
   renderFrame = () => {
     const {
       externalStyles,
-      preset,
+      environmentName,
       assetRoot,
       detectedModules,
       modules,
@@ -145,7 +145,7 @@ export default class extends PureComponent<Props, State> {
     if (!id) return null
 
     const queryString = encode({
-      preset,
+      environmentName,
       id,
       sharedEnvironment,
       assetRoot,

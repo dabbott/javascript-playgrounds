@@ -1,18 +1,15 @@
-import React, { CSSProperties } from 'react'
-import ReactDOM from 'react-dom'
-
-import Sandbox from './components/player/Sandbox'
-import { getHashString } from './utils/HashString'
-import { prefixAndApply, prefixObject } from './utils/Styles'
-import { appendCSS } from './utils/CSS'
-import VendorComponents, {
-  ExternalModule,
-} from './components/player/VendorComponents'
-import type { IEnvironment } from './environments/IEnvironment'
+import type { CSSProperties } from 'react'
+import type {
+  EnvironmentOptions,
+  IEnvironment,
+} from './environments/IEnvironment'
 import JavaScriptEnvironment from './environments/javascript-environment'
+import { appendCSS } from './utils/CSS'
+import { getHashString } from './utils/HashString'
+import { prefixObject } from './utils/Styles'
 
 const {
-  preset = 'react-native',
+  environmentName = 'react-native',
   id = '0',
   assetRoot = '',
   detectedModules: rawDetectedModules = '[]',
@@ -35,8 +32,6 @@ require('./styles/player.css')
 if (css) {
   appendCSS(css)
 }
-
-const mount = document.getElementById('player-root') as HTMLDivElement
 
 export type PlayerStyles = {
   playerRoot: CSSProperties
@@ -67,47 +62,32 @@ const parsedStyles: PlayerStyles = prefixObject(
   )
 )
 
-prefixAndApply(parsedStyles.playerRoot, mount)
-
-const modules: ExternalModule[] = JSON.parse(rawModules)
-const detectedModules: ExternalModule[] = JSON.parse(rawDetectedModules)
-
 const asyncEnvironment: Promise<IEnvironment> =
-  preset === 'javascript'
+  environmentName === 'javascript'
     ? Promise.resolve(JavaScriptEnvironment)
-    : import('./environments/' + preset + '-environment').then(
+    : import('./environments/' + environmentName + '-environment').then(
         (module) => module.default
       )
 
 asyncEnvironment.then((environment: IEnvironment) => {
-  return environment.initialize().then(() => {
-    const normalizedModules = modules
-      .map(VendorComponents.normalizeExternalModule)
-      .filter(({ name }) => !environment.hasModule(name))
+  const options: EnvironmentOptions = {
+    id,
+    assetRoot,
+    prelude,
+    styles: parsedStyles,
+    statusBarHeight: parseFloat(statusBarHeight),
+    statusBarColor: statusBarColor,
+    sharedEnvironment: sharedEnvironment === 'true',
+    modules: JSON.parse(rawModules),
+    detectedModules: JSON.parse(rawDetectedModules),
+  }
 
-    // Only download detected modules that aren't also listed as vendor components
-    const detectedModulesToDownload = detectedModules
-      .map(VendorComponents.normalizeExternalModule)
-      .filter(({ name }) => !normalizedModules.some((m) => m.name === name))
-
-    VendorComponents.load(
-      [...normalizedModules, ...detectedModulesToDownload],
-      () => {
-        const root = (
-          <Sandbox
-            environment={environment}
-            id={id}
-            assetRoot={assetRoot}
-            styles={parsedStyles}
-            prelude={prelude}
-            statusBarHeight={parseFloat(statusBarHeight)}
-            statusBarColor={statusBarColor}
-            sharedEnvironment={sharedEnvironment === 'true'}
-          />
-        )
-
-        ReactDOM.render(root, mount)
-      }
-    )
-  })
+  return environment.initialize(options).then(handleEnvironmentReady)
 })
+
+// Notify the parent that we're ready to receive/run compiled code
+function handleEnvironmentReady() {
+  try {
+    parent.postMessage(JSON.stringify({ id, type: 'ready' }), '*')
+  } catch {}
+}

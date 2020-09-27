@@ -1,23 +1,18 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import hasProperty from '../utils/hasProperty'
-import JavaScriptEnvironment from './javascript-environment'
-import type { IEnvironment } from './IEnvironment'
+import {
+  AfterEvaluateOptions,
+  BeforeEvaluateOptions,
+  JavaScriptEnvironment,
+} from './javascript-environment'
 
-const Environment: IEnvironment = {
-  initialize: JavaScriptEnvironment.initialize,
+class ReactEnvironment extends JavaScriptEnvironment {
+  beforeEvaluate({ host }: BeforeEvaluateOptions) {
+    ReactDOM.unmountComponentAtNode(host)
+  }
 
-  hasModule: JavaScriptEnvironment.hasModule,
-
-  requireModule: JavaScriptEnvironment.requireModule,
-
-  beforeEvaluate({ host }: { host?: HTMLDivElement }) {
-    if (host) {
-      ReactDOM.unmountComponentAtNode(host)
-    }
-  },
-
-  afterEvaluate({ context, host }) {
+  afterEvaluate({ context, host }: AfterEvaluateOptions) {
     const EntryComponent = context.requireCache[context.entry]
 
     if (
@@ -35,7 +30,7 @@ const Environment: IEnvironment = {
     if (renderedElement) {
       renderedElement.style.overflow = 'hidden'
     }
-  },
+  }
 }
 
-export default Environment
+export default new ReactEnvironment()

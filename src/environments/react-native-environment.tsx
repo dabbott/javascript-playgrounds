@@ -3,44 +3,33 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import * as ReactNative from 'react-native-web'
 import hasProperty from '../utils/hasProperty'
-import type { IEnvironment } from './IEnvironment'
+import type { EnvironmentOptions } from './IEnvironment'
+import {
+  AfterEvaluateOptions,
+  BeforeEvaluateOptions,
+  JavaScriptEnvironment,
+} from './javascript-environment'
 
 const DEFAULT_APP_NAME = 'Main Export'
 
-const modules: Record<string, unknown> = {}
-
-const Environment: IEnvironment = {
-  initialize() {
-    modules['react'] = React
-    modules['react-dom'] = ReactDOM
-    modules['react-native'] = ReactNative
-    modules['prop-types'] = PropTypes
+class ReactNativeEnvironment extends JavaScriptEnvironment {
+  initialize(options: EnvironmentOptions) {
+    this.nodeModules['react-native'] = ReactNative
 
     Object.assign(window, {
-      React,
-      ReactDOM,
       ReactNative,
-      PropTypes,
     })
 
-    return Promise.resolve()
-  },
+    return super.initialize(options)
+  }
 
-  hasModule(name: string): boolean {
-    return modules.hasOwnProperty(name)
-  },
-
-  requireModule(name: string): unknown {
-    return modules.hasOwnProperty(name) ? modules[name] : undefined
-  },
-
-  beforeEvaluate({ host }: { host?: HTMLDivElement }) {
-    if (ReactNative.AppRegistry.getAppKeys().length > 0 && host) {
+  beforeEvaluate({ host }: BeforeEvaluateOptions) {
+    if (ReactNative.AppRegistry.getAppKeys().length > 0) {
       ReactDOM.unmountComponentAtNode(host)
     }
-  },
+  }
 
-  afterEvaluate({ context, host }) {
+  afterEvaluate({ context, host }: AfterEvaluateOptions) {
     const { AppRegistry, Dimensions } = ReactNative
 
     // Attempt to register the default export of the entry file
@@ -81,7 +70,7 @@ const Environment: IEnvironment = {
     if (renderedElement) {
       renderedElement.style.overflow = 'hidden'
     }
-  },
+  }
 }
 
-export default Environment
+export default new ReactNativeEnvironment()

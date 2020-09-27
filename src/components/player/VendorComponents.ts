@@ -101,15 +101,15 @@ export default class VendorComponents {
   }
 
   // Load components from urls
-  static load(components: ExternalModuleDescription[], callback: () => void) {
+  static load(components: ExternalModuleDescription[]): Promise<void> {
     const modules = components.filter((vc) => !vc.globalName)
     const externals = components.filter(
       (vc) => !!vc.globalName
     ) as (ExternalModuleDescription & { globalName: string })[]
 
-    Promise.all([
+    return Promise.all([
       this.loadModules(modules),
       this.loadExternals(externals),
-    ]).then(callback)
+    ]).then(() => {})
   }
 }

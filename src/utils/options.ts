@@ -31,11 +31,13 @@ const userInterfaceStrings = {
 export type UserInterfaceStrings = typeof userInterfaceStrings
 
 export interface CompilerOptions {
+  type: 'none' | 'babel'
   maxLoopIterations?: number
 }
 
 export interface PublicOptions {
   preset?: string
+  environment?: string
   title?: string
   code?: string
   files?: Record<string, string>
@@ -67,9 +69,16 @@ export type PublicResponsivePaneSet = {
 export type InternalOptions = Required<
   Omit<
     PublicOptions,
-    'panes' | 'responsivePaneSets' | 'code' | 'detectDependencies' | 'modules'
+    | 'preset'
+    | 'panes'
+    | 'responsivePaneSets'
+    | 'code'
+    | 'detectDependencies'
+    | 'modules'
+    | 'environment'
   >
 > & {
+  environmentName: string
   responsivePaneSets: ResponsivePaneSet[]
   detectedModules: ExternalModule[]
 }
@@ -80,6 +89,7 @@ const defaults: {
   typescript: TypeScriptOptions
 } = {
   compiler: {
+    type: 'babel',
     maxLoopIterations: 1000,
   },
   playground: {
@@ -97,6 +107,29 @@ const defaults: {
 }
 
 const presetOptions: Record<string, PublicOptions> = {
+  none: {
+    code: '',
+    environment: 'javascript',
+    compiler: {
+      type: 'none',
+    },
+    panes: [
+      'editor',
+      {
+        id: 'player',
+        type: 'player',
+        platform: 'web',
+        style: { display: 'none' },
+      },
+    ],
+    playground: {
+      enabled: false,
+      inspector: 'browser',
+      renderReactElements: true,
+      debounceDuration: 200,
+      instrumentExpressionStatements: false,
+    },
+  },
   javascript: {
     code: DefaultCode.javaScript,
     panes: [
@@ -167,6 +200,7 @@ export function normalize(options: PublicOptions): InternalOptions {
   const preset = options.preset || 'javascript'
 
   let {
+    environment = preset,
     title = '',
     code = DefaultCode.reactNative,
     files = {},
@@ -234,7 +268,7 @@ export function normalize(options: PublicOptions): InternalOptions {
   }))
 
   return {
-    preset,
+    environmentName: environment,
     title,
     files,
     entry,

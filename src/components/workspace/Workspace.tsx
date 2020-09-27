@@ -123,7 +123,7 @@ export interface ExternalStyles {
 }
 
 export interface Props {
-  preset: string
+  environmentName: string
   title: string
   files: Record<string, string>
   entry: string
@@ -148,7 +148,7 @@ type WorkspacePaneProps = {
   options: PaneOptions
 
   // Props
-  preset: string
+  environmentName: string
   ready: boolean
   files: Record<string, string>
   strings: UserInterfaceStrings
@@ -185,7 +185,7 @@ type WorkspacePaneProps = {
 
 const WorkspacePane = memo((props: WorkspacePaneProps) => {
   const {
-    preset,
+    environmentName: environmentName,
     ready,
     files,
     strings,
@@ -261,7 +261,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
           detectedModules={detectedModules}
           options={options}
           externalStyles={externalStyles}
-          preset={preset}
+          environmentName={environmentName}
           sharedEnvironment={sharedEnvironment}
           files={files}
           logs={logs}
@@ -340,7 +340,7 @@ export default function Workspace(props: Props) {
 
   // Run the app once we've transformed each file at least once
   const runApplication = (compiledFiles: Record<string, string>) => {
-    if (Object.keys(files).every((filename) => compiledFiles[filename])) {
+    if (Object.keys(files).every((filename) => filename in compiledFiles)) {
       if (!ready) {
         setReady(true)
       }
@@ -381,22 +381,26 @@ export default function Workspace(props: Props) {
   }
 
   const compilerRequest = (filename: string, code: string) => {
-    babelRequest({
-      filename,
-      code,
-      options: {
-        retainLines: true,
-        maxLoopIterations: props.compilerOptions.maxLoopIterations ?? 0,
-        instrumentExpressionStatements:
-          props.playgroundOptions.instrumentExpressionStatements,
-      },
-    }).then((response: BabelResponse) => {
-      updateStatus(filename, response)
+    if (props.compilerOptions.type === 'none') {
+      dispatch(compiled(filename, code))
+    } else {
+      babelRequest({
+        filename,
+        code,
+        options: {
+          retainLines: true,
+          maxLoopIterations: props.compilerOptions.maxLoopIterations ?? 0,
+          instrumentExpressionStatements:
+            props.playgroundOptions.instrumentExpressionStatements,
+        },
+      }).then((response: BabelResponse) => {
+        updateStatus(filename, response)
 
-      if (response.type === 'code') {
-        dispatch(compiled(response.filename, response.code))
-      }
-    })
+        if (response.type === 'code') {
+          dispatch(compiled(response.filename, response.code))
+        }
+      })
+    }
   }
 
   const transpilerRequest = (filename: string, code: string) => {
@@ -538,7 +542,7 @@ export default function Workspace(props: Props) {
         <WorkspacePane
           key={index}
           // Props
-          preset={props.preset}
+          environmentName={props.environmentName}
           files={props.files}
           strings={props.strings}
           externalStyles={props.externalStyles}
@@ -574,7 +578,7 @@ export default function Workspace(props: Props) {
       )
     },
     [
-      props.preset,
+      props.environmentName,
       props.files,
       props.strings,
       props.externalStyles,

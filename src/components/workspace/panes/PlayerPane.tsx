@@ -24,7 +24,7 @@ const styles = prefixObject({
 export interface Props {
   options: PlayerPaneOptions
   externalStyles: ExternalStyles
-  preset: string
+  environmentName: string
   sharedEnvironment: boolean
   files: Record<string, string>
   detectedModules: ExternalModule[]
@@ -39,7 +39,7 @@ const PlayerPane = memo(
     {
       options,
       externalStyles,
-      preset,
+      environmentName: environmentName,
       sharedEnvironment,
       files,
       logs,
@@ -87,7 +87,7 @@ const PlayerPane = memo(
             <PlayerFrame
               ref={ref}
               externalStyles={externalStyles}
-              preset={preset}
+              environmentName={environmentName}
               width={width}
               scale={scale}
               platform={platform}

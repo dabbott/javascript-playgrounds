@@ -7,18 +7,18 @@ import consoleProxy, {
   consoleLog,
   consoleLogRNWP,
 } from '../components/player/ConsoleProxy'
-import type { EvaluationContext } from '../components/player/Sandbox'
+import { EvaluationContext } from '../environments/IEnvironment'
 
 export function initializeCommunication({
   id,
   sharedEnvironment,
   prefixLineCount,
-  runApplication,
+  onRunApplication,
 }: {
   id: string
   sharedEnvironment: boolean
   prefixLineCount: number
-  runApplication: (context: EvaluationContext) => void
+  onRunApplication: (context: EvaluationContext) => void
 }) {
   function post(message: Message) {
     try {
@@ -28,10 +28,6 @@ export function initializeCommunication({
 
   function sendError(errorMessage: string) {
     post({ id, type: 'error', payload: errorMessage })
-  }
-
-  function sendReady() {
-    post({ id, type: 'ready' })
   }
 
   function sendMessage(message: Message) {
@@ -51,7 +47,7 @@ export function initializeCommunication({
       fileMap: Record<string, string>
     }
 
-    runApplication({ entry, fileMap, requireCache: {} })
+    onRunApplication({ entry, fileMap, requireCache: {} })
   }
 
   window.onerror = (message: Event | string, _?: string, line?: number) => {
@@ -61,12 +57,11 @@ export function initializeCommunication({
   }
 
   consoleProxy._rnwp_log = consoleLogRNWP.bind(consoleProxy, sendMessage, id)
-  consoleProxy.log = consoleLog.bind(consoleProxy, sendMessage, id)
+  consoleProxy.log = consoleLog.bind(consoleProxy, sendMessage, id, 'visible')
   consoleProxy.clear = consoleClear.bind(consoleProxy, sendMessage, id)
 
   return {
     sendError,
-    sendReady,
   }
 }
 
