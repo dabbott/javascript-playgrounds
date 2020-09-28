@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import VendorComponents from './components/player/VendorComponents'
 import type {
   EnvironmentOptions,
   IEnvironment,
@@ -78,8 +79,12 @@ asyncEnvironment.then((environment: IEnvironment) => {
     statusBarHeight: parseFloat(statusBarHeight),
     statusBarColor: statusBarColor,
     sharedEnvironment: sharedEnvironment === 'true',
-    modules: JSON.parse(rawModules),
-    detectedModules: JSON.parse(rawDetectedModules),
+    modules: JSON.parse(rawModules).map(
+      VendorComponents.normalizeExternalModule
+    ),
+    detectedModules: JSON.parse(rawDetectedModules).map(
+      VendorComponents.normalizeExternalModule
+    ),
   }
 
   return environment.initialize(options).then(handleEnvironmentReady)

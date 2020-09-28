@@ -9,6 +9,7 @@ import type {
 import * as path from '../utils/path'
 import VendorComponents, {
   ExternalModule,
+  ExternalModuleDescription,
 } from '../components/player/VendorComponents'
 import consoleProxy from '../components/player/ConsoleProxy'
 import { initializeCommunication } from '../utils/playerCommunication'
@@ -258,18 +259,16 @@ export class JavaScriptEnvironment implements IEnvironment {
     detectedModules,
     hasModule,
   }: {
-    modules: ExternalModule[]
-    detectedModules: ExternalModule[]
+    modules: ExternalModuleDescription[]
+    detectedModules: ExternalModuleDescription[]
     hasModule: (name: string) => boolean
   }): Promise<void> => {
-    const normalizedModules = modules
-      .map(VendorComponents.normalizeExternalModule)
-      .filter(({ name }) => !hasModule(name))
+    const normalizedModules = modules.filter(({ name }) => !hasModule(name))
 
     // Only download detected modules that aren't also listed as vendor components
-    const detectedModulesToDownload = detectedModules
-      .map(VendorComponents.normalizeExternalModule)
-      .filter(({ name }) => !normalizedModules.some((m) => m.name === name))
+    const detectedModulesToDownload = detectedModules.filter(
+      ({ name }) => !normalizedModules.some((m) => m.name === name)
+    )
 
     return VendorComponents.load([
       ...normalizedModules,
@@ -281,11 +280,5 @@ export class JavaScriptEnvironment implements IEnvironment {
 
   afterEvaluate(options: AfterEvaluateOptions) {}
 }
-
-// hasModule(name: string): boolean
-// requireModule(name: string): unknown
-// evaluate?(options: { context: EvaluationContext; host: HTMLDivElement }): void
-// beforeEvaluate?(options: BeforeEvaluateOptions): void
-// afterEvaluate?(options: AfterEvaluateOptions): void
 
 export default new JavaScriptEnvironment()

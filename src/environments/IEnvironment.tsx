@@ -1,4 +1,4 @@
-import { ExternalModule } from '../components/player/VendorComponents'
+import { ExternalModuleDescription } from '../components/player/VendorComponents'
 import type { PlayerStyles } from '../player'
 import type { Message } from '../types/Messages'
 
@@ -23,8 +23,8 @@ export interface EnvironmentOptions {
   statusBarColor: string
   sharedEnvironment: boolean
   styles: PlayerStyles
-  modules: ExternalModule[]
-  detectedModules: ExternalModule[]
+  modules: ExternalModuleDescription[]
+  detectedModules: ExternalModuleDescription[]
 }
 
 export interface IEnvironment {

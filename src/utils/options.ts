@@ -130,6 +130,24 @@ const presetOptions: Record<string, PublicOptions> = {
       instrumentExpressionStatements: false,
     },
   },
+  python: {
+    code: `import sys
+sys.version`,
+    environment: 'python',
+    sharedEnvironment: true,
+    compiler: {
+      type: 'none',
+    },
+    panes: [
+      'editor',
+      {
+        id: 'player',
+        type: 'player',
+        platform: 'web',
+        style: { display: 'none' },
+      },
+    ],
+  },
   javascript: {
     code: DefaultCode.javaScript,
     panes: [
