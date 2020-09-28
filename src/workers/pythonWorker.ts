@@ -1,6 +1,11 @@
 const context: Worker & {
+  importScripts: (...urls: string[]) => void // Why isn't this part of the TS lib?
+
+  // Pyodide
   pyodide: Pyodide
-  languagePluginUrl: string
+  languagePluginLoader: Promise<void>
+
+  // Globals passed to python
   __source__: string
   __log__: (line: number, col: number, ...args: unknown[]) => void
 } = self as any
@@ -24,13 +29,7 @@ interface Pyodide {
   }
 }
 
-context.languagePluginUrl = 'https://pyodide-cdn2.iodide.io/v0.15.0/full/'
-
-const pyodideUrl = 'https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js'
-
-let loaded = fetch(pyodideUrl)
-  .then((response) => response.text())
-  .then((source) => eval(source))
+context.importScripts('https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js')
 
 export type PythonMessage =
   | {
@@ -78,9 +77,9 @@ exec(code)
 function handleMessage(message: PythonMessage): Promise<PythonResponse> {
   switch (message.type) {
     case 'init':
-      return loaded.then(() => ({}))
+      return context.languagePluginLoader.then(() => ({}))
     case 'run':
-      return loaded.then(() => {
+      return context.languagePluginLoader.then(() => {
         const { code, listenerId } = message
         const pyodide = context.pyodide
 
