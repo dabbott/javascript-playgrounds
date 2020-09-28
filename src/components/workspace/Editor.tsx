@@ -1,6 +1,6 @@
 import React, { PureComponent, CSSProperties, MutableRefObject } from 'react'
 import ReactDOM from 'react-dom'
-import { options, requireAddons } from '../../utils/CodeMirror'
+import { getOptions, requireAddons } from '../../utils/CodeMirror'
 import { prefixObject } from '../../utils/Styles'
 import PlaygroundPreview from './PlaygroundPreview'
 import { tooltipAddon, TooltipValue } from '../../utils/CodeMirrorTooltipAddon'
@@ -35,6 +35,10 @@ const styles = prefixObject({
 })
 
 const docCache: Record<string, CM.Doc> = {}
+
+function getMode(filename: string) {
+  return filename.endsWith('.py') ? 'python' : 'text/typescript-jsx'
+}
 
 export interface Props {
   filename: string
@@ -85,6 +89,8 @@ export default class extends PureComponent<Props> {
       tooltipStyle,
     } = this.props
 
+    const mode = getMode(filename)
+
     if (!this.editorNode.current) return
 
     let toolipPlugin: TooltipValue | undefined
@@ -119,14 +125,11 @@ export default class extends PureComponent<Props> {
     requireAddons()
 
     if (!docCache[filename]) {
-      docCache[filename] = new CodeMirror.Doc(
-        initialValue || value || '',
-        options.mode
-      )
+      docCache[filename] = new CodeMirror.Doc(initialValue || value || '', mode)
     }
 
     this.cm = CodeMirror(this.editorNode.current, {
-      ...options,
+      ...getOptions(mode),
       ...(typeof toolipPlugin && {
         tooltip: toolipPlugin,
       }),
@@ -161,6 +164,8 @@ export default class extends PureComponent<Props> {
   componentWillUnmount() {
     const { filename } = this.props
 
+    const mode = getMode(filename)
+
     if (typeof this.updateTimerId !== 'undefined') {
       clearTimeout(this.updateTimerId)
     }
@@ -168,7 +173,7 @@ export default class extends PureComponent<Props> {
     // Store a reference to the current linked doc
     const linkedDoc = this.cm.getDoc()
 
-    this.cm.swapDoc(new CodeMirror.Doc('', options.mode))
+    this.cm.swapDoc(new CodeMirror.Doc('', mode))
 
     // Unlink the doc
     docCache[filename].unlinkDoc(linkedDoc)

@@ -1,6 +1,6 @@
-export const options = {
+export const getOptions = (mode: string) => ({
+  mode,
   value: '',
-  mode: 'text/typescript-jsx',
   theme: 'react',
   keyMap: 'sublime',
   indentUnit: 2,
@@ -11,16 +11,18 @@ export const options = {
   matchTags: {
     bothTags: true,
   },
+  autoRefresh: true,
   extraKeys: {
     Tab: 'indentMore',
     'Cmd-/': (cm: CodeMirror.Editor) => {
       cm.listSelections().forEach((selection) => {
-        ;(cm as any).toggleComment({ lineComment: '//' })
+        ;(cm as any).toggleComment({
+          lineComment: mode === 'python' ? '#' : '//',
+        })
       })
     },
   },
-  autoRefresh: true,
-}
+})
 
 export const requireAddons = () => {
   require('codemirror/mode/jsx/jsx')

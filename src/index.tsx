@@ -31,7 +31,15 @@ const mount = document.getElementById('player-root') as HTMLDivElement
 // Set mount node to flex in a vendor-prefixed way
 prefixAndApply({ display: 'flex' }, mount)
 
-ReactDOM.render(<App onChange={onChange} {...rest} />, mount)
+function render() {
+  ReactDOM.render(<App onChange={onChange} {...rest} />, mount)
+}
+
+if (rest.environmentName === 'python') {
+  import('codemirror/mode/python/python' as any).then(render)
+} else {
+  render()
+}
 
 function onChange(files: Record<string, string>) {
   const merged = {

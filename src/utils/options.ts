@@ -131,8 +131,9 @@ const presetOptions: Record<string, PublicOptions> = {
     },
   },
   python: {
-    code: `import sys
-sys.version`,
+    files: {
+      ['main.py']: `import sys\n\nprint(sys.version)`,
+    },
     environment: 'python',
     sharedEnvironment: true,
     compiler: {
