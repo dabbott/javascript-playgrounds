@@ -7,6 +7,7 @@ const context: Worker & {
 
   // Globals passed to python
   __source__: string
+  __variables__: string[]
   __log__: (line: number, col: number, ...args: unknown[]) => void
 } = self as any
 
@@ -43,6 +44,17 @@ export type PythonMessage =
 
 export type PythonResponse = {}
 
+const DeleteGlobals = `
+import js
+
+js_vars__ = js.self.__variables__
+global_keys__ = list(globals().keys())
+
+for key__ in global_keys__:
+  if (key__ != "js") and (key__ not in js_vars__) and (not key__.endswith('__')):
+    del globals()[key__]
+`
+
 const ConsoleLogTransformer = `
 import ast
 import js
@@ -77,11 +89,21 @@ exec(code)
 function handleMessage(message: PythonMessage): Promise<PythonResponse> {
   switch (message.type) {
     case 'init':
-      return context.languagePluginLoader.then(() => ({}))
+      return context.languagePluginLoader.then(() => {
+        return {}
+      })
     case 'run':
       return context.languagePluginLoader.then(() => {
         const { code, listenerId } = message
         const pyodide = context.pyodide
+
+        if (!context.__variables__) {
+          context.__variables__ = context.pyodide.runPython(
+            `list(globals().keys())`
+          ) as string[]
+        } else {
+          pyodide.runPython(DeleteGlobals)
+        }
 
         // We expose the current source code and special logging function as globals, since
         // that seems to be the easiest way to pass variables into the code after our AST transformation

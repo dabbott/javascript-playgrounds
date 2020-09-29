@@ -131,9 +131,7 @@ const presetOptions: Record<string, PublicOptions> = {
     },
   },
   python: {
-    files: {
-      ['main.py']: `import sys\n\nprint(sys.version)`,
-    },
+    code: `import sys\n\nprint(sys.version)`,
     environment: 'python',
     sharedEnvironment: true,
     compiler: {
@@ -257,7 +255,12 @@ export function normalize(options: PublicOptions): InternalOptions {
   }
 
   if (!entry) {
-    entry = typescript.enabled ? 'index.tsx' : 'index.js'
+    entry =
+      environment === 'python'
+        ? 'main.py'
+        : typescript.enabled
+        ? 'index.tsx'
+        : 'index.js'
   }
 
   if (Object.keys(files).length > 0) {
