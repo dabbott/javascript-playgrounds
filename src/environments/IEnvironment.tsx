@@ -12,6 +12,7 @@ declare global {
 export type EvaluationContext = {
   fileMap: Record<string, string>
   entry: string
+  codeVersion: number
   requireCache: Record<string, unknown>
 }
 

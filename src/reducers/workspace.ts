@@ -67,6 +67,7 @@ type ValueOf<T> = T[keyof T]
 export type Action = ReturnType<ValueOf<typeof actionCreators>>
 
 export interface State {
+  codeVersion: number
   compilerError?: PublicError
   runtimeError?: PublicError
   logs: LogCommand[]
@@ -85,6 +86,7 @@ export const initialState = ({
   initialTab: string
   fileTabs: Tab[]
 }): State => ({
+  codeVersion: 0,
   compilerError: undefined,
   runtimeError: undefined,
   logs: [],
@@ -104,6 +106,7 @@ export function reducer(state: State, action: Action): State {
     case types.COMPILED: {
       return {
         ...state,
+        codeVersion: state.codeVersion + 1,
         playerCache: {
           ...state.playerCache,
           [action.filename]: action.code,

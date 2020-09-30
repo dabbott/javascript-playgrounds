@@ -177,8 +177,8 @@ type WorkspacePaneProps = {
   onClickTab: (tab: Tab) => void
   onCreatePlayer: (id: string, player: PlayerFrame | null) => void
   onPlayerRun: () => void
-  onPlayerError: (message: string) => void
-  onPlayerConsole: (payload: ConsoleCommand) => void
+  onPlayerError: (codeVersion: number, message: string) => void
+  onPlayerConsole: (codeVersion: number, payload: ConsoleCommand) => void
   getTypeScriptInfo: EditorProps['getTypeInfo']
   renderPane: (options: PaneOptions, index: number) => ReactNode
 }
@@ -339,14 +339,17 @@ export default function Workspace(props: Props) {
   const players = useRef<Record<string, PlayerFrame>>({})
 
   // Run the app once we've transformed each file at least once
-  const runApplication = (compiledFiles: Record<string, string>) => {
+  const runApplication = (
+    compiledFiles: Record<string, string>,
+    codeVersion: number
+  ) => {
     if (Object.keys(files).every((filename) => filename in compiledFiles)) {
       if (!ready) {
         setReady(true)
       }
       dispatch(consoleClear())
       Object.values(players.current).forEach((player) => {
-        player.runApplication(compiledFiles, entry)
+        player.runApplication(compiledFiles, entry, codeVersion)
       })
     }
   }
@@ -355,8 +358,8 @@ export default function Workspace(props: Props) {
   // When breakpoints change, we may be rendering different player panes,
   // so we need to re-run then too.
   useEffect(() => {
-    runApplication(state.playerCache)
-  }, [paneSetIndex, state.playerCache])
+    runApplication(state.playerCache, state.codeVersion)
+  }, [paneSetIndex, state.playerCache, state.codeVersion])
 
   const onCreatePlayer = useCallback(
     (id: string, player: PlayerFrame | null) => {
@@ -492,22 +495,32 @@ export default function Workspace(props: Props) {
     dispatch(playerRun())
   }, [])
 
-  const onPlayerError = useCallback((message: string) => {
-    dispatch(playerError(message))
-  }, [])
+  const onPlayerError = useCallback(
+    (codeVersion: number, message: string) => {
+      if (codeVersion !== state.codeVersion) return
 
-  const onPlayerConsole = useCallback((payload: ConsoleCommand) => {
-    // if (consoleOptions.enabled || playgroundOptions.enabled) {
-    switch (payload.command) {
-      case 'clear':
-        dispatch(consoleClear())
-        return
-      case 'log':
-        dispatch(consoleAppend(payload))
-        return
-    }
-    // }
-  }, [])
+      dispatch(playerError(message))
+    },
+    [state.codeVersion]
+  )
+
+  const onPlayerConsole = useCallback(
+    (codeVersion: number, payload: ConsoleCommand) => {
+      if (codeVersion !== state.codeVersion) return
+
+      // if (consoleOptions.enabled || playgroundOptions.enabled) {
+      switch (payload.command) {
+        case 'clear':
+          dispatch(consoleClear())
+          return
+        case 'log':
+          dispatch(consoleAppend(payload))
+          return
+      }
+      // }
+    },
+    [state.codeVersion]
+  )
 
   const getTypeScriptInfo = useCallback(
     (

@@ -25,6 +25,7 @@ export type ConsoleCommand = ClearCommand | LogCommand
 
 type MessageBase = {
   id: string
+  codeVersion: number
 }
 
 export type ConsoleMessage = MessageBase & {

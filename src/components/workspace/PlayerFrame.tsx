@@ -30,9 +30,9 @@ interface Props {
   styleSheet: string
   css: string
   prelude: string
-  onError: (payload: string) => void
+  onError: (codeVersion: number, payload: string) => void
   onRun: () => void
-  onConsole: (payload: ConsoleCommand) => void
+  onConsole: (codeVersion: number, payload: ConsoleCommand) => void
 }
 
 interface State {
@@ -61,6 +61,7 @@ export default class extends PureComponent<Props, State> {
   status: string = 'loading'
   fileMap?: Record<string, string>
   entry?: string
+  codeVersion?: number
 
   state: State = {
     id: null,
@@ -80,16 +81,17 @@ export default class extends PureComponent<Props, State> {
         case 'ready':
           this.status = 'ready'
           if (this.fileMap) {
-            this.runApplication(this.fileMap, this.entry!)
+            this.runApplication(this.fileMap, this.entry!, this.codeVersion!)
             this.fileMap = undefined
             this.entry = undefined
+            this.codeVersion = undefined
           }
           break
         case 'error':
-          this.props.onError(data.payload)
+          this.props.onError(data.codeVersion, data.payload)
           break
         case 'console':
-          this.props.onConsole(data.payload)
+          this.props.onConsole(data.codeVersion, data.payload)
           break
       }
     }
@@ -110,16 +112,21 @@ export default class extends PureComponent<Props, State> {
     })
   }
 
-  runApplication(fileMap: Record<string, string>, entry: string) {
+  runApplication(
+    fileMap: Record<string, string>,
+    entry: string,
+    codeVersion: number
+  ) {
     this.props.onRun()
     switch (this.status) {
       case 'loading':
         this.fileMap = fileMap
         this.entry = entry
+        this.codeVersion = codeVersion
         break
       case 'ready':
         ;(this.refs.iframe as HTMLIFrameElement).contentWindow!.postMessage(
-          { fileMap, entry, source: 'rnwp' },
+          { fileMap, entry, codeVersion, source: 'rnwp' },
           '*'
         )
         break

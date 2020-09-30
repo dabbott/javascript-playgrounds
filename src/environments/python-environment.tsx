@@ -40,7 +40,7 @@ let nextRequest: EvaluationContext | undefined
 
 function run(options: EnvironmentOptions, context: EvaluationContext) {
   const { id, sharedEnvironment, modules } = options
-  const { entry, fileMap } = context
+  const { entry, fileMap, codeVersion } = context
 
   const currentRequestId = requestId++
 
@@ -93,6 +93,7 @@ function run(options: EnvironmentOptions, context: EvaluationContext) {
         consoleLogRNWP(
           sendMessage.bind(null, sharedEnvironment),
           id,
+          codeVersion,
           entry,
           line,
           col,
@@ -106,6 +107,7 @@ function run(options: EnvironmentOptions, context: EvaluationContext) {
 
         sendMessage(sharedEnvironment, {
           id,
+          codeVersion,
           type: 'error',
           payload: message,
         })

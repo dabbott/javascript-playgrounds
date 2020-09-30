@@ -30,8 +30,8 @@ export interface Props {
   detectedModules: ExternalModule[]
   logs: LogCommand[]
   onPlayerRun: () => void
-  onPlayerError: (message: string) => void
-  onPlayerConsole: (payload: ConsoleCommand) => void
+  onPlayerError: (codeVersion: number, message: string) => void
+  onPlayerConsole: (codeVersion: number, payload: ConsoleCommand) => void
 }
 
 const PlayerPane = memo(

@@ -26,8 +26,8 @@ export function initializeCommunication({
     } catch {}
   }
 
-  function sendError(errorMessage: string) {
-    post({ id, type: 'error', payload: errorMessage })
+  function sendError(codeVersion: number, errorMessage: string) {
+    post({ id, codeVersion, type: 'error', payload: errorMessage })
   }
 
   function sendMessage(message: Message) {
@@ -42,23 +42,39 @@ export function initializeCommunication({
   window.onmessage = (e: MessageEvent) => {
     if (!e.data || e.data.source !== 'rnwp') return
 
-    const { entry, fileMap } = e.data as {
+    const { entry, fileMap, codeVersion } = e.data as {
       entry: string
       fileMap: Record<string, string>
+      codeVersion: number
     }
 
-    onRunApplication({ entry, fileMap, requireCache: {} })
-  }
+    consoleProxy._rnwp_log = consoleLogRNWP.bind(
+      consoleProxy,
+      sendMessage,
+      id,
+      codeVersion
+    )
+    consoleProxy.log = consoleLog.bind(
+      consoleProxy,
+      sendMessage,
+      id,
+      codeVersion,
+      'visible'
+    )
+    consoleProxy.clear = consoleClear.bind(
+      consoleProxy,
+      sendMessage,
+      id,
+      codeVersion
+    )
+    window.onerror = (message: Event | string, _?: string, line?: number) => {
+      const editorLine = (line || 0) - prefixLineCount
+      sendError(codeVersion, `${message} (${editorLine})`)
+      return true
+    }
 
-  window.onerror = (message: Event | string, _?: string, line?: number) => {
-    const editorLine = (line || 0) - prefixLineCount
-    sendError(`${message} (${editorLine})`)
-    return true
+    onRunApplication({ entry, fileMap, codeVersion, requireCache: {} })
   }
-
-  consoleProxy._rnwp_log = consoleLogRNWP.bind(consoleProxy, sendMessage, id)
-  consoleProxy.log = consoleLog.bind(consoleProxy, sendMessage, id, 'visible')
-  consoleProxy.clear = consoleClear.bind(consoleProxy, sendMessage, id)
 
   return {
     sendError,

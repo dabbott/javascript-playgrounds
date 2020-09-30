@@ -30,6 +30,7 @@ const nextMessageId = () => `${+new Date()}-${++consoleMessageIndex}`
 const consoleLogCommon = (
   callback: MessageCallback,
   id: string,
+  codeVersion: number,
   location: SourceLocation,
   visibility: LogVisibility,
   ...logs: unknown[]
@@ -48,6 +49,7 @@ const consoleLogCommon = (
 
   const message: Message = {
     id: id,
+    codeVersion,
     type: 'console',
     payload,
   }
@@ -58,6 +60,7 @@ const consoleLogCommon = (
 export const consoleLogRNWP = (
   callback: MessageCallback,
   id: string,
+  codeVersion: number,
   file: string,
   line: number,
   column: number,
@@ -65,25 +68,38 @@ export const consoleLogRNWP = (
   ...logs: unknown[]
 ) => {
   const location = { file, line, column }
-  return consoleLogCommon(callback, id, location, visibility, ...logs)
+  return consoleLogCommon(
+    callback,
+    id,
+    codeVersion,
+    location,
+    visibility,
+    ...logs
+  )
 }
 
 export const consoleLog = (
   callback: MessageCallback,
   id: string,
+  codeVersion: number,
   visibility: 'visible' | 'hidden',
   ...args: unknown[]
 ) => {
   return consoleLogCommon(
     callback,
     id,
+    codeVersion,
     { file: '<unknown>', line: 0, column: 0 },
     visibility,
     ...args
   )
 }
 
-export const consoleClear = (callback: MessageCallback, id: string) => {
+export const consoleClear = (
+  callback: MessageCallback,
+  id: string,
+  codeVersion: number
+) => {
   console.clear()
 
   const payload: ConsoleCommand = {
@@ -93,6 +109,7 @@ export const consoleClear = (callback: MessageCallback, id: string) => {
 
   const message: Message = {
     id: id,
+    codeVersion,
     type: 'console',
     payload,
   }

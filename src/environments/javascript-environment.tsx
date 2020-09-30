@@ -1,20 +1,19 @@
 import PropTypes from 'prop-types'
 import React, { CSSProperties } from 'react'
 import ReactDOM from 'react-dom'
+import consoleProxy from '../components/player/ConsoleProxy'
+import VendorComponents, {
+  ExternalModuleDescription,
+} from '../components/player/VendorComponents'
+import formatError from '../utils/formatError'
+import * as path from '../utils/path'
+import { initializeCommunication } from '../utils/playerCommunication'
+import { prefixAndApply } from '../utils/Styles'
 import type {
   EnvironmentOptions,
   EvaluationContext,
   IEnvironment,
 } from './IEnvironment'
-import * as path from '../utils/path'
-import VendorComponents, {
-  ExternalModule,
-  ExternalModuleDescription,
-} from '../components/player/VendorComponents'
-import consoleProxy from '../components/player/ConsoleProxy'
-import { initializeCommunication } from '../utils/playerCommunication'
-import { prefixAndApply } from '../utils/Styles'
-import formatError from '../utils/formatError'
 
 export interface BeforeEvaluateOptions {
   host: HTMLDivElement
@@ -29,13 +28,13 @@ class JavaScriptSandbox {
   environment: JavaScriptEnvironment
   assetRoot: string
   prelude: string
-  onError: (error: Error) => void
+  onError: (codeVersion: number, error: Error) => void
 
   constructor(
     environment: JavaScriptEnvironment,
     assetRoot: string,
     prelude: string,
-    onError: (error: Error) => void
+    onError: (codeVersion: number, error: Error) => void
   ) {
     this.environment = environment
     this.assetRoot = assetRoot
@@ -106,7 +105,7 @@ class JavaScriptSandbox {
   }
 
   runApplication = (context: EvaluationContext, host: HTMLDivElement) => {
-    const { entry, fileMap } = context
+    const { entry, fileMap, codeVersion } = context
     const { environment, prelude, onError } = this
 
     environment.beforeEvaluate({ host })
@@ -132,7 +131,7 @@ class JavaScriptSandbox {
 
       environment.afterEvaluate({ context, host })
     } catch (e) {
-      onError(e)
+      onError(codeVersion, e)
     }
   }
 
@@ -235,10 +234,15 @@ export class JavaScriptEnvironment implements IEnvironment {
         },
       })
 
-      sandbox = new JavaScriptSandbox(this, assetRoot, prelude, (error) => {
-        const message = formatError(error, this.prefixLineCount)
-        sendError(message)
-      })
+      sandbox = new JavaScriptSandbox(
+        this,
+        assetRoot,
+        prelude,
+        (codeVersion, error) => {
+          const message = formatError(error, this.prefixLineCount)
+          sendError(codeVersion, message)
+        }
+      )
 
       return Promise.resolve()
     })
