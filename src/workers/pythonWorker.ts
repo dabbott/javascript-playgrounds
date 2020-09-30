@@ -1,3 +1,5 @@
+import { document, reset, DOMCanvasElement } from '../utils/MockDOM'
+
 const context: Worker & {
   importScripts: (...urls: string[]) => void // Why isn't this part of the TS lib?
 
@@ -30,6 +32,11 @@ interface Pyodide {
   }
 }
 
+Object.assign(context, {
+  document,
+  window: self,
+})
+
 context.importScripts('https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js')
 
 export type PythonMessage =
@@ -39,7 +46,7 @@ export type PythonMessage =
   | {
       type: 'run'
       code: string
-      listenerId: number
+      requestId: number
     }
 
 export type PythonResponse = {}
@@ -86,6 +93,40 @@ code = compile(tree, "<unknown>", "exec")
 exec(code)
 `
 
+/**
+ * Handle pyplot figures as a special case, drawing the figure as an image
+ */
+function isPlot(obj: any) {
+  try {
+    if (obj.__name__ === 'matplotlib.pyplot') {
+      return true
+    }
+  } catch {
+    return false
+  }
+}
+
+export type TransferableImage = {
+  marker: '__rnwp_transferable_image__'
+  buffer: Uint8ClampedArray
+  width: number
+  height: number
+}
+
+function extractImageData(plt: any): TransferableImage {
+  plt.gcf().canvas.show()
+  const canvas: DOMCanvasElement = plt.gcf().canvas.get_element('canvas')
+  const image: ImageData = canvas.getContext().getImageData()
+  const arrayBuffer = image.data
+
+  return {
+    marker: '__rnwp_transferable_image__',
+    buffer: arrayBuffer,
+    width: (canvas.attributes.width as number) || 0,
+    height: (canvas.attributes.height as number) || 0,
+  }
+}
+
 function handleMessage(message: PythonMessage): Promise<PythonResponse> {
   switch (message.type) {
     case 'init':
@@ -94,7 +135,7 @@ function handleMessage(message: PythonMessage): Promise<PythonResponse> {
       })
     case 'run':
       return context.languagePluginLoader.then(() => {
-        const { code, listenerId } = message
+        const { code, requestId } = message
         const pyodide = context.pyodide
 
         if (!context.__variables__) {
@@ -102,6 +143,7 @@ function handleMessage(message: PythonMessage): Promise<PythonResponse> {
             `list(globals().keys())`
           ) as string[]
         } else {
+          reset()
           pyodide.runPython(DeleteGlobals)
         }
 
@@ -109,13 +151,17 @@ function handleMessage(message: PythonMessage): Promise<PythonResponse> {
         // that seems to be the easiest way to pass variables into the code after our AST transformation
         context.__source__ = code
         context.__log__ = (line: number, col: number, ...args: unknown[]) => {
-          const logs = args.map((x) =>
-            typeof x === 'function' ? pyodide.globals.repr(x) : x
+          const logs = args.map((arg, index) =>
+            isPlot(arg)
+              ? extractImageData(arg)
+              : typeof arg === 'function'
+              ? pyodide.globals.repr(arg)
+              : arg
           )
 
           context.postMessage({
             type: 'log',
-            payload: { line, col, logs, listenerId },
+            payload: { line, col, logs, requestId },
           })
         }
         return findAndLoadImports(pyodide).then(() => {
@@ -127,7 +173,7 @@ function handleMessage(message: PythonMessage): Promise<PythonResponse> {
               context.postMessage({
                 type: 'error',
                 payload: {
-                  listenerId,
+                  requestId,
                   message,
                 },
               })

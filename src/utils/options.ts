@@ -49,7 +49,7 @@ export interface PublicOptions {
   fullscreen?: boolean
   sharedEnvironment?: boolean
   compiler?: CompilerOptions
-  playground?: PlaygroundOptions
+  playground?: Partial<PlaygroundOptions>
   typescript?: TypeScriptOptions
   workspaces?: WorkspaceStep[]
   panes?: PublicPaneOptions[]
@@ -76,11 +76,13 @@ export type InternalOptions = Required<
     | 'detectDependencies'
     | 'modules'
     | 'environment'
+    | 'playground'
   >
 > & {
   environmentName: string
   responsivePaneSets: ResponsivePaneSet[]
   detectedModules: ExternalModule[]
+  playground: PlaygroundOptions
 }
 
 const defaults: {
