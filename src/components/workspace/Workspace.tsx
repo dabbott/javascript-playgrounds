@@ -177,6 +177,7 @@ type WorkspacePaneProps = {
   onClickTab: (tab: Tab) => void
   onCreatePlayer: (id: string, player: PlayerFrame | null) => void
   onPlayerRun: () => void
+  onPlayerReady: () => void
   onPlayerError: (codeVersion: number, message: string) => void
   onPlayerConsole: (codeVersion: number, payload: ConsoleCommand) => void
   getTypeScriptInfo: EditorProps['getTypeInfo']
@@ -211,6 +212,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
     onClickTab,
     onCreatePlayer,
     onPlayerRun,
+    onPlayerReady,
     onPlayerError,
     onPlayerConsole,
     getTypeScriptInfo,
@@ -266,6 +268,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
           files={files}
           logs={logs}
           onPlayerRun={onPlayerRun}
+          onPlayerReady={onPlayerReady}
           onPlayerError={onPlayerError}
           onPlayerConsole={onPlayerConsole}
         />
@@ -325,6 +328,14 @@ export default function Workspace(props: Props) {
   // If we have a player pane, show a loading indicator
   const [ready, setReady] = useState(!playerVisible)
 
+  // If we have an environment that takes a while to load, keep track of whether it's ready separately.
+  // Assume JS environments are preloaded for now (TODO: consider using this instead of the 'ready' check
+  // in PlayerFrame)
+  const isSlowLoadingEnvironment = props.environmentName === 'python'
+  const [environmentReady, setEnvironmentReady] = useState(
+    !isSlowLoadingEnvironment
+  )
+
   const [state, dispatch] = useReducer(reducer, undefined, () =>
     workspace.initialState({
       fileTabs: Object.keys(files).map((filename, index) => ({
@@ -358,8 +369,10 @@ export default function Workspace(props: Props) {
   // When breakpoints change, we may be rendering different player panes,
   // so we need to re-run then too.
   useEffect(() => {
-    runApplication(state.playerCache, state.codeVersion)
-  }, [paneSetIndex, state.playerCache, state.codeVersion])
+    if (environmentReady) {
+      runApplication(state.playerCache, state.codeVersion)
+    }
+  }, [environmentReady, paneSetIndex, state.playerCache, state.codeVersion])
 
   const onCreatePlayer = useCallback(
     (id: string, player: PlayerFrame | null) => {
@@ -495,6 +508,10 @@ export default function Workspace(props: Props) {
     dispatch(playerRun())
   }, [])
 
+  const onPlayerReady = useCallback(() => {
+    setEnvironmentReady(true)
+  }, [environmentReady])
+
   const onPlayerError = useCallback(
     (codeVersion: number, message: string) => {
       if (codeVersion !== state.codeVersion) return
@@ -583,6 +600,7 @@ export default function Workspace(props: Props) {
           onCodeChange={onCodeChange}
           onClickTab={onClickTab}
           onPlayerRun={onPlayerRun}
+          onPlayerReady={onPlayerReady}
           onPlayerError={onPlayerError}
           onPlayerConsole={onPlayerConsole}
           getTypeScriptInfo={getTypeScriptInfo}
@@ -616,6 +634,7 @@ export default function Workspace(props: Props) {
       onCodeChange,
       onClickTab,
       onPlayerRun,
+      onPlayerReady,
       onPlayerError,
       onPlayerConsole,
       getTypeScriptInfo,

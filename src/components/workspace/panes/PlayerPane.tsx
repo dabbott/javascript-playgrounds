@@ -30,6 +30,7 @@ export interface Props {
   detectedModules: ExternalModule[]
   logs: LogCommand[]
   onPlayerRun: () => void
+  onPlayerReady: () => void
   onPlayerError: (codeVersion: number, message: string) => void
   onPlayerConsole: (codeVersion: number, payload: ConsoleCommand) => void
 }
@@ -44,6 +45,7 @@ const PlayerPane = memo(
       files,
       logs,
       onPlayerRun,
+      onPlayerReady,
       onPlayerError,
       onPlayerConsole,
       detectedModules,
@@ -101,6 +103,7 @@ const PlayerPane = memo(
               statusBarColor={statusBarColor}
               sharedEnvironment={sharedEnvironment}
               onRun={onPlayerRun}
+              onReady={onPlayerReady}
               onError={onPlayerError}
               onConsole={onPlayerConsole}
             />

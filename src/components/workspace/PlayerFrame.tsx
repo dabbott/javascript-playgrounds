@@ -30,9 +30,10 @@ interface Props {
   styleSheet: string
   css: string
   prelude: string
-  onError: (codeVersion: number, payload: string) => void
   onRun: () => void
+  onReady: () => void
   onConsole: (codeVersion: number, payload: ConsoleCommand) => void
+  onError: (codeVersion: number, payload: string) => void
 }
 
 interface State {
@@ -53,9 +54,10 @@ export default class extends PureComponent<Props, State> {
     styleSheet: 'reset',
     css: '',
     prelude: '',
-    onError: () => {},
     onRun: () => {},
+    onReady: () => {},
     onConsole: () => {},
+    onError: () => {},
   }
 
   status: string = 'loading'
@@ -80,6 +82,7 @@ export default class extends PureComponent<Props, State> {
       switch (data.type) {
         case 'ready':
           this.status = 'ready'
+          this.props.onReady()
           if (this.fileMap) {
             this.runApplication(this.fileMap, this.entry!, this.codeVersion!)
             this.fileMap = undefined
