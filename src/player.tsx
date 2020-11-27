@@ -31,7 +31,7 @@ if (styleSheet === 'reset') {
 require('./styles/player.css')
 
 if (css) {
-  appendCSS(css)
+  appendCSS(document, css)
 }
 
 export type PlayerStyles = {

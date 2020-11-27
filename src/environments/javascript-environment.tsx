@@ -8,6 +8,7 @@ import VendorComponents, {
 import formatError from '../utils/formatError'
 import * as path from '../utils/path'
 import { initializeCommunication } from '../utils/playerCommunication'
+import { createAppLayout } from '../utils/PlayerUtils'
 import { prefixAndApply } from '../utils/Styles'
 import type {
   EnvironmentOptions,
@@ -196,19 +197,7 @@ export class JavaScriptEnvironment implements IEnvironment {
       detectedModules,
       hasModule: this.hasModule,
     }).then(() => {
-      const mount = document.getElementById('player-root') as HTMLDivElement
-      prefixAndApply(styles.playerRoot, mount)
-
-      const wrapperElement = document.createElement('div')
-      prefixAndApply(styles.playerWrapper, wrapperElement)
-
-      mount.appendChild(wrapperElement)
-
-      const appElement = document.createElement('div')
-      appElement.id = 'app'
-      prefixAndApply(styles.playerApp, appElement)
-
-      wrapperElement.appendChild(appElement)
+      const { appElement, wrapperElement } = createAppLayout(document, styles)
 
       if (statusBarHeight > 0) {
         const statusBarStyle: CSSProperties = {

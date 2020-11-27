@@ -69,6 +69,8 @@ export default class extends PureComponent<Props, State> {
     id: null,
   }
 
+  iframe = React.createRef<HTMLIFrameElement>()
+
   componentDidMount() {
     const { sharedEnvironment } = this.props
 
@@ -128,7 +130,7 @@ export default class extends PureComponent<Props, State> {
         this.codeVersion = codeVersion
         break
       case 'ready':
-        ;(this.refs.iframe as HTMLIFrameElement).contentWindow!.postMessage(
+        this.iframe.current!.contentWindow!.postMessage(
           { fileMap, entry, codeVersion, source: 'rnwp' },
           '*'
         )
@@ -176,7 +178,7 @@ export default class extends PureComponent<Props, State> {
     return (
       <iframe
         style={styles.iframe}
-        ref={'iframe'}
+        ref={this.iframe}
         frameBorder={0}
         src={`player.html#${queryString}`}
       />

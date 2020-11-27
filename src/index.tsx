@@ -23,7 +23,7 @@ if (preset) {
 const { css, targetOrigin, ...rest }: InternalOptions = normalize(publicOptions)
 
 if (css) {
-  appendCSS(css)
+  appendCSS(document, css)
 }
 
 const mount = document.getElementById('player-root') as HTMLDivElement
