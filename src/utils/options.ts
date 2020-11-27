@@ -8,6 +8,7 @@ import * as DefaultCode from '../constants/DefaultCode'
 import { PaneOptions, PaneShorthand, normalizePane } from './Panes'
 import defaultLibs from '../utils/TypeScriptDefaultLibs'
 import type { ExternalModule } from '../components/player/VendorComponents'
+import { extname } from './path'
 
 export interface WorkspaceStep {
   title: string
@@ -131,6 +132,42 @@ const presetOptions: Record<string, PublicOptions> = {
       debounceDuration: 200,
       instrumentExpressionStatements: false,
     },
+  },
+  html: {
+    code: '',
+    files: {
+      'index.html': `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Title</title>
+</head>
+<body>
+  <p>Hello, world!</p>
+</body>
+</html>`,
+      'main.css': `* {
+  box-sizing: border-box;
+}
+
+body, p {
+  padding: 0;
+  margin: 0;
+}`,
+    },
+    environment: 'html',
+    compiler: {
+      type: 'none',
+    },
+    panes: [
+      'editor',
+      {
+        id: 'player',
+        type: 'player',
+        platform: 'web',
+      },
+    ],
   },
   python: {
     code: `import sys\n\nprint(sys.version)`,
@@ -260,6 +297,8 @@ export function normalize(options: PublicOptions): InternalOptions {
     entry =
       environment === 'python'
         ? 'main.py'
+        : environment === 'html'
+        ? 'index.html'
         : typescript.enabled
         ? 'index.tsx'
         : 'index.js'
@@ -318,4 +357,24 @@ export function normalize(options: PublicOptions): InternalOptions {
     targetOrigin,
     compiler,
   }
+}
+
+/**
+ * Get every file name from every option
+ */
+function getFileNames(options: InternalOptions): string[] {
+  const names = Object.keys(options.files).concat(
+    ...options.workspaces.map((workspace) =>
+      Object.keys(workspace.workspace.files)
+    )
+  )
+
+  return names
+}
+
+/**
+ * Get every file extension in options
+ */
+export function getFileExtensions(options: InternalOptions): string[] {
+  return getFileNames(options).map((filename) => extname(filename))
 }

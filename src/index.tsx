@@ -9,7 +9,7 @@ import ReactDOM from 'react-dom'
 import { getHashString, buildHashString } from './utils/HashString'
 import { prefixAndApply } from './utils/Styles'
 import { appendCSS } from './utils/CSS'
-import { normalize, InternalOptions, PublicOptions } from './utils/options'
+import { normalize, PublicOptions, getFileExtensions } from './utils/options'
 import App from './components/workspace/App'
 
 const { data = '{}', preset } = getHashString()
@@ -20,7 +20,9 @@ if (preset) {
   publicOptions.preset = decodeURIComponent(preset)
 }
 
-const { css, targetOrigin, ...rest }: InternalOptions = normalize(publicOptions)
+const internalOptions = normalize(publicOptions)
+
+const { css, targetOrigin, ...rest } = internalOptions
 
 if (css) {
   appendCSS(document, css)
@@ -35,11 +37,20 @@ function render() {
   ReactDOM.render(<App onChange={onChange} {...rest} />, mount)
 }
 
-if (rest.environmentName === 'python') {
-  import('codemirror/mode/python/python' as any).then(render)
-} else {
-  render()
+const extensions = getFileExtensions(internalOptions)
+const editorModes: Promise<void>[] = []
+
+if (extensions.includes('.py')) {
+  editorModes.push(import('codemirror/mode/python/python' as any))
 }
+if (extensions.includes('.html')) {
+  editorModes.push(import('codemirror/mode/htmlmixed/htmlmixed' as any))
+}
+if (extensions.includes('.css')) {
+  editorModes.push(import('codemirror/mode/css/css' as any))
+}
+
+Promise.all(editorModes).then(render)
 
 function onChange(files: Record<string, string>) {
   const merged = {

@@ -11,6 +11,7 @@ import { SourceLocation, LogCommand } from '../../types/Messages'
 import type * as ts from 'typescript'
 import CodeMirror from 'codemirror'
 import type { PlaygroundOptions } from './Workspace'
+import { extname } from '../../utils/path'
 
 // Import scrollPosIntoView directly. The public API calls the native DOM scrollIntoView,
 // which will scroll the parent window when displayed in an iframe.
@@ -36,8 +37,15 @@ const styles = prefixObject({
 
 const docCache: Record<string, CM.Doc> = {}
 
-function getMode(filename: string) {
-  return filename.endsWith('.py') ? 'python' : 'text/typescript-jsx'
+const modeMap: Record<string, string> = {
+  '.py': 'python',
+  '.css': 'css',
+  '.html': 'htmlmixed',
+}
+
+function getMode(filename: string): string {
+  const ext = extname(filename)
+  return modeMap[ext] || 'text/typescript-jsx'
 }
 
 export interface Props {
