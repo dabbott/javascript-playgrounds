@@ -15,11 +15,14 @@ export const getOptions = (mode: string) => ({
   extraKeys: {
     Tab: 'indentMore',
     'Cmd-/': (cm: CodeMirror.Editor) => {
-      cm.listSelections().forEach((selection) => {
+      // Improve commenting within JSX (the default is HTML-style comments)
+      if (mode === 'text/typescript-jsx') {
         ;(cm as any).toggleComment({
-          lineComment: mode === 'python' ? '#' : '//',
+          lineComment: '//',
         })
-      })
+      } else {
+        cm.execCommand('toggleComment')
+      }
     },
   },
 })
