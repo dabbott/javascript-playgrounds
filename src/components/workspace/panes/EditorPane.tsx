@@ -16,14 +16,9 @@ import Header from '../Header'
 import Overlay from '../Overlay'
 import Status from '../Status'
 import Tabs from '../Tabs'
-import {
-  PlaygroundOptions,
-  PublicError,
-  TypeScriptOptions,
-  ExternalStyles,
-} from '../Workspace'
+import { PlaygroundOptions, PublicError, ExternalStyles } from '../Workspace'
 import type { WorkspaceDiff } from '../App'
-import { UserInterfaceStrings } from '../../../utils/options'
+import { TypeScriptOptions, UserInterfaceStrings } from '../../../utils/options'
 
 const styles = prefixObject({
   editorPane: columnStyle,

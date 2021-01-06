@@ -11,6 +11,7 @@ const baseTextStyle = prefix({
   overflow: 'hidden',
   whiteSpace: 'nowrap',
   transition: 'color 0.2s',
+  lineHeight: '1.2',
 })
 
 const styles = prefixObject({

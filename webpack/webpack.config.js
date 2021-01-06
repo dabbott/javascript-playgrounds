@@ -54,6 +54,16 @@ const common = merge({
         use: ['style-loader', 'css-loader'],
       },
       {
+        test: /-worker\.ts/,
+        use: [
+          {
+            loader: 'worker-loader',
+            options: { filename: '[name]-bundle.js', esModule: true },
+          },
+          'ts-loader',
+        ],
+      },
+      {
         test: /-worker\.js/,
         loader: 'worker-loader',
         options: { filename: '[name]-bundle.js', esModule: false },

@@ -16,7 +16,9 @@ import babelRequest, { BabelResponse } from '../../utils/BabelRequest'
 import { PaneOptions, containsPane } from '../../utils/Panes'
 import { prefixObject, rowStyle } from '../../utils/Styles'
 import { Tab } from '../../utils/Tab'
-import typeScriptRequest from '../../utils/TypeScriptRequest'
+import typeScriptRequest, {
+  TypeScriptCompileRequest,
+} from '../../utils/TypeScriptRequest'
 import { Props as EditorProps } from './Editor'
 import ConsolePane from './panes/ConsolePane'
 import EditorPane from './panes/EditorPane'
@@ -30,18 +32,20 @@ import {
   WorkspaceStep,
   UserInterfaceStrings,
   CompilerOptions,
+  TypeScriptOptions,
 } from '../../utils/options'
 import { WorkspaceDiff } from './App'
 import useRerenderEffect from '../../hooks/useRerenderEffect'
 import type { ExternalModule } from '../player/VendorComponents'
+import { basename, extname } from '../../utils/path'
 
 const {
   reducer,
   actionCreators: {
     compiled,
     transpiled,
-    babelCode,
-    babelError,
+    compilerSuccess,
+    compilerError,
     codeChange,
     openEditorTab,
     playerRun,
@@ -75,12 +79,6 @@ export interface PlaygroundOptions {
   debounceDuration: number
   instrumentExpressionStatements: boolean
   expandLevel?: number
-}
-
-export interface TypeScriptOptions {
-  enabled?: false
-  libs?: string[]
-  types?: string[]
 }
 
 export interface ExternalStyles {
@@ -385,37 +383,64 @@ export default function Workspace(props: Props) {
     []
   )
 
-  const updateStatus = (filename: string, babelMessage: BabelResponse) => {
-    switch (babelMessage.type) {
-      case 'code':
-        dispatch(babelCode(filename))
-        break
-      case 'error':
-        dispatch(babelError(filename, babelMessage.error.message))
-        break
+  const updateStatus = (filename: string, errorMessage?: string) => {
+    if (errorMessage) {
+      dispatch(compilerError(filename, errorMessage))
+    } else {
+      dispatch(compilerSuccess(filename))
     }
   }
 
-  const compilerRequest = (filename: string, code: string) => {
-    if (props.compilerOptions.type === 'none') {
-      dispatch(compiled(filename, code))
-    } else {
-      babelRequest({
+  const runBabel = useCallback((filename: string, code: string) => {
+    babelRequest({
+      filename,
+      code,
+      options: {
+        retainLines: true,
+        maxLoopIterations: props.compilerOptions.maxLoopIterations ?? 0,
+        instrumentExpressionStatements:
+          props.playgroundOptions.instrumentExpressionStatements,
+      },
+    }).then((response: BabelResponse) => {
+      updateStatus(
         filename,
-        code,
-        options: {
-          retainLines: true,
-          maxLoopIterations: props.compilerOptions.maxLoopIterations ?? 0,
-          instrumentExpressionStatements:
-            props.playgroundOptions.instrumentExpressionStatements,
-        },
-      }).then((response: BabelResponse) => {
-        updateStatus(filename, response)
+        response.type === 'error' ? response.error.message : undefined
+      )
 
-        if (response.type === 'code') {
-          dispatch(compiled(response.filename, response.code))
-        }
-      })
+      if (response.type === 'code') {
+        dispatch(compiled(response.filename, response.code))
+      }
+    })
+  }, [])
+
+  // We currently ignore the output from tsc, instead transpiling the code
+  // again through babel. This is so the console.log/playground code transformations
+  // get applied. It could be worth rewriting them directly in tsc at some point.
+  const runTsc = useCallback((filename: string, code: string) => {
+    typeScriptRequest({
+      type: 'compile',
+      filename,
+    }).then((response) => {
+      if (response.type === 'error') {
+        updateStatus(filename, response.error.message)
+        return
+      }
+
+      runBabel(filename, code)
+    })
+  }, [])
+
+  const compilerRequest = (filename: string, code: string) => {
+    switch (props.compilerOptions.type) {
+      case 'none':
+        dispatch(compiled(filename, code))
+        break
+      case 'tsc':
+        runTsc(filename, code)
+        break
+      case 'babel':
+      default:
+        runBabel(filename, code)
     }
   }
 
@@ -440,25 +465,25 @@ export default function Workspace(props: Props) {
     }
 
     if (typeof navigator !== 'undefined') {
+      if (typescriptOptions.enabled) {
+        typeScriptRequest({
+          type: 'init',
+          libs: typescriptOptions.libs || [],
+          types: typescriptOptions.types || [],
+          compilerOptions: typescriptOptions.compilerOptions || {},
+        })
+
+        typeScriptRequest({
+          type: 'files',
+          files,
+        })
+      }
+
       // Cache and compile each file
       Object.keys(files).forEach((filename) => {
         const code = files[filename]
 
         state.codeCache[filename] = code
-
-        if (typescriptOptions.enabled) {
-          typeScriptRequest({
-            type: 'libs',
-            libs: typescriptOptions.libs || [],
-            types: typescriptOptions.types || [],
-          })
-
-          typeScriptRequest({
-            type: 'file',
-            filename,
-            code,
-          })
-        }
 
         if (playerVisible) {
           compilerRequest(filename, code)
@@ -477,9 +502,8 @@ export default function Workspace(props: Props) {
     (code: string) => {
       if (typescriptOptions.enabled) {
         typeScriptRequest({
-          type: 'file',
-          filename: state.activeFile,
-          code,
+          type: 'files',
+          files: { [state.activeFile]: code },
         })
       }
 

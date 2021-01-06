@@ -28,11 +28,11 @@ export const actionCreators = {
     filename,
     code,
   }),
-  babelCode: (filename: string) => ({
+  compilerSuccess: (filename: string) => ({
     type: types.BABEL_CODE,
     filename,
   }),
-  babelError: (filename: string, message: string) => ({
+  compilerError: (filename: string, message: string) => ({
     type: types.BABEL_ERROR,
     filename,
     message,

@@ -1,6 +1,6 @@
+import type * as ts from 'typescript'
 import {
   PlaygroundOptions,
-  TypeScriptOptions,
   ResponsivePaneSet,
   ExternalStyles,
 } from '../components/workspace/Workspace'
@@ -9,6 +9,13 @@ import { PaneOptions, PaneShorthand, normalizePane } from './Panes'
 import defaultLibs from '../utils/TypeScriptDefaultLibs'
 import type { ExternalModule } from '../components/player/VendorComponents'
 import { extname } from './path'
+
+export interface TypeScriptOptions {
+  enabled?: boolean
+  libs?: string[]
+  types?: { name: string; url: string }[]
+  compilerOptions?: ts.CompilerOptions
+}
 
 export interface WorkspaceStep {
   title: string
@@ -32,7 +39,7 @@ const userInterfaceStrings = {
 export type UserInterfaceStrings = typeof userInterfaceStrings
 
 export interface CompilerOptions {
-  type: 'none' | 'babel'
+  type: 'none' | 'babel' | 'tsc'
   maxLoopIterations?: number
 }
 
@@ -106,6 +113,7 @@ const defaults: {
     enabled: false,
     libs: defaultLibs,
     types: [],
+    compilerOptions: {},
   },
 }
 
@@ -193,6 +201,35 @@ body, p {
       renderReactElements: true,
       debounceDuration: 200,
       instrumentExpressionStatements: false,
+    },
+  },
+  typescript: {
+    code: DefaultCode.javaScript,
+    environment: 'javascript',
+    compiler: {
+      type: 'tsc',
+    },
+    panes: [
+      'editor',
+      {
+        id: 'player',
+        type: 'player',
+        platform: 'web',
+        style: { display: 'none' },
+      },
+    ],
+    playground: {
+      enabled: true,
+      inspector: 'browser',
+      renderReactElements: true,
+      debounceDuration: 200,
+      instrumentExpressionStatements: false,
+    },
+    typescript: {
+      enabled: true,
+      libs: defaultLibs,
+      types: [],
+      compilerOptions: {},
     },
   },
   react: {
