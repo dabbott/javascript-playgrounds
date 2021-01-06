@@ -133,11 +133,13 @@ onmessage = function ({ data }) {
 
       return
     }
-    case 'file': {
+    case 'files': {
       compiler.then(({ host }) => {
-        const { filename, code } = command
+        const { files } = command
 
-        host.addFile(filename, code)
+        Object.entries(files).forEach(([filename, code]) => {
+          host.addFile(filename, code)
+        })
       })
       return
     }

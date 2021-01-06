@@ -9,9 +9,8 @@ export type TypeScriptInitRequest = {
 }
 
 export type TypeScriptFileRequest = {
-  type: 'file'
-  filename: string
-  code: string
+  type: 'files'
+  files: Record<string, string>
 }
 
 export type TypeScriptQuickInfoRequest = {
