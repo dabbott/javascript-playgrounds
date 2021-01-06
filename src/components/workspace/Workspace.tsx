@@ -16,7 +16,9 @@ import babelRequest, { BabelResponse } from '../../utils/BabelRequest'
 import { PaneOptions, containsPane } from '../../utils/Panes'
 import { prefixObject, rowStyle } from '../../utils/Styles'
 import { Tab } from '../../utils/Tab'
-import typeScriptRequest from '../../utils/TypeScriptRequest'
+import typeScriptRequest, {
+  TypeScriptCompileRequest,
+} from '../../utils/TypeScriptRequest'
 import { Props as EditorProps } from './Editor'
 import ConsolePane from './panes/ConsolePane'
 import EditorPane from './panes/EditorPane'
@@ -30,18 +32,20 @@ import {
   WorkspaceStep,
   UserInterfaceStrings,
   CompilerOptions,
+  TypeScriptOptions,
 } from '../../utils/options'
 import { WorkspaceDiff } from './App'
 import useRerenderEffect from '../../hooks/useRerenderEffect'
 import type { ExternalModule } from '../player/VendorComponents'
+import { basename, extname } from '../../utils/path'
 
 const {
   reducer,
   actionCreators: {
     compiled,
     transpiled,
-    babelCode,
-    babelError,
+    compilerSuccess,
+    compilerError,
     codeChange,
     openEditorTab,
     playerRun,
@@ -75,12 +79,6 @@ export interface PlaygroundOptions {
   debounceDuration: number
   instrumentExpressionStatements: boolean
   expandLevel?: number
-}
-
-export interface TypeScriptOptions {
-  enabled?: false
-  libs?: string[]
-  types?: string[]
 }
 
 export interface ExternalStyles {
@@ -347,6 +345,12 @@ export default function Workspace(props: Props) {
     })
   )
 
+  const codeVersionRef = useRef(state.codeVersion)
+
+  useEffect(() => {
+    codeVersionRef.current = state.codeVersion
+  }, [state.codeVersion])
+
   const players = useRef<Record<string, PlayerFrame>>({})
 
   // Run the app once we've transformed each file at least once
@@ -385,21 +389,16 @@ export default function Workspace(props: Props) {
     []
   )
 
-  const updateStatus = (filename: string, babelMessage: BabelResponse) => {
-    switch (babelMessage.type) {
-      case 'code':
-        dispatch(babelCode(filename))
-        break
-      case 'error':
-        dispatch(babelError(filename, babelMessage.error.message))
-        break
+  const updateStatus = (filename: string, errorMessage?: string) => {
+    if (errorMessage) {
+      dispatch(compilerError(filename, errorMessage))
+    } else {
+      dispatch(compilerSuccess(filename))
     }
   }
 
-  const compilerRequest = (filename: string, code: string) => {
-    if (props.compilerOptions.type === 'none') {
-      dispatch(compiled(filename, code))
-    } else {
+  const runBabel = useCallback(
+    (filename: string, code: string, currentCodeVersion: number) => {
       babelRequest({
         filename,
         code,
@@ -410,12 +409,67 @@ export default function Workspace(props: Props) {
             props.playgroundOptions.instrumentExpressionStatements,
         },
       }).then((response: BabelResponse) => {
-        updateStatus(filename, response)
+        if (currentCodeVersion !== codeVersionRef.current) return
+
+        updateStatus(
+          filename,
+          response.type === 'error' ? response.error.message : undefined
+        )
 
         if (response.type === 'code') {
           dispatch(compiled(response.filename, response.code))
         }
       })
+    },
+    []
+  )
+
+  // We currently ignore the output from tsc, instead transpiling the code
+  // again through babel. This is so the console.log/playground code transformations
+  // get applied. It could be worth rewriting them directly in tsc at some point.
+  const runTsc = useCallback(
+    (filename: string, code: string, currentCodeVersion: number) => {
+      typeScriptRequest({
+        type: 'compile',
+        filename,
+      }).then((response) => {
+        if (currentCodeVersion !== codeVersionRef.current) return
+
+        if (response.type === 'error') {
+          updateStatus(filename, response.error.message)
+          return
+        }
+
+        runBabel(filename, code, currentCodeVersion)
+
+        // if (response.type === 'code') {
+        //   Object.entries(response.files).forEach(([name, compiledCode]) => {
+        //     if (
+        //       basename(filename, extname(filename)) ===
+        //       basename(name, extname(name))
+        //     ) {
+        //       dispatch(compiled(filename, compiledCode))
+        //     }
+        //   })
+        // }
+      })
+    },
+    []
+  )
+
+  const compilerRequest = (filename: string, code: string) => {
+    let currentCodeVersion = codeVersionRef.current
+
+    switch (props.compilerOptions.type) {
+      case 'none':
+        dispatch(compiled(filename, code))
+        break
+      case 'tsc':
+        runTsc(filename, code, currentCodeVersion)
+        break
+      case 'babel':
+      default:
+        runBabel(filename, code, currentCodeVersion)
     }
   }
 
@@ -448,9 +502,10 @@ export default function Workspace(props: Props) {
 
         if (typescriptOptions.enabled) {
           typeScriptRequest({
-            type: 'libs',
+            type: 'init',
             libs: typescriptOptions.libs || [],
             types: typescriptOptions.types || [],
+            compilerOptions: typescriptOptions.compilerOptions || {},
           })
 
           typeScriptRequest({
