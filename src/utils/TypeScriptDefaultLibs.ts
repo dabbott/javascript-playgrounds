@@ -23,7 +23,7 @@ export default [
   // 'lib.es2018.promise',
   // 'lib.es2018.regexp',
   // 'lib.es2019.array',
-  // 'lib.es2019.object',
+  'lib.es2019.object',
   // 'lib.es2019.string',
   // 'lib.es2019.symbol',
   // 'lib.es2020.bigint',

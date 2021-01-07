@@ -11,6 +11,7 @@ import { prefixAndApply } from './utils/Styles'
 import { appendCSS } from './utils/CSS'
 import { normalize, PublicOptions, getFileExtensions } from './utils/options'
 import App from './components/workspace/App'
+import { OptionsProvider } from './contexts/OptionsContext'
 
 const { data = '{}', preset } = getHashString()
 
@@ -34,7 +35,12 @@ const mount = document.getElementById('player-root') as HTMLDivElement
 prefixAndApply({ display: 'flex' }, mount)
 
 function render() {
-  ReactDOM.render(<App onChange={onChange} {...rest} />, mount)
+  ReactDOM.render(
+    <OptionsProvider value={internalOptions}>
+      <App onChange={onChange} {...rest} />
+    </OptionsProvider>,
+    mount
+  )
 }
 
 const extensions = getFileExtensions(internalOptions)

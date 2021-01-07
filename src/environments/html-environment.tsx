@@ -1,4 +1,5 @@
 import { appendCSS } from '../utils/CSS'
+import { entries } from '../utils/Object'
 import { initializeCommunication } from '../utils/playerCommunication'
 import { createAppLayout } from '../utils/PlayerUtils'
 import { EnvironmentOptions, IEnvironment } from './IEnvironment'
@@ -31,7 +32,7 @@ export class HTMLEnvironment implements IEnvironment {
         document.write(entryFile)
         document.close()
 
-        const cssFiles = Object.entries(context.fileMap).filter(([name]) =>
+        const cssFiles = entries(context.fileMap).filter(([name]) =>
           name.endsWith('.css')
         )
 

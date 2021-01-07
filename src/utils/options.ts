@@ -7,6 +7,7 @@ import {
 import * as DefaultCode from '../constants/DefaultCode'
 import { PaneOptions, PaneShorthand, normalizePane } from './Panes'
 import defaultLibs from '../utils/TypeScriptDefaultLibs'
+import defaultCompilerOptions from '../utils/TypeScriptDefaultConfig'
 import type { ExternalModule } from '../components/player/VendorComponents'
 import { extname } from './path'
 
@@ -34,6 +35,7 @@ const userInterfaceStrings = {
   noErrors: 'No Errors',
   showDetails: 'Show Details',
   fullscreen: 'Fullscreen',
+  codesandbox: 'Open in CodeSandbox',
 }
 
 export type UserInterfaceStrings = typeof userInterfaceStrings
@@ -55,6 +57,7 @@ export interface PublicOptions {
   css?: string // was workspaceCSS
   styles?: ExternalStyles
   fullscreen?: boolean
+  codesandbox?: boolean
   sharedEnvironment?: boolean
   compiler?: CompilerOptions
   playground?: Partial<PlaygroundOptions>
@@ -113,7 +116,7 @@ const defaults: {
     enabled: false,
     libs: defaultLibs,
     types: [],
-    compilerOptions: {},
+    compilerOptions: defaultCompilerOptions,
   },
 }
 
@@ -227,9 +230,6 @@ body, p {
     },
     typescript: {
       enabled: true,
-      libs: defaultLibs,
-      types: [],
-      compilerOptions: {},
     },
   },
   react: {
@@ -293,6 +293,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     css = '', // was workspaceCSS
     styles = Object.assign({}, presetOptions[preset]?.styles, options.styles),
     fullscreen = false,
+    codesandbox = false,
     sharedEnvironment = false,
     panes = ['editor', 'player'],
     responsivePaneSets = [],
@@ -366,6 +367,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     css,
     styles,
     strings: Object.assign({}, userInterfaceStrings, rawStrings),
+    codesandbox,
     fullscreen,
     sharedEnvironment,
     responsivePaneSets: normalizedPaneSets,
