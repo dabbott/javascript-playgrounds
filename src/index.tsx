@@ -23,10 +23,12 @@ if (preset) {
 
 const internalOptions = normalize(publicOptions)
 
-const { css, targetOrigin, ...rest } = internalOptions
+const { css, _css, targetOrigin, ...rest } = internalOptions
 
-if (css) {
-  appendCSS(document, css)
+const documentCSS = css || _css
+
+if (documentCSS) {
+  appendCSS(document, documentCSS)
 }
 
 const mount = document.getElementById('player-root') as HTMLDivElement

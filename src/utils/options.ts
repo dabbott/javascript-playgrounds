@@ -55,6 +55,7 @@ export interface PublicOptions {
   initialTab?: string
   strings?: UserInterfaceStrings
   css?: string // was workspaceCSS
+  _css?: string // workaround for styled-components renaming this props
   styles?: ExternalStyles
   fullscreen?: boolean
   codesandbox?: boolean
@@ -291,6 +292,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     initialTab,
     strings: rawStrings,
     css = '', // was workspaceCSS
+    _css = '',
     styles = Object.assign({}, presetOptions[preset]?.styles, options.styles),
     fullscreen = false,
     codesandbox = false,
@@ -365,6 +367,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     entry,
     initialTab,
     css,
+    _css,
     styles,
     strings: Object.assign({}, userInterfaceStrings, rawStrings),
     codesandbox,
