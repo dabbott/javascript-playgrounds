@@ -28,25 +28,7 @@ export default class LanguageServiceHost implements TSLanguageServiceHost {
   // Implementation of ts.LanguageServiceHost
 
   getCompilationSettings(): ts.CompilerOptions {
-    return {
-      target: ts.ScriptTarget.ES5,
-      module: ts.ModuleKind.CommonJS,
-      strict: true,
-      strictNullChecks: true,
-      strictFunctionTypes: true,
-      strictPropertyInitialization: true,
-      strictBindCallApply: true,
-      noImplicitThis: true,
-      noImplicitAny: true,
-      alwaysStrict: true,
-      esModuleInterop: true,
-      experimentalDecorators: true,
-      emitDecoratorMetadata: true,
-      incremental: true,
-      tsBuildInfoFile: '/.tsbuildinfo',
-      jsx: ts.JsxEmit.React,
-      ...this.compilerOptions,
-    }
+    return this.compilerOptions
   }
 
   getScriptFileNames() {

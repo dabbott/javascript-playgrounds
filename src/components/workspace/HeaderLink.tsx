@@ -1,5 +1,4 @@
 import React, { CSSProperties, memo } from 'react'
-import screenfull from 'screenfull'
 import { mergeStyles, prefixObject } from '../../utils/Styles'
 
 const styles = prefixObject({
@@ -10,22 +9,27 @@ const styles = prefixObject({
     padding: '0 20px',
     display: 'flex',
     alignItems: 'center',
+    cursor: 'pointer',
+    textDecoration: 'underline',
   },
 })
 
 interface Props {
-  title: string
+  children: React.ReactNode
   textStyle?: CSSProperties
+  onClick?: () => void
 }
 
-const toggleFullscreen = () => (screenfull as any).toggle()
-
-export default memo(function Fullscreen({ textStyle, title }: Props) {
+export default memo(function Fullscreen({
+  textStyle,
+  onClick,
+  children,
+}: Props) {
   const computedTextStyle = mergeStyles(styles.text, textStyle)
 
   return (
-    <div style={computedTextStyle} onClick={toggleFullscreen}>
-      {title}
+    <div style={computedTextStyle} onClick={onClick}>
+      {children}
     </div>
   )
 })

@@ -1,4 +1,5 @@
 import * as ts from 'typescript'
+import { entries } from './utils/Object'
 import type {
   TypeScriptErrorResponse,
   TypeScriptRequest,
@@ -137,7 +138,7 @@ onmessage = function ({ data }) {
       compiler.then(({ host }) => {
         const { files } = command
 
-        Object.entries(files).forEach(([filename, code]) => {
+        entries(files).forEach(([filename, code]) => {
           host.addFile(filename, code)
         })
       })

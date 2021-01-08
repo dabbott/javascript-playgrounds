@@ -1,4 +1,5 @@
 import React, { memo, useState } from 'react'
+import screenfull from 'screenfull'
 import { LogCommand } from '../../../types/Messages'
 import { EditorPaneOptions } from '../../../utils/Panes'
 import { columnStyle, mergeStyles, prefixObject } from '../../../utils/Styles'
@@ -11,7 +12,7 @@ import {
 import About from '../About'
 import Button from '../Button'
 import Editor, { Props as EditorProps } from '../Editor'
-import Fullscreen from '../Fullscreen'
+import HeaderLink from '../HeaderLink'
 import Header from '../Header'
 import Overlay from '../Overlay'
 import Status from '../Status'
@@ -19,6 +20,10 @@ import Tabs from '../Tabs'
 import { PlaygroundOptions, PublicError, ExternalStyles } from '../Workspace'
 import type { WorkspaceDiff } from '../App'
 import { TypeScriptOptions, UserInterfaceStrings } from '../../../utils/options'
+import { useOptions } from '../../../contexts/OptionsContext'
+import { CodeSandboxButton } from '../CodeSandboxButton'
+
+const toggleFullscreen = () => (screenfull as any).toggle()
 
 const styles = prefixObject({
   editorPane: columnStyle,
@@ -97,9 +102,11 @@ export default memo(function EditorPane({
   getTypeInfo,
   onClickTab,
 }: Props) {
+  const internalOptions = useOptions()
+
   const [showDetails, setShowDetails] = useState(false)
 
-  const { title } = options
+  const title = options.title ?? internalOptions.title
 
   const fileDiff = diff[activeFile] ? diff[activeFile].ranges : []
 
@@ -107,6 +114,24 @@ export default memo(function EditorPane({
   const isError = !!error
 
   const style = mergeStyles(styles.editorPane, options.style)
+
+  const headerElements = (
+    <>
+      {fullscreen && (
+        <HeaderLink
+          textStyle={externalStyles.tabText}
+          onClick={toggleFullscreen}
+        >
+          {strings.fullscreen}
+        </HeaderLink>
+      )}
+      {internalOptions.codesandbox && (
+        <CodeSandboxButton files={files}>
+          {strings.codesandbox}
+        </CodeSandboxButton>
+      )}
+    </>
+  )
 
   return (
     <div style={style}>
@@ -116,12 +141,7 @@ export default memo(function EditorPane({
           headerStyle={externalStyles.header}
           textStyle={externalStyles.headerText}
         >
-          {fullscreen && (
-            <Fullscreen
-              title={strings.fullscreen}
-              textStyle={externalStyles.headerText}
-            />
-          )}
+          {headerElements}
         </Header>
       )}
       {fileTabs.length > 1 && (
@@ -137,12 +157,7 @@ export default memo(function EditorPane({
           activeTextStyle={externalStyles.tabTextActive}
           changedTextStyle={externalStyles.tabTextChanged}
         >
-          {fullscreen && !title && (
-            <Fullscreen
-              title={strings.fullscreen}
-              textStyle={externalStyles.tabText}
-            />
-          )}
+          {!title && headerElements}
         </Tabs>
       )}
       <Editor
