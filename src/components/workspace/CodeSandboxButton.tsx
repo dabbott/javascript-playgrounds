@@ -14,21 +14,6 @@ const styles = prefixObject({
   form: {
     display: 'flex',
   },
-  // Reset button CSS: https://gist.github.com/MoOx/9137295
-  button: {
-    border: 'none',
-    margin: '0',
-    padding: '0',
-    width: 'auto',
-    overflow: 'visible',
-    background: 'transparent',
-    color: 'inherit',
-    font: 'inherit',
-    lineHeight: 'normal',
-    WebkitFontSmoothing: 'inherit',
-    MozOsxFontSmoothing: 'inherit',
-    WebkitAppearance: 'none',
-  },
 })
 
 const scriptTargetMap: Record<number, string> = {
@@ -135,13 +120,9 @@ export const CodeSandboxButton = memo(function CodeSandboxButton({
       target="_blank"
     >
       <input type="hidden" name="parameters" value={parameters} />
-      <button
-        title={internalOptions.strings.codesandbox}
-        style={styles.button}
-        type="submit"
-      >
-        <HeaderLink>{children}</HeaderLink>
-      </button>
+      <HeaderLink type="submit" title={internalOptions.strings.codesandbox}>
+        {children}
+      </HeaderLink>
     </form>
   )
 })

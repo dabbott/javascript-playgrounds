@@ -23,6 +23,7 @@ import { TypeScriptOptions, UserInterfaceStrings } from '../../../utils/options'
 import { useOptions } from '../../../contexts/OptionsContext'
 import { CodeSandboxButton } from '../CodeSandboxButton'
 import { CubeIcon, EnterFullScreenIcon, ExternalLinkIcon } from '../Icons'
+import { HorizontalSpacer } from '../Spacer'
 
 const toggleFullscreen = () => (screenfull as any).toggle()
 
@@ -118,6 +119,11 @@ export default memo(function EditorPane({
 
   const headerElements = (
     <>
+      {internalOptions.codesandbox && (
+        <CodeSandboxButton files={files}>
+          <CubeIcon />
+        </CodeSandboxButton>
+      )}
       {internalOptions.openInNewWindow && (
         <HeaderLink
           title={strings.openInNewWindow}
@@ -128,11 +134,6 @@ export default memo(function EditorPane({
           <ExternalLinkIcon />
         </HeaderLink>
       )}
-      {internalOptions.codesandbox && (
-        <CodeSandboxButton files={files}>
-          <CubeIcon />
-        </CodeSandboxButton>
-      )}
       {fullscreen && (
         <HeaderLink
           title={strings.fullscreen}
@@ -142,6 +143,7 @@ export default memo(function EditorPane({
           <EnterFullScreenIcon />
         </HeaderLink>
       )}
+      <HorizontalSpacer size={10} />
     </>
   )
 

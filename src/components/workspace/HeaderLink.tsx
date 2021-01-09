@@ -1,7 +1,8 @@
-import React, { CSSProperties, memo } from 'react'
+import React, { ButtonHTMLAttributes, CSSProperties, memo } from 'react'
 import { mergeStyles, prefixObject } from '../../utils/Styles'
 
 const styles = prefixObject({
+  // Reset button CSS: https://gist.github.com/MoOx/9137295
   buttonReset: {
     border: 'none',
     margin: '0',
@@ -20,7 +21,7 @@ const styles = prefixObject({
     color: '#FFF',
     fontSize: 13,
     fontFamily: 'proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif',
-    marginRight: '20px',
+    padding: '9px',
     display: 'flex',
     alignItems: 'center',
     cursor: 'pointer',
@@ -28,31 +29,33 @@ const styles = prefixObject({
   },
 })
 
-interface Props {
-  href?: string
+type BaseProps = {
   textStyle?: CSSProperties
   title?: string
-  onClick?: () => void
   children: React.ReactNode
 }
 
-export default memo(function HeaderLink({
-  textStyle,
-  href,
-  onClick,
-  title,
-  children,
-}: Props) {
+type AnchorProps = BaseProps & {
+  href: string
+}
+
+type ButtonProps = BaseProps & {
+  type?: ButtonHTMLAttributes<unknown>['type']
+  onClick?: () => void
+}
+
+export default memo(function HeaderLink(props: AnchorProps | ButtonProps) {
+  const { textStyle, title, children } = props
+
   const computedTextStyle = mergeStyles(styles.text, textStyle)
   const buttonStyle = mergeStyles(styles.buttonReset, styles.text, textStyle)
 
-  if (href) {
+  if ('href' in props) {
     return (
       <a
         title={title}
         style={computedTextStyle}
-        onClick={onClick}
-        href={href}
+        href={props.href}
         target="_blank"
       >
         {children}
@@ -60,7 +63,12 @@ export default memo(function HeaderLink({
     )
   } else {
     return (
-      <button title={title} style={buttonStyle} onClick={onClick}>
+      <button
+        type={props.type}
+        title={title}
+        style={buttonStyle}
+        onClick={props.onClick}
+      >
         {children}
       </button>
     )
