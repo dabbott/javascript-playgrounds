@@ -120,7 +120,7 @@ export default memo(function EditorPane({
   const headerElements = (
     <>
       {internalOptions.codesandbox && (
-        <CodeSandboxButton files={files}>
+        <CodeSandboxButton textStyle={externalStyles.tabText} files={files}>
           <CubeIcon />
         </CodeSandboxButton>
       )}

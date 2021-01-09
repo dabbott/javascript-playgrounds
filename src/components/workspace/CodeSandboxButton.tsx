@@ -1,14 +1,9 @@
 import { getParameters } from 'codesandbox/lib/api/define'
-import React, { memo, useMemo } from 'react'
+import React, { CSSProperties, memo, useMemo } from 'react'
 import { useOptions } from '../../contexts/OptionsContext'
 import { entries, fromEntries } from '../../utils/Object'
 import { prefixObject } from '../../utils/Styles'
 import HeaderLink from './HeaderLink'
-
-interface Props {
-  files: Record<string, string>
-  children?: React.ReactNode
-}
 
 const styles = prefixObject({
   form: {
@@ -47,8 +42,15 @@ const jsxEmitMap: Record<number, string> = {
   3: 'react-native',
 }
 
+interface Props {
+  files: Record<string, string>
+  textStyle?: CSSProperties
+  children?: React.ReactNode
+}
+
 export const CodeSandboxButton = memo(function CodeSandboxButton({
   files,
+  textStyle,
   children,
 }: Props) {
   const internalOptions = useOptions()
@@ -120,7 +122,11 @@ export const CodeSandboxButton = memo(function CodeSandboxButton({
       target="_blank"
     >
       <input type="hidden" name="parameters" value={parameters} />
-      <HeaderLink type="submit" title={internalOptions.strings.codesandbox}>
+      <HeaderLink
+        textStyle={textStyle}
+        type="submit"
+        title={internalOptions.strings.codesandbox}
+      >
         {children}
       </HeaderLink>
     </form>
