@@ -48,6 +48,7 @@ export type PlayerPaneOptions = PaneBaseOptions & {
   statusBarHeight?: number
   statusBarColor?: string
   console?: EmbeddedConsoleOptions
+  reloadable?: boolean
 }
 
 export type WorkspacesPaneOptions = PaneBaseOptions & {

@@ -37,6 +37,7 @@ const userInterfaceStrings = {
   fullscreen: 'Fullscreen',
   openInNewWindow: 'Open in new window',
   codesandbox: 'Open in CodeSandbox',
+  reload: 'Reload',
 }
 
 export type UserInterfaceStrings = typeof userInterfaceStrings
@@ -62,6 +63,7 @@ export interface PublicOptions {
   codesandbox?: boolean
   openInNewWindow?: boolean
   sharedEnvironment?: boolean
+  reloadMode?: 'soft' | 'hard'
   compiler?: CompilerOptions
   playground?: Partial<PlaygroundOptions>
   typescript?: TypeScriptOptions
@@ -300,6 +302,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     codesandbox = false,
     openInNewWindow = false,
     sharedEnvironment = false,
+    reloadMode = 'soft',
     panes = ['editor', 'player'],
     responsivePaneSets = [],
     workspaces = [],
@@ -373,6 +376,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     _css,
     styles,
     strings: Object.assign({}, userInterfaceStrings, rawStrings),
+    reloadMode,
     codesandbox,
     openInNewWindow,
     fullscreen,

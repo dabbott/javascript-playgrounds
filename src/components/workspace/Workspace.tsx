@@ -38,6 +38,7 @@ import { WorkspaceDiff } from './App'
 import useRerenderEffect from '../../hooks/useRerenderEffect'
 import type { ExternalModule } from '../player/VendorComponents'
 import { basename, extname } from '../../utils/path'
+import { useOptions } from '../../contexts/OptionsContext'
 
 const {
   reducer,
@@ -176,6 +177,7 @@ type WorkspacePaneProps = {
   onCreatePlayer: (id: string, player: PlayerFrame | null) => void
   onPlayerRun: () => void
   onPlayerReady: () => void
+  onPlayerReload: () => void
   onPlayerError: (codeVersion: number, message: string) => void
   onPlayerConsole: (codeVersion: number, payload: ConsoleCommand) => void
   getTypeScriptInfo: EditorProps['getTypeInfo']
@@ -211,6 +213,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
     onCreatePlayer,
     onPlayerRun,
     onPlayerReady,
+    onPlayerReload,
     onPlayerError,
     onPlayerConsole,
     getTypeScriptInfo,
@@ -267,6 +270,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
           logs={logs}
           onPlayerRun={onPlayerRun}
           onPlayerReady={onPlayerReady}
+          onPlayerReload={onPlayerReload}
           onPlayerError={onPlayerError}
           onPlayerConsole={onPlayerConsole}
         />
@@ -313,6 +317,7 @@ export default function Workspace(props: Props) {
     typescriptOptions = {},
     diff = {},
   } = props
+  const internalOptions = useOptions()
 
   // Determine which pane set to use based on responsive breakpoint
   const widths = useMemo(() => responsivePaneSets.map((set) => set.maxWidth), [
@@ -369,6 +374,15 @@ export default function Workspace(props: Props) {
   useEffect(() => {
     if (environmentReady) {
       runApplication(state.playerCache, state.codeVersion)
+    }
+  }, [environmentReady, paneSetIndex, state.playerCache, state.codeVersion])
+
+  const onPlayerReload = useCallback(() => {
+    if (environmentReady) {
+      setEnvironmentReady(false)
+      Object.values(players.current).forEach((player) => {
+        player.reload()
+      })
     }
   }, [environmentReady, paneSetIndex, state.playerCache, state.codeVersion])
 
@@ -500,6 +514,10 @@ export default function Workspace(props: Props) {
 
   const onCodeChange = useCallback(
     (code: string) => {
+      if (internalOptions.reloadMode === 'hard') {
+        onPlayerReload()
+      }
+
       if (typescriptOptions.enabled) {
         typeScriptRequest({
           type: 'files',
@@ -625,6 +643,7 @@ export default function Workspace(props: Props) {
           onClickTab={onClickTab}
           onPlayerRun={onPlayerRun}
           onPlayerReady={onPlayerReady}
+          onPlayerReload={onPlayerReload}
           onPlayerError={onPlayerError}
           onPlayerConsole={onPlayerConsole}
           getTypeScriptInfo={getTypeScriptInfo}

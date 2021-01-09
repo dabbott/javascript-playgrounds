@@ -138,6 +138,12 @@ export default class extends PureComponent<Props, State> {
     }
   }
 
+  reload() {
+    if (!this.iframe.current) return
+
+    this.iframe.current.contentWindow?.location.reload()
+  }
+
   renderFrame = () => {
     const {
       externalStyles,

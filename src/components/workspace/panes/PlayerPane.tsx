@@ -14,6 +14,10 @@ import Status from '../Status'
 import { PlayerPaneOptions } from '../../../utils/Panes'
 import { ExternalStyles } from '../Workspace'
 import type { ExternalModule } from '../../player/VendorComponents'
+import { ReloadIcon } from '../Icons'
+import HeaderLink from '../HeaderLink'
+import { HorizontalSpacer } from '../Spacer'
+import { useOptions } from '../../../contexts/OptionsContext'
 
 const styles = prefixObject({
   playerPane: mergeStyles(columnStyle, { flex: '0 0 auto' }),
@@ -31,6 +35,7 @@ export interface Props {
   logs: LogCommand[]
   onPlayerRun: () => void
   onPlayerReady: () => void
+  onPlayerReload: () => void
   onPlayerError: (codeVersion: number, message: string) => void
   onPlayerConsole: (codeVersion: number, payload: ConsoleCommand) => void
 }
@@ -46,6 +51,7 @@ const PlayerPane = memo(
       logs,
       onPlayerRun,
       onPlayerReady,
+      onPlayerReload,
       onPlayerError,
       onPlayerConsole,
       detectedModules,
@@ -66,6 +72,7 @@ const PlayerPane = memo(
       statusBarColor,
       console,
     } = options
+    const { strings } = useOptions()
 
     const [showLogs, setShowLogs] = useState(console?.visible)
 
@@ -82,7 +89,16 @@ const PlayerPane = memo(
             text={title}
             headerStyle={externalStyles.playerHeader}
             textStyle={externalStyles.playerHeaderText}
-          />
+          >
+            {options.reloadable && (
+              <>
+                <HeaderLink title={strings.reload} onClick={onPlayerReload}>
+                  <ReloadIcon />
+                </HeaderLink>
+                <HorizontalSpacer size={10} />
+              </>
+            )}
+          </Header>
         )}
         <div style={styles.column}>
           <div style={styles.row}>
