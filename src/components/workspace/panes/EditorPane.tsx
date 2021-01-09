@@ -22,6 +22,7 @@ import type { WorkspaceDiff } from '../App'
 import { TypeScriptOptions, UserInterfaceStrings } from '../../../utils/options'
 import { useOptions } from '../../../contexts/OptionsContext'
 import { CodeSandboxButton } from '../CodeSandboxButton'
+import { CubeIcon, EnterFullScreenIcon, ExternalLinkIcon } from '../Icons'
 
 const toggleFullscreen = () => (screenfull as any).toggle()
 
@@ -117,18 +118,29 @@ export default memo(function EditorPane({
 
   const headerElements = (
     <>
-      {fullscreen && (
+      {internalOptions.openInNewWindow && (
         <HeaderLink
+          title={strings.openInNewWindow}
           textStyle={externalStyles.tabText}
-          onClick={toggleFullscreen}
+          // There may not be a need to guard here, but just in case it runs server-side
+          href={typeof location !== undefined ? location.href : undefined}
         >
-          {strings.fullscreen}
+          <ExternalLinkIcon />
         </HeaderLink>
       )}
       {internalOptions.codesandbox && (
         <CodeSandboxButton files={files}>
-          {strings.codesandbox}
+          <CubeIcon />
         </CodeSandboxButton>
+      )}
+      {fullscreen && (
+        <HeaderLink
+          title={strings.fullscreen}
+          textStyle={externalStyles.tabText}
+          onClick={toggleFullscreen}
+        >
+          <EnterFullScreenIcon />
+        </HeaderLink>
       )}
     </>
   )

@@ -135,7 +135,11 @@ export const CodeSandboxButton = memo(function CodeSandboxButton({
       target="_blank"
     >
       <input type="hidden" name="parameters" value={parameters} />
-      <button style={styles.button} type="submit">
+      <button
+        title={internalOptions.strings.codesandbox}
+        style={styles.button}
+        type="submit"
+      >
         <HeaderLink>{children}</HeaderLink>
       </button>
     </form>

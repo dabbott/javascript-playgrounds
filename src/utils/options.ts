@@ -35,6 +35,7 @@ const userInterfaceStrings = {
   noErrors: 'No Errors',
   showDetails: 'Show Details',
   fullscreen: 'Fullscreen',
+  openInNewWindow: 'Open in new window',
   codesandbox: 'Open in CodeSandbox',
 }
 
@@ -59,6 +60,7 @@ export interface PublicOptions {
   styles?: ExternalStyles
   fullscreen?: boolean
   codesandbox?: boolean
+  openInNewWindow?: boolean
   sharedEnvironment?: boolean
   compiler?: CompilerOptions
   playground?: Partial<PlaygroundOptions>
@@ -296,6 +298,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     styles = Object.assign({}, presetOptions[preset]?.styles, options.styles),
     fullscreen = false,
     codesandbox = false,
+    openInNewWindow = false,
     sharedEnvironment = false,
     panes = ['editor', 'player'],
     responsivePaneSets = [],
@@ -371,6 +374,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     styles,
     strings: Object.assign({}, userInterfaceStrings, rawStrings),
     codesandbox,
+    openInNewWindow,
     fullscreen,
     sharedEnvironment,
     responsivePaneSets: normalizedPaneSets,
