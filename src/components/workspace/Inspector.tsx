@@ -27,7 +27,7 @@ export const Inspector = Loadable({
     import('react-inspector').then(({ default: Inspector, chromeLight }) => {
       const theme = createInspectorTheme(chromeLight)
 
-      return (props: InspectorProps) => <Inspector {...props} theme={theme} />
+      return function LazyInspector(props: InspectorProps) { return <Inspector {...props} theme={theme} /> }
     }),
   loading: () => null,
 })

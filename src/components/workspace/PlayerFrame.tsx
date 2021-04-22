@@ -40,7 +40,7 @@ interface State {
   id: string | null
 }
 
-export default class extends PureComponent<Props, State> {
+export default class PlayerFrame extends PureComponent<Props, State> {
   static defaultProps = {
     preset: 'react-native',
     platform: 'ios',

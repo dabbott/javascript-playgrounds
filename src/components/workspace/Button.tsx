@@ -69,7 +69,7 @@ interface State {
   hover: boolean
 }
 
-export default class extends PureComponent<Props, State> {
+export default class Button extends PureComponent<Props, State> {
   static defaultProps = {
     active: false,
     inverse: false,

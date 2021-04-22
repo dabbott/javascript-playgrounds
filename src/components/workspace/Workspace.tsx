@@ -184,7 +184,7 @@ type WorkspacePaneProps = {
   renderPane: (options: PaneOptions, index: number) => ReactNode
 }
 
-const WorkspacePane = memo((props: WorkspacePaneProps) => {
+const WorkspacePane = memo(function WorkspacePane (props: WorkspacePaneProps) {
   const {
     environmentName: environmentName,
     ready,
