@@ -216,6 +216,9 @@ export default memo(function EditorPane({
             : strings.noErrors
         }
         isError={isError}
+        style={externalStyles.status}
+        textStyle={externalStyles.statusText}
+        errorTextStyle={externalStyles.statusTextError}
       >
         {strings.showDetails && (
           <Button

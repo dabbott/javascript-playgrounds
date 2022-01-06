@@ -132,7 +132,7 @@ class JavaScriptSandbox {
 
       environment.afterEvaluate({ context, host })
     } catch (e) {
-      onError(codeVersion, e)
+      onError(codeVersion, e as Error)
     }
   }
 

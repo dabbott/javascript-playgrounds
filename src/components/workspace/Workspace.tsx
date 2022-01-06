@@ -93,6 +93,9 @@ export interface ExternalStyles {
   stackTab?: CSSProperties
   stackTabText?: CSSProperties
   stackTabTextActive?: CSSProperties
+  status?: CSSProperties
+  statusText?: CSSProperties
+  statusTextError?: CSSProperties
   tab?: CSSProperties
   tabText?: CSSProperties
   tabTextActive?: CSSProperties

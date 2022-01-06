@@ -7025,6 +7025,14 @@ package-json@^4.0.0:
     registry-url "^3.0.3"
     semver "^5.1.0"
 
+packly@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/packly/-/packly-0.0.1.tgz#48cccb1499a9b2d8d28000980281538133cdafb6"
+  integrity sha512-ilxga8ytuboOWw9P1ma9YODgDEG2YRGyIblMZkk6Tl8vlQwbaC7yl6j80HT5crqGESbSdp0INUrGSINL72HoMw==
+  dependencies:
+    parse5 "^6.0.1"
+    tree-visit "^0.1.0"
+
 pacote@^2.7.36:
   version "2.7.38"
   resolved "https://registry.yarnpkg.com/pacote/-/pacote-2.7.38.tgz#5091f8774298c26c3eca24606037f1bb73db74c1"
@@ -7117,6 +7125,11 @@ parse-passwd@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/parse-passwd/-/parse-passwd-1.0.0.tgz#6d5b934a456993b23d37f40a382d6f1666a8e5c6"
   integrity sha1-bVuTSkVpk7I9N/QKOC1vFmao5cY=
+
+parse5@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/parse5/-/parse5-6.0.1.tgz#e1a1c085c569b3dc08321184f19a39cc27f7c30b"
+  integrity sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==
 
 parseurl@~1.3.2, parseurl@~1.3.3:
   version "1.3.3"
@@ -8914,6 +8927,11 @@ toidentifier@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/toidentifier/-/toidentifier-1.0.0.tgz#7e1be3470f1e77948bc43d94a3c8f4d7752ba553"
   integrity sha512-yaOH/Pk/VEhBWWTlhI+qXxDFXlejDGcQipMlyxda9nthulaxLZUNcUqFxokp0vcYnvteJln5FNQDRrxj3YcbVw==
+
+tree-visit@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/tree-visit/-/tree-visit-0.1.0.tgz#ec35cfc13548b41ca5eabd5cbd7f83b574a8ed83"
+  integrity sha512-5lARH0BoZY70TwE+MV7v0KRtApSP4LSxC2JLRCUyK6KUCb8f/Qv9dS+PaWx9h3yKyNYjX2/JHwDx8DyQHHFzlw==
 
 trim-repeated@^1.0.0:
   version "1.0.0"

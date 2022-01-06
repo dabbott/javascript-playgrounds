@@ -152,7 +152,17 @@ const presetOptions: Record<string, PublicOptions> = {
   html: {
     code: '',
     files: {
-      'index.html': `<p>Hello, world!</p>`,
+      'index.html': `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>My page</title>
+    <link rel="stylesheet" href="./main.css"></link>
+  </head>
+  <body>  
+    <p>Hello, world!</p>
+  </body>
+</html>`,
       'main.css': `* {
   box-sizing: border-box;
 }

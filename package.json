@@ -66,6 +66,7 @@
     "html-webpack-plugin": "^4.3.0",
     "inline-style-prefixer": "^6.0.0",
     "metro-react-native-babel-preset": "^0.59.0",
+    "packly": "^0.0.1",
     "prettier": "^2.0.5",
     "prop-types": "^15.7.2",
     "raw-loader": "^4.0.1",
