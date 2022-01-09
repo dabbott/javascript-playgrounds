@@ -1,6 +1,6 @@
 {
   "name": "javascript-playgrounds",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Interactive JavaScript sandbox",
   "main": "dist/javascript-playgrounds.js",
   "files": [
@@ -16,7 +16,7 @@
     "build:core": "webpack --env production --config webpack/webpack.config.js --sort-assets-by --progress",
     "build:embed": "webpack --config webpack/webpack-embed.config.js --sort-assets-by --progress",
     "clean": "rm -rf ./dist ./public",
-    "prepublish": "npm run clean && npm run build",
+    "prepublishOnly": "npm run clean && npm run build",
     "gh-pages": "npm run prepublish && gh-pages -d public",
     "analyze": "webpack --env production --config webpack/webpack.config.js --sort-assets-by --progress --profile --json > stats.json"
   },
