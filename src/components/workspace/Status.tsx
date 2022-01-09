@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react'
-import { prefix, prefixObject } from '../../utils/Styles'
+import React, { CSSProperties, ReactNode, useMemo } from 'react'
+import { mergeStyles, prefix, prefixObject } from '../../utils/Styles'
 
 const baseTextStyle = prefix({
   color: '#BBB',
@@ -37,13 +37,39 @@ const styles = prefixObject({
 interface Props {
   text: string
   isError: boolean
+  style?: CSSProperties
+  textStyle?: CSSProperties
+  errorTextStyle?: CSSProperties
   children?: ReactNode
 }
 
-export default function Status({ text, isError, children }: Props) {
+export default function Status({
+  text,
+  isError,
+  children,
+  style,
+  textStyle,
+  errorTextStyle,
+}: Props) {
+  const computedContainerStyle = useMemo(
+    () => mergeStyles(styles.container, style),
+    [style]
+  )
+
+  const computedTextStyle = useMemo(() => mergeStyles(styles.text, textStyle), [
+    textStyle,
+  ])
+
+  const computedErrorTextStyle = useMemo(
+    () => mergeStyles(styles.error, textStyle, errorTextStyle),
+    [textStyle, errorTextStyle]
+  )
+
   return (
-    <div style={styles.container}>
-      <div style={isError ? styles.error : styles.text}>{text}</div>
+    <div style={computedContainerStyle}>
+      <div style={isError ? computedErrorTextStyle : computedTextStyle}>
+        {text}
+      </div>
       {children}
     </div>
   )
