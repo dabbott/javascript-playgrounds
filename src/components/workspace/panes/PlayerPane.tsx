@@ -141,6 +141,9 @@ const PlayerPane = memo(
             <Status
               text={'Logs' + (showLogs ? '' : ` (${logs.length})`)}
               isError={false}
+              style={externalStyles.status}
+              textStyle={externalStyles.statusText}
+              errorTextStyle={externalStyles.statusTextError}
             >
               <Button active={showLogs} onChange={setShowLogs}>
                 {'Show Logs'}
