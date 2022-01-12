@@ -456,8 +456,16 @@ export default function Workspace(props: Props) {
         runTsc(filename, code)
         break
       case 'babel':
-      default:
-        runBabel(filename, code)
+      default: {
+        if (/(j|t)sx?$/.test(filename)) {
+          runBabel(filename, code)
+        } else {
+          // We don't actually "compile" non-JS/TS files, but it's simpler
+          // to mark them as compiled so we only have to check file extensions
+          // in one place
+          dispatch(compiled(filename, code))
+        }
+      }
     }
   }
 

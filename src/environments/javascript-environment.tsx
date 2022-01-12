@@ -7,7 +7,10 @@ import VendorComponents, {
 } from '../components/player/VendorComponents'
 import formatError from '../utils/formatError'
 import * as path from '../utils/path'
-import { initializeCommunication } from '../utils/playerCommunication'
+import {
+  initializeCommunication,
+  sendError,
+} from '../utils/playerCommunication'
 import { createAppLayout } from '../utils/PlayerUtils'
 import { prefixAndApply } from '../utils/Styles'
 import type {
@@ -214,8 +217,9 @@ export class JavaScriptEnvironment implements IEnvironment {
         wrapperElement.appendChild(statusBarElement)
       }
 
-      const { sendError } = initializeCommunication({
+      initializeCommunication({
         id,
+        consoleProxy,
         prefixLineCount: this.prefixLineCount,
         sharedEnvironment,
         onRunApplication: (context) => {
@@ -229,7 +233,7 @@ export class JavaScriptEnvironment implements IEnvironment {
         prelude,
         (codeVersion, error) => {
           const message = formatError(error, this.prefixLineCount)
-          sendError(codeVersion, message)
+          sendError(id, codeVersion, message)
         }
       )
 

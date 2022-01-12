@@ -1,8 +1,61 @@
 import { bundle } from 'packly'
+import consoleProxy, { ConsoleProxy } from '../components/player/ConsoleProxy'
 import * as path from '../utils/path'
-import { initializeCommunication } from '../utils/playerCommunication'
+import {
+  bindConsoleLogMethods,
+  createWindowErrorHandler,
+  initializeCommunication,
+} from '../utils/playerCommunication'
 import { createAppLayout } from '../utils/PlayerUtils'
-import { EnvironmentOptions, IEnvironment } from './IEnvironment'
+import {
+  EnvironmentOptions,
+  EvaluationContext,
+  IEnvironment,
+} from './IEnvironment'
+
+// Inline stylesheets and scripts
+function generateBundle(context: EvaluationContext) {
+  return bundle({
+    entry: context.entry,
+    request({ origin, url }) {
+      if (origin === undefined) return context.fileMap[url]
+
+      // Don't inline (external) urls starting with http://, https://, or //
+      if (/^(https?)?\/\//.test(url)) return undefined
+
+      // Inline absolute urls
+      if (url.startsWith('/')) return context.fileMap[url.slice(1)]
+
+      // Inline relative urls
+      const lookup = path.join(path.dirname(origin), url)
+
+      return context.fileMap[lookup]
+    },
+  })
+}
+
+function bindIframeCommunication(
+  iframe: HTMLIFrameElement,
+  { id, codeVersion }: { id: string; codeVersion: number }
+) {
+  const iframeWindow = iframe.contentWindow! as Window & {
+    console: ConsoleProxy
+  }
+
+  bindConsoleLogMethods({
+    consoleProxy: iframeWindow.console,
+    codeVersion,
+    id,
+    prefixLineCount: 0,
+    sharedEnvironment: false,
+  })
+
+  iframeWindow.onerror = createWindowErrorHandler({
+    codeVersion,
+    id,
+    prefixLineCount: 0,
+  })
+}
 
 export class HTMLEnvironment implements IEnvironment {
   async initialize({
@@ -21,24 +74,9 @@ export class HTMLEnvironment implements IEnvironment {
       id,
       prefixLineCount: 0,
       sharedEnvironment,
+      consoleProxy,
       onRunApplication: (context) => {
-        const html = bundle({
-          entry: context.entry,
-          request({ origin, url }) {
-            if (origin === undefined) return context.fileMap[url]
-
-            // Don't inline (external) urls starting with http://, https://, or //
-            if (/^(https?)?\/\//.test(url)) return undefined
-
-            // Inline absolute urls
-            if (url.startsWith('/')) return context.fileMap[url.slice(1)]
-
-            // Inline relative urls
-            const lookup = path.join(path.dirname(origin), url)
-
-            return context.fileMap[lookup]
-          },
-        })
+        const html = generateBundle(context)
 
         const document = iframe.contentDocument
 
@@ -47,6 +85,12 @@ export class HTMLEnvironment implements IEnvironment {
         // https://stackoverflow.com/questions/5784638/replace-entire-content-of-iframe
         document.close()
         document.open()
+
+        bindIframeCommunication(iframe, {
+          id,
+          codeVersion: context.codeVersion,
+        })
+
         document.write(html)
         document.close()
       },

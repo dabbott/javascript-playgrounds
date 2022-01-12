@@ -6,22 +6,25 @@ import {
   LogVisibility,
 } from '../../types/Messages'
 
-const consoleProxy = ({ id: '0' } as unknown) as typeof window.console & {
-  id: string
-  _rnwp_log?: typeof window.console.log
+export type ConsoleProxy = Console & { _rnwp_log: Console['log'] }
+
+function attachConsoleMethodsToProxy(self: { console: Console }) {
+  // I don't think this can fail, but the console object can be strange...
+  // If it fails, we won't proxy all the methods (which is likely fine)
+  try {
+    for (let key in self.console) {
+      let f = (self.console as any)[key]
+
+      if (typeof f === 'function') {
+        ;(consoleProxy as any)[key] = f.bind(self.console)
+      }
+    }
+  } catch (e) {}
 }
 
-// I don't think this can fail, but the console object can be strange...
-// If it fails, we won't proxy all the methods (which is likely fine)
-try {
-  for (let key in window.console) {
-    let f = (window.console as any)[key]
+const consoleProxy = {} as ConsoleProxy
 
-    if (typeof f === 'function') {
-      ;(consoleProxy as any)[key] = f.bind(window.console)
-    }
-  }
-} catch (e) {}
+attachConsoleMethodsToProxy(window)
 
 let consoleMessageIndex = 0
 
