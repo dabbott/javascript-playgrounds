@@ -34,6 +34,7 @@ const userInterfaceStrings = {
   about: '',
   noErrors: 'No Errors',
   showDetails: 'Show Details',
+  hideDetails: 'Hide Details',
   fullscreen: 'Fullscreen',
   openInNewWindow: 'Open in new window',
   codesandbox: 'Open in CodeSandbox',

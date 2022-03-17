@@ -226,7 +226,7 @@ export default memo(function EditorPane({
             isError={isError}
             onChange={setShowDetails}
           >
-            {strings.showDetails}
+            {showDetails ? strings.hideDetails : strings.showDetails}
           </Button>
         )}
       </Status>
