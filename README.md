@@ -202,6 +202,18 @@ None at the moment.
 
 This project contains static assets that run standalone in the browser. You don't need a server, unless you want to host the assets yourself.
 
+# using docker
+
+```
+git clone https://github.com/dabbott/javascript-playgrounds.git
+cd javascript-playgrounds
+docker-compose build
+
+docker-compose up -d
+```
+
+and make any changes you need for your personal setup
+
 ### unpkg
 
 The recommended host is https://unpkg.com, which is a CDN that serves content from the npm registry. The examples in this README all point to:

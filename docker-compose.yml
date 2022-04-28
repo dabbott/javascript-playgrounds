@@ -1,0 +1,7 @@
+version: '3.3'
+
+services:
+  javascript-playgrounds:
+    build: .
+    ports:
+      - 1337:80
