@@ -1,4 +1,4 @@
-import { document, reset, DOMCanvasElement } from '../utils/MockDOM'
+import { document, DOMCanvasElement, reset } from '../utils/MockDOM'
 
 const context: Worker & {
   importScripts: (...urls: string[]) => void // Why isn't this part of the TS lib?
@@ -168,7 +168,7 @@ function handleMessage(message: PythonMessage): Promise<PythonResponse> {
           try {
             pyodide.runPython(ConsoleLogTransformer)
           } catch (error) {
-            const message = formatPythonError(error)
+            const message = formatPythonError(error as Error)
             if (message) {
               context.postMessage({
                 type: 'error',

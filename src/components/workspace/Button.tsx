@@ -1,4 +1,4 @@
-import React, { PureComponent, CSSProperties } from 'react'
+import React, { CSSProperties, PureComponent, ReactNode } from 'react'
 import { prefixObject } from '../../utils/Styles'
 
 const colors = {
@@ -63,6 +63,7 @@ interface Props {
   onChange: (active: boolean) => void
   containerStyle?: CSSProperties
   textStyle?: CSSProperties
+  children: ReactNode
 }
 
 interface State {

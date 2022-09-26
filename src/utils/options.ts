@@ -1,14 +1,14 @@
 import type * as ts from 'typescript'
+import type { ExternalModule } from '../components/player/VendorComponents'
 import {
+  ExternalStyles,
   PlaygroundOptions,
   ResponsivePaneSet,
-  ExternalStyles,
 } from '../components/workspace/Workspace'
 import * as DefaultCode from '../constants/DefaultCode'
-import { PaneOptions, PaneShorthand, normalizePane } from './Panes'
-import defaultLibs from '../utils/TypeScriptDefaultLibs'
 import defaultCompilerOptions from '../utils/TypeScriptDefaultConfig'
-import type { ExternalModule } from '../components/player/VendorComponents'
+import defaultLibs from '../utils/TypeScriptDefaultLibs'
+import { normalizePane, PaneOptions, PaneShorthand } from './Panes'
 import { extname } from './path'
 
 export interface TypeScriptOptions {

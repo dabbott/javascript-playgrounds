@@ -1,7 +1,7 @@
 import React, { memo, ReactNode, useCallback, useMemo } from 'react'
-import { StackPaneOptions, PaneOptions } from '../../../utils/Panes'
+import { PaneOptions, StackPaneOptions } from '../../../utils/Panes'
+import { compareTabs, getTabTitle, Tab } from '../../../utils/Tab'
 import TabContainer from '../TabContainer'
-import { Tab, getTabTitle, compareTabs } from '../../../utils/Tab'
 import { ExternalStyles } from '../Workspace'
 
 interface Props {
@@ -34,10 +34,10 @@ export default memo(function StackPane({
     [children]
   )
 
-  const callback = useCallback((tab) => renderPane(tab.pane, tab.index), [
-    tabs,
-    renderPane,
-  ])
+  const callback = useCallback(
+    (tab: Tab & { pane: PaneOptions }) => renderPane(tab.pane, tab.index),
+    [tabs, renderPane]
+  )
 
   return (
     <TabContainer

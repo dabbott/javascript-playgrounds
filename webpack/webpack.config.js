@@ -1,5 +1,5 @@
 const webpack = require('webpack')
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
@@ -23,9 +23,6 @@ const paths = {
 }
 
 const common = merge({
-  devServer: {
-    contentBase: paths.public,
-  },
   entry: {
     index: paths.index,
     player: paths.player,
@@ -74,14 +71,6 @@ const common = merge({
       },
     ],
   },
-  node: {
-    // From babel-standalone:
-    // Mock Node.js modules that Babel require()s but that we don't
-    // particularly care about.
-    fs: 'empty',
-    module: 'empty',
-    net: 'empty',
-  },
   output: {
     path: paths.public,
     filename: '[name]-bundle.js',
@@ -91,6 +80,17 @@ const common = merge({
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     alias: {
       '@babel/plugin-transform-unicode-regex': path.join(__dirname, 'empty.js'),
+    },
+    // From babel-standalone:
+    // Mock Node.js modules that Babel require()s but that we don't
+    // particularly care about.
+    fallback: {
+      fs: false,
+      module: false,
+      net: false,
+      assert: require.resolve('assert/'),
+      buffer: require.resolve('buffer/'),
+      path: require.resolve('path-browserify'),
     },
   },
   plugins: [
@@ -108,10 +108,19 @@ const common = merge({
       minify: false,
       chunks: ['player'],
     }),
+    new webpack.ProvidePlugin({
+      process: require.resolve('process'),
+      Buffer: ['buffer', 'Buffer'],
+    }),
   ],
+  stats: {
+    children: true,
+  },
 })
 
-module.exports = (mode = 'development') => {
+module.exports = ({ production = false }) => {
+  const mode = production ? 'production' : 'development'
+
   const defines = new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(mode),
   })

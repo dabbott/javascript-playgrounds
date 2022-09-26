@@ -68,7 +68,7 @@ export default class VendorComponents {
   static loadExternals(
     externals: (ExternalModuleDescription & { globalName: string })[]
   ) {
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       if (externals.length === 0) {
         resolve()
         return

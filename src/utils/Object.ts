@@ -29,7 +29,7 @@ export function entries<T>(
 
   for (let key in obj) {
     if (hasOwnProperty(obj, key) && isEnumerable(obj, key)) {
-      pairs.push([key, obj[key]])
+      pairs.push([key, obj[key] as T])
     }
   }
 

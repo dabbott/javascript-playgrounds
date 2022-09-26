@@ -49,7 +49,7 @@ export default memo(function TabContainer<T>({
   const [activeTab, setActiveTab] = useState(initialTab)
 
   const onClickTabAndSetActive = useCallback(
-    (tab) => {
+    (tab: T) => {
       if (onClickTab) {
         onClickTab(tab)
       }

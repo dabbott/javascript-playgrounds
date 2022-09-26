@@ -152,7 +152,11 @@ class JavaScriptSandbox {
     const requireModule = (name: string) =>
       this.require(context, name, moduleName)
 
-    f(exports, requireModule, module, consoleProxy)
+    try {
+      f(exports, requireModule, module, consoleProxy)
+    } catch (e) {
+      console.error('XXX', e)
+    }
 
     context.requireCache[moduleName] = module.exports
   }
@@ -188,6 +192,12 @@ export class JavaScriptEnvironment implements IEnvironment {
     this.nodeModules['react'] = React
     this.nodeModules['react-dom'] = ReactDOM
     this.nodeModules['prop-types'] = PropTypes
+
+    // Needed for the compiled output
+    this.nodeModules[
+      '@babel/runtime/helpers/interopRequireDefault'
+    ] = require('@babel/runtime/helpers/interopRequireDefault')
+    this.nodeModules['react/jsx-runtime'] = require('react/jsx-runtime')
 
     Object.assign(window, {
       React,

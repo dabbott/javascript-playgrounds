@@ -1,17 +1,17 @@
-import React, { PureComponent, CSSProperties, MutableRefObject } from 'react'
+import type * as CM from 'codemirror'
+import CodeMirror from 'codemirror'
+import React, { CSSProperties, MutableRefObject, PureComponent } from 'react'
 import ReactDOM from 'react-dom'
+import type * as ts from 'typescript'
+import { LogCommand, SourceLocation } from '../../types/Messages'
 import { getOptions, requireAddons } from '../../utils/CodeMirror'
+import { tooltipAddon, TooltipValue } from '../../utils/CodeMirrorTooltipAddon'
+import type { DiffRange } from '../../utils/Diff'
+import { extname } from '../../utils/path'
 import { prefixObject } from '../../utils/Styles'
 import PlaygroundPreview from './PlaygroundPreview'
-import { tooltipAddon, TooltipValue } from '../../utils/CodeMirrorTooltipAddon'
 import Tooltip from './Tooltip'
-import type * as CM from 'codemirror'
-import type { DiffRange } from '../../utils/Diff'
-import { SourceLocation, LogCommand } from '../../types/Messages'
-import type * as ts from 'typescript'
-import CodeMirror from 'codemirror'
 import type { PlaygroundOptions } from './Workspace'
-import { extname } from '../../utils/path'
 
 // Import scrollPosIntoView directly. The public API calls the native DOM scrollIntoView,
 // which will scroll the parent window when displayed in an iframe.
@@ -354,7 +354,7 @@ export default class extends PureComponent<Props> {
     }
   }
 
-  componentWillUpdate(nextProps: Props) {
+  UNSAFE_componentWillUpdate(nextProps: Props) {
     const { errorLineNumber: nextLineNumber, value } = nextProps
     const { errorLineNumber: prevLineNumber } = this.props
 

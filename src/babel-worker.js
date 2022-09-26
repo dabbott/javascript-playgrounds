@@ -1,4 +1,4 @@
-import * as Babel from '@babel/core'
+import * as Babel from '@babel/standalone'
 
 onmessage = function (event) {
   const {

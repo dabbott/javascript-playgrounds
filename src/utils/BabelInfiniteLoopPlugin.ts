@@ -13,7 +13,7 @@ import type Babel from '@babel/core'
 
 const DEFAULT_MAX_ITERATIONS = 1000
 
-module.exports = ({ types: t }: typeof Babel) => {
+export default function BabelInfiniteLoopPlugin({ types: t }: typeof Babel) {
   return {
     visitor: {
       'WhileStatement|ForStatement|DoWhileStatement': (

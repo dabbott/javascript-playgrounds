@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import screenfull from 'screenfull'
 import diff, { DiffRange } from '../../utils/Diff'
 import { InternalOptions, WorkspaceStep } from '../../utils/options'
@@ -104,7 +104,7 @@ export default function App({
         // Merge props from the current workspace step
         {...(workspaces.length > 0
           ? workspaces[activeStepIndex].workspace
-          : {})}
+          : ({} as Record<never, void>))}
       />
     </div>
   )

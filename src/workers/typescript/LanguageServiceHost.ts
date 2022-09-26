@@ -1,5 +1,5 @@
 import * as ts from 'typescript'
-import { exists, writeFile, getFile, getPaths } from './fileSystem'
+import { exists, getFile, getPaths, writeFile } from './fileSystem'
 import { fs } from './system'
 
 type TSLanguageServiceHost = Parameters<typeof ts.createLanguageService>[0]
@@ -8,6 +8,13 @@ export default class LanguageServiceHost implements TSLanguageServiceHost {
   constructor(public compilerOptions: ts.CompilerOptions) {}
 
   versions: Record<string, string> = {}
+
+  readFile(
+    fileName: string,
+    encoding?: string | undefined
+  ): string | undefined {
+    return getFile(fs, fileName)
+  }
 
   fileExists(fileName: string) {
     return exists(fs, fileName)
