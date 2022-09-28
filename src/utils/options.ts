@@ -258,6 +258,22 @@ body, p {
     },
   },
   ['react-native']: {},
+  solidity: {
+    code: `contract Testing {}`,
+    environment: 'solidity',
+    sharedEnvironment: true,
+    compiler: {
+      type: 'none',
+    },
+    panes: [
+      'editor',
+      {
+        id: 'player',
+        type: 'player',
+        platform: 'web',
+      },
+    ],
+  },
 }
 
 const importRe = /import\s+?(?:(?:(?:[\w*\s{},]*)\s+from\s+?)|)(?:(?:"(.*?)")|(?:'(.*?)'))[\s]*?(?:;|$|)/gm
@@ -341,7 +357,9 @@ export function normalize(options: PublicOptions): InternalOptions {
 
   if (!entry) {
     entry =
-      environment === 'python'
+      environment === 'solidity'
+        ? 'Contract.sol'
+        : environment === 'python'
         ? 'main.py'
         : environment === 'html'
         ? 'index.html'

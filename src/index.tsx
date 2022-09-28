@@ -48,6 +48,9 @@ function render() {
 const extensions = getFileExtensions(internalOptions)
 const editorModes: Promise<void>[] = []
 
+if (extensions.includes('.sol')) {
+  editorModes.push(import('./utils/codemirror-solidity' as any))
+}
 if (extensions.includes('.py')) {
   editorModes.push(import('codemirror/mode/python/python' as any))
 }

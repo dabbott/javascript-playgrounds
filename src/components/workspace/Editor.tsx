@@ -38,6 +38,7 @@ const styles = prefixObject({
 const docCache: Record<string, CM.Doc> = {}
 
 const modeMap: Record<string, string> = {
+  '.sol': 'solidity',
   '.py': 'python',
   '.css': 'css',
   '.html': 'htmlmixed',
