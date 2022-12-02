@@ -1,3 +1,4 @@
+import { deploy } from 'contract-testing-library'
 import React from 'react'
 import { render } from 'react-dom'
 import consoleProxy, { ConsoleProxy } from '../components/player/ConsoleProxy'
@@ -68,8 +69,27 @@ export class SolidityEnvironment implements IEnvironment {
         solidityRequest({
           type: 'compile',
           code: fileMap[entry],
-        }).then((result) => {
-          console.log(result)
+        }).then(async (output) => {
+          console.log(output)
+
+          const {
+            abi,
+            evm: { bytecode },
+          } = output.contracts['Contract.sol'].Log
+
+          const contract = await deploy({ abi, bytecode, args: [] })
+
+          const [count1] = await contract.call('entryCount')
+
+          console.log(contract, count1.toString())
+
+          // expect(greeting1Result).toEqual([greeting1]);
+
+          // await contract.call('setGreeting', greeting2);
+
+          // const greeting2Result = await contract.call('greet');
+
+          // expect(greeting2Result).toEqual([greeting2]);
 
           render(<span>Hello world</span>, appElement)
         })

@@ -1,6 +1,8 @@
 import React, { memo, useState } from 'react'
 import screenfull from 'screenfull'
+import { useOptions } from '../../../contexts/OptionsContext'
 import { LogCommand } from '../../../types/Messages'
+import { TypeScriptOptions, UserInterfaceStrings } from '../../../utils/options'
 import { EditorPaneOptions } from '../../../utils/Panes'
 import { columnStyle, mergeStyles, prefixObject } from '../../../utils/Styles'
 import {
@@ -10,20 +12,18 @@ import {
   Tab,
 } from '../../../utils/Tab'
 import About from '../About'
+import type { WorkspaceDiff } from '../App'
 import Button from '../Button'
+import { CodeSandboxButton } from '../CodeSandboxButton'
 import Editor, { Props as EditorProps } from '../Editor'
-import HeaderLink from '../HeaderLink'
 import Header from '../Header'
+import HeaderLink from '../HeaderLink'
+import { CubeIcon, EnterFullScreenIcon, ExternalLinkIcon } from '../Icons'
 import Overlay from '../Overlay'
+import { HorizontalSpacer } from '../Spacer'
 import Status from '../Status'
 import Tabs from '../Tabs'
-import { PlaygroundOptions, PublicError, ExternalStyles } from '../Workspace'
-import type { WorkspaceDiff } from '../App'
-import { TypeScriptOptions, UserInterfaceStrings } from '../../../utils/options'
-import { useOptions } from '../../../contexts/OptionsContext'
-import { CodeSandboxButton } from '../CodeSandboxButton'
-import { CubeIcon, EnterFullScreenIcon, ExternalLinkIcon } from '../Icons'
-import { HorizontalSpacer } from '../Spacer'
+import { ExternalStyles, PlaygroundOptions, PublicError } from '../Workspace'
 
 const toggleFullscreen = () => (screenfull as any).toggle()
 
@@ -104,6 +104,8 @@ export default memo(function EditorPane({
   getTypeInfo,
   onClickTab,
 }: Props) {
+  console.log(logs)
+
   const internalOptions = useOptions()
 
   const [showDetails, setShowDetails] = useState(false)

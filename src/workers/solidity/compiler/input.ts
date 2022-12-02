@@ -17,6 +17,7 @@ export function createCompilerInput(
       outputSelection: {
         '*': {
           '*': ['*'],
+          '': ['*'],
         },
       },
     },

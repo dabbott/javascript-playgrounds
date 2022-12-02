@@ -54,6 +54,7 @@
     "buffer": "^6.0.3",
     "codemirror": "^5.54.0",
     "codesandbox": "^2.2.1",
+    "contract-testing-library": "^0.0.1",
     "css-loader": "^6.7.1",
     "diff": "^4.0.1",
     "eslint": "^1.10.3",
