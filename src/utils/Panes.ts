@@ -29,6 +29,7 @@ export type StackPaneOptions = PaneBaseOptions & {
 
 export type EditorPaneOptions = PaneBaseOptions & {
   type: 'editor'
+  fileList?: 'tabs' | 'sidebar'
 }
 
 export type TranspilerPaneOptions = PaneBaseOptions & {

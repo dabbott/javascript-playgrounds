@@ -2,7 +2,7 @@ import React, { memo, useState } from 'react'
 import screenfull from 'screenfull'
 import { LogCommand } from '../../../types/Messages'
 import { EditorPaneOptions } from '../../../utils/Panes'
-import { columnStyle, mergeStyles, prefixObject } from '../../../utils/Styles'
+import { columnStyle, mergeStyles, prefixObject, rowStyle } from '../../../utils/Styles'
 import {
   compareTabs,
   getTabChanged,
@@ -24,6 +24,7 @@ import { useOptions } from '../../../contexts/OptionsContext'
 import { CodeSandboxButton } from '../CodeSandboxButton'
 import { CubeIcon, EnterFullScreenIcon, ExternalLinkIcon } from '../Icons'
 import { HorizontalSpacer } from '../Spacer'
+import WorkspacesList from '../WorkspacesList'
 
 const toggleFullscreen = () => (screenfull as any).toggle()
 
@@ -59,6 +60,11 @@ const styles = prefixObject({
     backgroundColor: 'rgba(0,0,0,0.02)',
     border: '1px solid rgba(0,0,0,0.05)',
   },
+  sidebar: mergeStyles(columnStyle, {
+    flex: '0 0 220px',
+    overflowX: 'hidden',
+    overflowY: 'auto',
+  }),
 })
 
 interface Props {
@@ -116,6 +122,10 @@ export default memo(function EditorPane({
   const isError = !!error
 
   const style = mergeStyles(styles.editorPane, options.style)
+  const sidebarStyle = mergeStyles(
+    styles.sidebar,
+    externalStyles.workspacesList
+  )
 
   const headerElements = (
     <>
@@ -147,6 +157,39 @@ export default memo(function EditorPane({
     </>
   )
 
+  const tabsElement = fileTabs.length > 1 && (
+    <Tabs
+      tabs={fileTabs}
+      getTitle={getTabTitle}
+      getChanged={getTabChanged}
+      activeTab={activeFileTab}
+      compareTabs={compareTabs}
+      onClickTab={onClickTab}
+      tabStyle={externalStyles.tab}
+      textStyle={externalStyles.tabText}
+      activeTextStyle={externalStyles.tabTextActive}
+      changedTextStyle={externalStyles.tabTextChanged}
+    >
+      {!title && headerElements}
+    </Tabs>
+  )
+
+  const editorElement = (
+    <Editor
+      key={activeFile}
+      initialValue={files[activeFile]}
+      filename={activeStepIndex + ':' + activeFile}
+      onChange={onChange}
+      errorLineNumber={error?.lineNumber}
+      showDiff={true}
+      diff={fileDiff}
+      logs={playgroundOptions.enabled ? logs : undefined}
+      playgroundOptions={playgroundOptions}
+      getTypeInfo={typescriptOptions.enabled ? getTypeInfo : undefined}
+      tooltipStyle={externalStyles.tooltip}
+    />
+  )
+
   return (
     <div style={style}>
       {title && (
@@ -158,35 +201,38 @@ export default memo(function EditorPane({
           {headerElements}
         </Header>
       )}
-      {fileTabs.length > 1 && (
-        <Tabs
-          tabs={fileTabs}
-          getTitle={getTabTitle}
-          getChanged={getTabChanged}
-          activeTab={activeFileTab}
-          compareTabs={compareTabs}
-          onClickTab={onClickTab}
-          tabStyle={externalStyles.tab}
-          textStyle={externalStyles.tabText}
-          activeTextStyle={externalStyles.tabTextActive}
-          changedTextStyle={externalStyles.tabTextChanged}
-        >
-          {!title && headerElements}
-        </Tabs>
+      {options.fileList === 'sidebar' ? (
+        <div style={rowStyle}>
+          <WorkspacesList
+            activeStepIndex={
+              // Index of active tab
+              fileTabs.findIndex((tab) => tab === activeFileTab)
+            }
+            onChangeActiveStepIndex={(index) => {
+              onClickTab(fileTabs[index])
+            }}
+            showNextButton={false}
+            steps={fileTabs}
+            style={sidebarStyle}
+            rowStyle={externalStyles.workspacesRow}
+            rowStyleActive={externalStyles.workspacesRowActive}
+            rowTitleStyle={externalStyles.workspacesRowTitle}
+            rowTitleStyleActive={externalStyles.workspacesRowTitleActive}
+            descriptionStyle={externalStyles.workspacesDescription}
+            descriptionTextStyle={externalStyles.workspacesDescriptionText}
+            buttonTextStyle={externalStyles.workspacesButtonText}
+            buttonContainerStyle={externalStyles.workspacesButtonContainer}
+            buttonWrapperStyle={externalStyles.workspacesButtonWrapper}
+            dividerStyle={externalStyles.workspacesDivider}
+          />
+          {editorElement}
+        </div>
+      ) : (
+        <React.Fragment>
+          {tabsElement}
+          {editorElement}
+        </React.Fragment>
       )}
-      <Editor
-        key={activeFile}
-        initialValue={files[activeFile]}
-        filename={activeStepIndex + ':' + activeFile}
-        onChange={onChange}
-        errorLineNumber={error?.lineNumber}
-        showDiff={true}
-        diff={fileDiff}
-        logs={playgroundOptions.enabled ? logs : undefined}
-        playgroundOptions={playgroundOptions}
-        getTypeInfo={typescriptOptions.enabled ? getTypeInfo : undefined}
-        tooltipStyle={externalStyles.tooltip}
-      />
       {showDetails && (
         <div style={styles.overlayContainer}>
           <div style={styles.overlay}>

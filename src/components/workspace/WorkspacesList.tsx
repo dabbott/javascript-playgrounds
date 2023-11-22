@@ -88,13 +88,14 @@ const styles = prefixObject(rawStyles)
 
 export interface Step {
   title: string
-  description: string
+  description?: string
 }
 
 interface Props {
   steps: Step[]
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
+  showNextButton?: boolean
   style?: CSSProperties
   rowStyle?: CSSProperties
   rowStyleActive?: CSSProperties
@@ -210,7 +211,11 @@ export default class WorkspacesList extends PureComponent<Props> {
   }
 
   renderStep = (step: Step, index: number, list: Step[]) => {
-    const { activeStepIndex, onChangeActiveStepIndex } = this.props
+    const {
+      activeStepIndex,
+      onChangeActiveStepIndex,
+      showNextButton = true,
+    } = this.props
     const { title, description } = step
 
     const isActive = index === activeStepIndex
@@ -223,7 +228,7 @@ export default class WorkspacesList extends PureComponent<Props> {
         >
           <div style={this.getComputedRowTitleStyle(isActive)}>{title}</div>
         </div>
-        {isActive && (
+        {description && isActive && (
           <div style={this.getComputedDescriptionStyle()}>
             <div
               className={'markdown'}
@@ -232,7 +237,7 @@ export default class WorkspacesList extends PureComponent<Props> {
             />
           </div>
         )}
-        {isActive && index !== list.length - 1 && (
+        {showNextButton && isActive && index !== list.length - 1 && (
           <div style={this.getComputedButtonWrapperStyle()}>
             <Button
               inverse={true}
