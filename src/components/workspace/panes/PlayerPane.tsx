@@ -41,7 +41,7 @@ export interface Props {
 }
 
 const PlayerPane = memo(
-  React.forwardRef<PlayerFrame, Props>(function renderPlayer(
+  React.forwardRef<PlayerFrame, Props>(function PlayerPane(
     {
       options,
       externalStyles,

@@ -67,7 +67,7 @@ export interface Props {
   errorLineNumber?: number
 }
 
-export default class extends PureComponent<Props> {
+export default class Editor extends PureComponent<Props> {
   static defaultProps = {
     initialValue: null,
     value: null,
