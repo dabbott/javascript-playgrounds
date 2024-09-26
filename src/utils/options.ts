@@ -1,14 +1,14 @@
 import type * as ts from 'typescript'
+import type { ExternalModule } from '../components/player/VendorComponents'
 import {
+  ExternalStyles,
   PlaygroundOptions,
   ResponsivePaneSet,
-  ExternalStyles,
 } from '../components/workspace/Workspace'
 import * as DefaultCode from '../constants/DefaultCode'
-import { PaneOptions, PaneShorthand, normalizePane } from './Panes'
-import defaultLibs from '../utils/TypeScriptDefaultLibs'
 import defaultCompilerOptions from '../utils/TypeScriptDefaultConfig'
-import type { ExternalModule } from '../components/player/VendorComponents'
+import defaultLibs from '../utils/TypeScriptDefaultLibs'
+import { PaneOptions, PaneShorthand, normalizePane } from './Panes'
 import { extname } from './path'
 
 export interface TypeScriptOptions {
@@ -270,7 +270,7 @@ function findImports(code: string) {
     const name = match[1] || match[2]
 
     // Check if this import looks like a module name (and not a relative import)
-    if (name && name.match(/^[a-zA-Z]/)) {
+    if (name && (name.startsWith('@') || name.match(/^[a-zA-Z]/))) {
       imports.push(name)
     }
   }
