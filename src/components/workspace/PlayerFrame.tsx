@@ -1,11 +1,11 @@
 import React, { PureComponent } from 'react'
+import { ConsoleCommand, Message } from '../../types/Messages'
 import * as ExtendedJSON from '../../utils/ExtendedJSON'
-import { prefixObject } from '../../utils/Styles'
-import Phone from './Phone'
-import { Message, ConsoleCommand } from '../../types/Messages'
 import { encode } from '../../utils/queryString'
-import { ExternalStyles } from './Workspace'
+import { prefixObject } from '../../utils/Styles'
 import type { ExternalModule } from '../player/VendorComponents'
+import Phone from './Phone'
+import { ExternalStyles } from './Workspace'
 
 const styles = prefixObject({
   iframe: {
@@ -27,6 +27,7 @@ interface Props {
   sharedEnvironment: boolean
   detectedModules: ExternalModule[]
   modules: ExternalModule[]
+  registerBundledModules: boolean
   styleSheet: string
   css: string
   prelude: string
@@ -149,6 +150,7 @@ export default class extends PureComponent<Props, State> {
       externalStyles,
       environmentName,
       assetRoot,
+      registerBundledModules,
       detectedModules,
       modules,
       styleSheet,
@@ -169,6 +171,7 @@ export default class extends PureComponent<Props, State> {
       assetRoot,
       detectedModules: JSON.stringify(detectedModules),
       modules: JSON.stringify(modules),
+      registerBundledModules,
       styleSheet,
       css,
       statusBarColor,

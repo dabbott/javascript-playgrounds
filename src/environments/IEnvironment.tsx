@@ -26,6 +26,7 @@ export interface EnvironmentOptions {
   styles: PlayerStyles
   modules: ExternalModuleDescription[]
   detectedModules: ExternalModuleDescription[]
+  registerBundledModules: boolean
 }
 
 export interface IEnvironment {

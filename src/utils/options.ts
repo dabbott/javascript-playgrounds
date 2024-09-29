@@ -8,7 +8,7 @@ import {
 import * as DefaultCode from '../constants/DefaultCode'
 import defaultCompilerOptions from '../utils/TypeScriptDefaultConfig'
 import defaultLibs from '../utils/TypeScriptDefaultLibs'
-import { PaneOptions, PaneShorthand, normalizePane } from './Panes'
+import { normalizePane, PaneOptions, PaneShorthand } from './Panes'
 import { extname } from './path'
 
 export interface TypeScriptOptions {
@@ -71,6 +71,7 @@ export interface PublicOptions {
   panes?: PublicPaneOptions[]
   responsivePaneSets?: PublicResponsivePaneSet[]
   detectDependencies?: boolean
+  registerBundledModules?: boolean
   modules?: ExternalModule[] // These are added to each player pane's options
   targetOrigin?: string
 }
@@ -320,6 +321,7 @@ export function normalize(options: PublicOptions): InternalOptions {
     playground: rawPlayground,
     typescript: rawTypescript,
     detectDependencies = true,
+    registerBundledModules = true,
     targetOrigin = '',
   } = Object.assign({}, presetOptions[preset], options)
 
@@ -404,6 +406,7 @@ export function normalize(options: PublicOptions): InternalOptions {
           )
         )
       : [],
+    registerBundledModules,
     targetOrigin,
     compiler,
   }

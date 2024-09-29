@@ -1,24 +1,33 @@
 import React, {
   CSSProperties,
+  memo,
   ReactNode,
+  useCallback,
   useEffect,
+  useMemo,
   useReducer,
   useRef,
-  useMemo,
-  useCallback,
-  memo,
   useState,
 } from 'react'
 import type * as ts from 'typescript'
+import { useOptions } from '../../contexts/OptionsContext'
+import useRerenderEffect from '../../hooks/useRerenderEffect'
+import useResponsiveBreakpoint from '../../hooks/useResponsiveBreakpoint'
 import * as workspace from '../../reducers/workspace'
 import { ConsoleCommand, LogCommand } from '../../types/Messages'
 import babelRequest, { BabelResponse } from '../../utils/BabelRequest'
-import { PaneOptions, containsPane } from '../../utils/Panes'
+import {
+  CompilerOptions,
+  TypeScriptOptions,
+  UserInterfaceStrings,
+  WorkspaceStep,
+} from '../../utils/options'
+import { containsPane, PaneOptions } from '../../utils/Panes'
 import { prefixObject, rowStyle } from '../../utils/Styles'
 import { Tab } from '../../utils/Tab'
-import typeScriptRequest, {
-  TypeScriptCompileRequest,
-} from '../../utils/TypeScriptRequest'
+import typeScriptRequest from '../../utils/TypeScriptRequest'
+import type { ExternalModule } from '../player/VendorComponents'
+import { WorkspaceDiff } from './App'
 import { Props as EditorProps } from './Editor'
 import ConsolePane from './panes/ConsolePane'
 import EditorPane from './panes/EditorPane'
@@ -27,18 +36,6 @@ import StackPane from './panes/StackPane'
 import TranspilerPane from './panes/TranspilerPane'
 import WorkspacesPane from './panes/WorkspacesPane'
 import PlayerFrame from './PlayerFrame'
-import useResponsiveBreakpoint from '../../hooks/useResponsiveBreakpoint'
-import {
-  WorkspaceStep,
-  UserInterfaceStrings,
-  CompilerOptions,
-  TypeScriptOptions,
-} from '../../utils/options'
-import { WorkspaceDiff } from './App'
-import useRerenderEffect from '../../hooks/useRerenderEffect'
-import type { ExternalModule } from '../player/VendorComponents'
-import { basename, extname } from '../../utils/path'
-import { useOptions } from '../../contexts/OptionsContext'
 
 const {
   reducer,
@@ -144,6 +141,7 @@ export interface Props {
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
   detectedModules: ExternalModule[]
+  registerBundledModules: boolean
 }
 
 type WorkspacePaneProps = {
@@ -161,6 +159,7 @@ type WorkspacePaneProps = {
   typescriptOptions: TypeScriptOptions
   workspaces: WorkspaceStep[]
   detectedModules: ExternalModule[]
+  registerBundledModules: boolean
   diff: Record<string, WorkspaceDiff>
   activeStepIndex: number
   onChangeActiveStepIndex: (index: number) => void
@@ -197,6 +196,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
     sharedEnvironment,
     workspaces,
     detectedModules,
+    registerBundledModules,
     activeStepIndex,
     onChangeActiveStepIndex,
     fullscreen,
@@ -265,6 +265,7 @@ const WorkspacePane = memo((props: WorkspacePaneProps) => {
             onCreatePlayer(options.id, player)
           }}
           detectedModules={detectedModules}
+          registerBundledModules={registerBundledModules}
           options={options}
           externalStyles={externalStyles}
           environmentName={environmentName}
@@ -635,6 +636,7 @@ export default function Workspace(props: Props) {
           typescriptOptions={props.typescriptOptions}
           workspaces={props.workspaces}
           detectedModules={props.detectedModules}
+          registerBundledModules={props.registerBundledModules}
           diff={props.diff}
           activeStepIndex={props.activeStepIndex}
           onChangeActiveStepIndex={props.onChangeActiveStepIndex}

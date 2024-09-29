@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import type ReactDOM from 'react-dom'
 import hasProperty from '../utils/hasProperty'
 import {
   AfterEvaluateOptions,
@@ -8,11 +8,16 @@ import {
 } from './javascript-environment'
 
 class ReactEnvironment extends JavaScriptEnvironment {
+  lastReactDOM: typeof ReactDOM | null = null
+
   beforeEvaluate({ host }: BeforeEvaluateOptions) {
-    ReactDOM.unmountComponentAtNode(host)
+    this.lastReactDOM?.unmountComponentAtNode(host)
   }
 
-  afterEvaluate({ context, host }: AfterEvaluateOptions) {
+  afterEvaluate({ context, host, require }: AfterEvaluateOptions) {
+    const currentReactDOM = require('react-dom') as typeof ReactDOM
+    this.lastReactDOM = currentReactDOM
+
     const EntryComponent = context.requireCache[context.entry]
 
     if (
@@ -21,7 +26,7 @@ class ReactEnvironment extends JavaScriptEnvironment {
       hasProperty(EntryComponent, 'default')
     ) {
       const Component = EntryComponent.default as React.FunctionComponent
-      ReactDOM.render(<Component />, host)
+      currentReactDOM.render(<Component />, host)
     }
 
     const renderedElement = host.firstElementChild as HTMLElement | undefined

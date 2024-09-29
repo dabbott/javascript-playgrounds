@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import screenfull from 'screenfull'
 import diff, { DiffRange } from '../../utils/Diff'
 import { InternalOptions, WorkspaceStep } from '../../utils/options'
@@ -65,6 +65,7 @@ export default function App({
   workspaces,
   typescript,
   detectedModules,
+  registerBundledModules,
   compiler,
   onChange,
 }: Props) {
@@ -100,6 +101,7 @@ export default function App({
         activeStepIndex={activeStepIndex}
         onChangeActiveStepIndex={setActiveStepIndex}
         detectedModules={detectedModules}
+        registerBundledModules={registerBundledModules}
         diff={diff}
         // Merge props from the current workspace step
         {...(workspaces.length > 0

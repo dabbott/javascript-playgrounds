@@ -26,6 +26,7 @@ export interface BeforeEvaluateOptions {
 export interface AfterEvaluateOptions {
   context: EvaluationContext
   host: HTMLDivElement
+  require: (name: string) => unknown
 }
 
 class JavaScriptSandbox {
@@ -53,10 +54,6 @@ class JavaScriptSandbox {
   ) => {
     const { fileMap, entry, requireCache } = context
     let { environment, assetRoot } = this
-
-    if (environment.hasModule(name)) {
-      return environment.requireModule(name)
-    }
 
     // If name begins with . or ..
     if (name.match(/^\.{1,2}\//)) {
@@ -103,6 +100,8 @@ class JavaScriptSandbox {
       }
 
       return requireCache[name]
+    } else if (environment.hasModule(name)) {
+      return environment.requireModule(name)
     } else {
       throw new Error(`Failed to resolve module ${name}`)
     }
@@ -133,7 +132,11 @@ class JavaScriptSandbox {
 
       this.evaluate(entry, fileMap[entry], context)
 
-      environment.afterEvaluate({ context, host })
+      environment.afterEvaluate({
+        context,
+        host,
+        require: (name: string) => this.require(context, name, entry),
+      })
     } catch (e) {
       onError(codeVersion, e as Error)
     }
@@ -182,23 +185,26 @@ export class JavaScriptEnvironment implements IEnvironment {
     styles,
     modules,
     detectedModules,
+    registerBundledModules,
   }: EnvironmentOptions) {
-    // Since these are already loaded anyway, there's no real cost to exposing them.
-    // Always register them even for pure JS
-    this.nodeModules['react'] = React
-    this.nodeModules['react-dom'] = ReactDOM
-    this.nodeModules['prop-types'] = PropTypes
+    if (registerBundledModules) {
+      // Since these are already loaded anyway, there's no real cost to exposing them.
+      // Always register them even for pure JS
+      this.nodeModules['react'] = React
+      this.nodeModules['react-dom'] = ReactDOM
+      this.nodeModules['prop-types'] = PropTypes
 
-    Object.assign(window, {
-      React,
-      ReactDOM,
-      PropTypes,
-    })
+      Object.assign(window, {
+        React,
+        ReactDOM,
+        PropTypes,
+      })
+    }
 
     return this.loadExternalModules({
       modules,
       detectedModules,
-      hasModule: this.hasModule,
+      hasModule: registerBundledModules ? this.hasModule : () => false,
     }).then(() => {
       const { appElement, wrapperElement } = createAppLayout(document, styles)
 
@@ -263,9 +269,9 @@ export class JavaScriptEnvironment implements IEnvironment {
     const normalizedModules = modules.filter(({ name }) => !hasModule(name))
 
     // Only download detected modules that aren't also listed as vendor components
-    const detectedModulesToDownload = detectedModules.filter(
-      ({ name }) => !normalizedModules.some((m) => m.name === name)
-    )
+    const detectedModulesToDownload = detectedModules
+      .filter(({ name }) => !hasModule(name))
+      .filter(({ name }) => !normalizedModules.some((m) => m.name === name))
 
     return VendorComponents.load([
       ...normalizedModules,

@@ -14,6 +14,7 @@ const {
   id = '0',
   assetRoot = '',
   detectedModules: rawDetectedModules = '[]',
+  registerBundledModules = 'true',
   modules: rawModules = '[]',
   styleSheet = 'reset',
   css = '',
@@ -85,6 +86,7 @@ asyncEnvironment.then((environment: IEnvironment) => {
     detectedModules: JSON.parse(rawDetectedModules).map(
       VendorComponents.normalizeExternalModule
     ),
+    registerBundledModules: registerBundledModules === 'true',
   }
 
   return environment.initialize(options).then(handleEnvironmentReady)

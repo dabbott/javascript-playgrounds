@@ -1,23 +1,23 @@
-import React, { CSSProperties, memo, useState } from 'react'
+import React, { memo, useState } from 'react'
+import { useOptions } from '../../../contexts/OptionsContext'
 import { ConsoleCommand, LogCommand } from '../../../types/Messages'
+import { PlayerPaneOptions } from '../../../utils/Panes'
 import {
   columnStyle,
   mergeStyles,
   prefixObject,
   rowStyle,
 } from '../../../utils/Styles'
+import type { ExternalModule } from '../../player/VendorComponents'
 import Button from '../Button'
 import Console from '../Console'
 import Header from '../Header'
-import PlayerFrame from '../PlayerFrame'
-import Status from '../Status'
-import { PlayerPaneOptions } from '../../../utils/Panes'
-import { ExternalStyles } from '../Workspace'
-import type { ExternalModule } from '../../player/VendorComponents'
-import { ReloadIcon } from '../Icons'
 import HeaderLink from '../HeaderLink'
+import { ReloadIcon } from '../Icons'
+import PlayerFrame from '../PlayerFrame'
 import { HorizontalSpacer } from '../Spacer'
-import { useOptions } from '../../../contexts/OptionsContext'
+import Status from '../Status'
+import { ExternalStyles } from '../Workspace'
 
 const styles = prefixObject({
   playerPane: mergeStyles(columnStyle, { flex: '0 0 auto' }),
@@ -32,6 +32,7 @@ export interface Props {
   sharedEnvironment: boolean
   files: Record<string, string>
   detectedModules: ExternalModule[]
+  registerBundledModules: boolean
   logs: LogCommand[]
   onPlayerRun: () => void
   onPlayerReady: () => void
@@ -55,6 +56,7 @@ const PlayerPane = memo(
       onPlayerError,
       onPlayerConsole,
       detectedModules,
+      registerBundledModules,
     },
     ref
   ) {
@@ -112,6 +114,7 @@ const PlayerPane = memo(
               assetRoot={assetRoot}
               detectedModules={detectedModules}
               modules={modules}
+              registerBundledModules={registerBundledModules}
               styleSheet={styleSheet}
               css={css}
               prelude={prelude}
