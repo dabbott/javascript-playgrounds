@@ -148,8 +148,29 @@ class JavaScriptSandbox {
    * @param context
    */
   evaluate(moduleName: string, code: string, context: EvaluationContext) {
-    const f = new Function('exports', 'require', 'module', 'console', code)
+    // Handle CSS modules
+    if (moduleName.endsWith('.css')) {
+      const styleId = `style-${moduleName}`
+      let styleElement = document.getElementById(styleId)
 
+      if (styleElement) {
+        // Update existing style element
+        styleElement.textContent = code
+      } else {
+        // Create new style element
+        styleElement = document.createElement('style')
+        styleElement.id = styleId
+        styleElement.textContent = code
+        document.head.appendChild(styleElement)
+      }
+
+      // Cache an empty exports object to mark this CSS as loaded
+      context.requireCache[moduleName] = {}
+      return
+    }
+
+    // Handle regular JS/TS modules
+    const f = new Function('exports', 'require', 'module', 'console', code)
     const exports = {}
     const module = { exports }
     const requireModule = (name: string) =>
